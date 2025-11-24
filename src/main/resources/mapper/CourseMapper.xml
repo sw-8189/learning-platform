@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nchu.learningplatform.mapper.CourseMapper">
+
+    <resultMap id="CourseResultMap" type="com.nchu.learningplatform.entity.Course">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="level" property="level"/>
+        <result column="category" property="category"/>
+        <result column="cover_url" property="coverUrl"/>
+        <result column="teacher" property="teacher"/>
+        <result column="price" property="price"/>
+    </resultMap>
+
+    <!-- 分页查询课程列表 -->
+    <select id="pageQuery" resultMap="CourseResultMap">
+        SELECT
+        id,
+        title,
+        description,
+        level,
+        category,
+        cover_url,
+        teacher,
+        price
+        FROM course
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%')
+                OR description LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 统计总数 -->
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+        FROM course
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%')
+                OR description LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 id 查询课程详情 -->
+    <select id="findById" resultMap="CourseResultMap">
+        SELECT
+            id,
+            title,
+            description,
+            level,
+            category,
+            cover_url,
+            teacher,
+            price
+        FROM course
+        WHERE id = #{id}
+    </select>
+
+</mapper>

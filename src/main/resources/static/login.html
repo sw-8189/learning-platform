@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧学习平台 - 用户登录</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+</head>
+<body>
+<!-- 导航栏：只有返回首页 -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="#3182ce"/>
+                    <path d="M8 10h16v2H8v-2zm0 4h16v2H8v-2zm0 4h12v2H8v-2z" fill="white"/>
+                    <circle cx="24" cy="8" r="3" fill="#ed8936"/>
+                </svg>
+            </div>
+            <span class="brand-text">智慧学习平台</span>
+        </div>
+
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">返回首页</a></li>
+        </ul>
+
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<main class="main-content login-container">
+    <div class="login-content">
+        <div class="login-image">
+            <img src="image/登录界面图片.png" alt="登录界面图片">
+        </div>
+
+        <div class="login-form-container">
+            <div class="login-card">
+                <div class="card-header register-header-center">
+                    <h1 class="form-title main-register-title">用户登录</h1>
+                    <p class="form-subtitle">欢迎回到智慧学习平台</p>
+                </div>
+
+                <form class="register-form" id="loginForm" novalidate>
+                    <!-- 用户名/手机号 -->
+                    <div class="form-group">
+                        <div class="input-container">
+                            <label for="loginUsername" class="form-label">用户名 / 手机号 <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" stroke="#a0aec0" stroke-width="2"/>
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#a0aec0" stroke-width="2"/>
+                                </svg>
+                                <input type="text" id="loginUsername" name="username" class="form-input"
+                                       placeholder="请输入用户名或手机号" autocomplete="username">
+                                <div class="input-status" id="loginUsernameStatus"></div>
+                            </div>
+                            <div class="input-hint">请输入注册时使用的用户名或手机号码</div>
+                        </div>
+                    </div>
+
+                    <!-- 密码 -->
+                    <div class="form-group">
+                        <div class="input-container">
+                            <label for="loginPassword" class="form-label">密码 <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"
+                                          stroke="#a0aec0" stroke-width="2"/>
+                                    <circle cx="12" cy="16" r="1" stroke="#a0aec0" stroke-width="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#a0aec0" stroke-width="2"/>
+                                </svg>
+                                <input type="password" id="loginPassword" name="password" class="form-input"
+                                       placeholder="请输入密码" autocomplete="current-password">
+                                <div class="input-status" id="loginPasswordStatus"></div>
+                                <button type="button" id="loginPasswordToggle" class="toggle-btn">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                                              stroke="#a0aec0" stroke-width="2"/>
+                                        <circle cx="12" cy="12" r="3" stroke="#a0aec0" stroke-width="2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作区 -->
+                    <div class="form-section">
+                        <div class="form-actions form-actions-centered">
+                            <button type="submit" class="btn btn-primary" id="loginSubmitBtn">登录</button>
+                        </div>
+
+                        <div class="form-footer">
+                            <p>还没有账号？<a href="register.html" class="login-link">立即注册</a></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 class="footer-title">智慧学习平台</h3>
+                <p class="footer-desc">致力于为全球学习者提供优质的在线教育服务，让知识触手可及。</p>
+            </div>
+
+            <div class="footer-section">
+                <h4 class="footer-subtitle">联系我们</h4>
+                <div class="contact-info">
+                    <p>📞 客服热线：400-123-4567</p>
+                    <p>📧 邮箱：service@example.com</p>
+                    <p>🕒 服务时间：9:00-21:00</p>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4 class="footer-subtitle">重要链接</h4>
+                <ul class="footer-links">
+                    <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
+                           rel="noopener noreferrer">关于我们</a></li>
+                    <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
+                           rel="noopener noreferrer">用户协议</a></li>
+                    <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
+                           rel="noopener noreferrer">隐私政策</a></li>
+                    <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
+                           rel="noopener noreferrer">合作院校</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p class="copyright">© 2025 智慧学习平台. 保留所有权利.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>

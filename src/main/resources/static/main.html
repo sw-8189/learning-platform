@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习空间 - 智慧学习平台</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="gradient-bg">
+<div id="app" class="app-layout">
+    <!-- 左侧侧边栏 -->
+    <aside class="sidebar glass-sidebar">
+        <div class="sidebar-header">
+            <div class="nav-brand">
+                <span class="brand-logo">📚</span>
+                <span class="brand-text">智慧学习平台</span>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item" :class="{active: activeTab === 'profile'}" @click="switchTab('profile')">
+                个人中心
+            </li>
+            <ul class="sidebar-submenu">
+                <li class="sidebar-subitem" :class="{active: activeSubTab === 'profile-info'}" @click="switchSubTab('profile-info')">
+                    我的信息
+                </li>
+                <li class="sidebar-subitem" :class="{active: activeSubTab === 'profile-course'}" @click="switchSubTab('profile-course')">
+                    我的课程
+                </li>
+            </ul>
+            <li class="sidebar-item" :class="{active: activeTab === 'course-center'}" @click="switchTab('course-center')">
+                课程中心
+            </li>
+            <li class="sidebar-item" :class="{active: activeTab === 'community'}" @click="switchTab('community')">
+                学习社区
+            </li>
+            <li class="sidebar-item" :class="{active: activeTab === 'admin'}" id="adminMenuItem" style="display: none;">
+                管理后台
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="ghost-btn full" @click="logout">退出登录</button>
+        </div>
+    </aside>
+
+    <!-- 右侧主内容 -->
+    <main class="main-content">
+        <!-- 我的信息 -->
+        <section v-show="activeTab === 'profile' && activeSubTab === 'profile-info'" class="tab-panel active glass-panel">
+            <h2 class="panel-title">我的信息</h2>
+            <p class="panel-subtitle">我们会基于你的基础信息和学习画像，为你推荐更合适的学习路径。</p>
+
+            <div class="profile-layout">
+                <div class="profile-avatar-card">
+                    <div class="profile-avatar-wrapper">
+                        <img
+                                :src="user.avatarUrl || '/image/avatar/default-avatar.png'"
+                                alt="用户头像"
+                                onerror="this.onerror=null;this.src='/image/avatar/default-avatar.png';"
+                        />
+                    </div>
+                    <div class="profile-basic">
+                        <div class="profile-label">角色</div>
+                        <div class="profile-role">{{ user.role || '普通用户' }}</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-card">
+                    <div class="info-row">
+                        <span class="info-label">用户名</span>
+                        <span class="info-value">{{ user.username || '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">手机号</span>
+                        <span class="info-value">{{ user.phone || '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">邮箱</span>
+                        <span class="info-value">{{ user.email || '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">性别</span>
+                        <span class="info-value">{{ user.gender || '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">学习偏好</span>
+                        <span class="info-value">{{ user.learningPreference || '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">课程兴趣</span>
+                        <span class="info-value">{{ user.courseInterest || '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">学习目标</span>
+                        <span class="info-value">{{ user.learningGoal || '-' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel form-panel">
+                <h3 class="panel-title">编辑个人信息</h3>
+
+                <form id="profileForm" class="inline-form" @submit.prevent="updateUserInfo">
+                    <!-- 头像上传 -->
+                    <div class="form-group avatar-group">
+                        <label class="form-label">头像</label>
+                        <div class="avatar-upload-container">
+                            <div class="avatar-upload" @click="triggerAvatarUpload">
+                                <div class="avatar-preview">
+                                    <img :src="editUser.avatarUrl || '/image/avatar/default-avatar.png'"
+                                         alt="头像预览"
+                                         onerror="this.onerror=null;this.src='/image/avatar/default-avatar.png';">
+                                </div>
+                                <input type="file" ref="avatarInput" accept="image/*" class="avatar-input" @change="handleAvatarChange">
+                                <div class="avatar-overlay">
+                                    <span class="upload-text">点击上传</span>
+                                </div>
+                            </div>
+                            <div class="avatar-hint">支持 JPG、PNG 格式，文件大小不超过 2MB</div>
+                        </div>
+                    </div>
+
+                    <!-- 用户名 -->
+                    <div class="form-group">
+                        <label class="form-label">用户名</label>
+                        <input type="text" v-model="editUser.username" class="form-input">
+                    </div>
+
+                    <!-- 性别 -->
+                    <div class="form-group">
+                        <label class="form-label">性别</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="editGender" value="男" v-model="editUser.gender"> 男
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="editGender" value="女" v-model="editUser.gender"> 女
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="editGender" value="保密" v-model="editUser.gender"> 保密
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 学习偏好（多选） -->
+                    <div class="form-group">
+                        <label class="form-label">学习偏好</label>
+                        <div class="checkbox-group grid-3">
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="视觉学习" v-model="editUser.learningPreference"> 视觉学习
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="听觉学习" v-model="editUser.learningPreference"> 听觉学习
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="动手实践" v-model="editUser.learningPreference"> 动手实践
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="阅读写作" v-model="editUser.learningPreference"> 阅读写作
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="社交学习" v-model="editUser.learningPreference"> 社交学习
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="独立学习" v-model="editUser.learningPreference"> 独立学习
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 课程兴趣（多选） -->
+                    <div class="form-group">
+                        <label class="form-label">课程兴趣</label>
+                        <div class="checkbox-group grid-3">
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="编程开发" v-model="editUser.courseInterest"> 编程开发
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="数据科学" v-model="editUser.courseInterest"> 数据科学
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="人工智能" v-model="editUser.courseInterest"> 人工智能
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="设计创意" v-model="editUser.courseInterest"> 设计创意
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="商业管理" v-model="editUser.courseInterest"> 商业管理
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="职业技能" v-model="editUser.courseInterest"> 职业技能
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 学习目标（单选） -->
+                    <div class="form-group">
+                        <label class="form-label">学习目标</label>
+                        <div class="radio-group grid-4">
+                            <label class="radio-item">
+                                <input type="radio" name="editLearningGoal" value="职业提升" v-model="editUser.learningGoal"> 职业提升
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="editLearningGoal" value="技能拓展" v-model="editUser.learningGoal"> 技能拓展
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="editLearningGoal" value="学术深造" v-model="editUser.learningGoal"> 学术深造
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="editLearningGoal" value="兴趣爱好" v-model="editUser.learningGoal"> 兴趣爱好
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="primary-btn">保存修改</button>
+                    <div v-if="updateMessage" class="success-text">{{ updateMessage }}</div>
+                    <div v-if="updateError" class="error-text">{{ updateError }}</div>
+                </form>
+            </div>
+
+
+            <div class="glass-panel form-panel">
+                <h3 class="panel-title">修改密码</h3>
+                <form id="passwordForm" class="inline-form" @submit.prevent="updatePassword">
+                    <div class="form-group">
+                        <label for="oldPassword" class="form-label">当前密码</label>
+                        <input type="password" id="oldPassword" v-model="passwordForm.oldPassword" placeholder="请输入当前密码" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">新密码</label>
+                        <input type="password" id="newPassword" v-model="passwordForm.newPassword" placeholder="至少 8 位，建议包含字母与数字" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmNewPassword" class="form-label">确认新密码</label>
+                        <input type="password" id="confirmNewPassword" v-model="passwordForm.confirmNewPassword" placeholder="再次输入新密码" class="form-input">
+                    </div>
+                    <button type="submit" class="primary-btn">修改密码</button>
+                    <div v-if="passwordMessage" class="success-text">{{ passwordMessage }}</div>
+                    <div v-if="passwordError" class="error-text">{{ passwordError }}</div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 我的课程 -->
+        <section v-show="activeTab === 'profile' && activeSubTab === 'profile-course'" class="tab-panel glass-panel">
+            <h2 class="panel-title">我的课程</h2>
+            <p class="panel-subtitle">你正在学习或已加入的课程。</p>
+            <div id="my-course-list" class="card-grid">
+                <div v-for="course in myCourses" :key="course.id" class="feature-card">
+                    <div class="course-image">
+                        <img :src="course.coverUrl || '/image/course/default-course.png'" :alt="course.title">
+                    </div>
+                    <h3 class="course-title">{{ course.title }}</h3>
+                    <p class="course-description">{{ course.description }}</p>
+                    <div class="course-meta">
+                        <span class="course-level">{{ course.level }}</span>
+                        <span class="course-category">{{ course.category }}</span>
+                    </div>
+                    <div class="course-teacher">讲师：{{ course.teacher }}</div>
+                </div>
+                <div v-if="myCourses.length === 0" class="no-courses">
+                    您还没有加入任何课程
+                </div>
+            </div>
+        </section>
+
+        <!-- 课程中心 -->
+        <section v-show="activeTab === 'course-center'" class="tab-panel glass-panel">
+            <h2 class="panel-title">课程中心</h2>
+            <p class="panel-subtitle">根据你的基础与目标推荐合适课程。</p>
+
+            <div class="search-bar">
+                <input type="text" v-model="searchKeyword" placeholder="搜索课程..." @keyup.enter="searchCourses">
+                <button @click="searchCourses" class="btn btn-primary">搜索</button>
+            </div>
+
+            <div id="course-list" class="card-grid">
+                <div v-for="course in courses" :key="course.id" class="feature-card">
+                    <div class="course-image">
+                        <img :src="course.coverUrl || '/image/course/default-course.png'" :alt="course.title">
+                    </div>
+                    <h3 class="course-title">{{ course.title }}</h3>
+                    <p class="course-description">{{ course.description }}</p>
+                    <div class="course-meta">
+                        <span class="course-level">{{ course.level }}</span>
+                        <span class="course-category">{{ course.category }}</span>
+                    </div>
+                    <div class="course-teacher">讲师：{{ course.teacher }}</div>
+                    <div class="course-price">¥{{ course.price }}</div>
+                    <button @click="joinCourse(course.id)" class="btn btn-primary join-course-btn">加入课程</button>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
+                <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
+                <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+            </div>
+        </section>
+
+        <!-- 学习社区 -->
+        <section v-show="activeTab === 'community'" class="tab-panel glass-panel">
+            <h2 class="panel-title">学习社区</h2>
+            <p class="panel-subtitle">与其他学习者一起讨论问题、分享经验、互相鼓励。</p>
+            <div class="community-placeholder">
+                社区功能建设中，后续可以接入讨论区 / 评论系统 / 积分体系等。
+            </div>
+        </section>
+
+        <!-- 管理后台 -->
+        <section v-show="activeTab === 'admin'" class="tab-panel glass-panel">
+            <h2 class="panel-title">管理后台</h2>
+            <p class="panel-subtitle">
+                当前仅作为占位示例。后续可以在此增加用户管理、课程管理、统计报表等模块。
+            </p>
+            <div class="community-placeholder">
+                管理员功能开发中……（仅 ADMIN 角色可以看到本入口）
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="/js/main.js"></script>
+</body>
+</html>

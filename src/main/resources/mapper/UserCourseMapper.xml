@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nchu.learningplatform.mapper.UserCourseMapper">
+
+    <resultMap id="UserCourseResultMap" type="com.nchu.learningplatform.entity.UserCourse">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="join_time" property="joinTime"/>
+    </resultMap>
+
+    <!-- 用户加入课程 -->
+    <insert id="insert" parameterType="com.nchu.learningplatform.entity.UserCourse"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_course(user_id, course_id, join_time)
+        VALUES (#{userId}, #{courseId}, #{joinTime})
+    </insert>
+
+    <!-- 根据用户 id 查询选课记录 -->
+    <select id="findByUserId" resultMap="UserCourseResultMap">
+        SELECT
+            id,
+            user_id,
+            course_id,
+            join_time
+        FROM user_course
+        WHERE user_id = #{userId}
+    </select>
+
+</mapper>
