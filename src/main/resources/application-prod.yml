@@ -1,0 +1,18 @@
+# 生产环境配置
+# 生产环境配置，使用环境变量
+
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?useSSL=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+app:
+  mail:
+    user: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+  
+  admin:
+    invite-code: ${ADMIN_INVITE_CODE}
+

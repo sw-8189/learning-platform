@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 智慧学习平台</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <style>
+        /* 管理员页面专用样式 */
+        .admin-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .admin-nav {
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .admin-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .stat-card .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        tr:hover {
+            background: #f7fafc;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .pagination button:hover {
+            background: #f7fafc;
+        }
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="admin-container">
+        <!-- 头部 -->
+        <div class="admin-header">
+            <h1>管理后台</h1>
+            <div>
+                <button class="btn btn-secondary" @click="goBack">返回主页</button>
+                <button class="btn btn-secondary" @click="logout" style="margin-left: 10px;">退出登录</button>
+            </div>
+        </div>
+
+        <!-- 导航 -->
+        <div class="admin-nav">
+            <button class="nav-btn" :class="{active: activeTab === 'users'}" @click="switchTab('users')">用户管理</button>
+            <button class="nav-btn" :class="{active: activeTab === 'courses'}" @click="switchTab('courses')">课程管理</button>
+            <button class="nav-btn" :class="{active: activeTab === 'statistics'}" @click="switchTab('statistics')">数据统计</button>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="admin-content">
+            <!-- 用户管理 -->
+            <div v-show="activeTab === 'users'">
+                <h2>用户管理</h2>
+                <div class="search-box">
+                    <input type="text" v-model="userKeyword" placeholder="搜索用户名、邮箱或手机号..." @input="searchUsers">
+                    <button class="btn btn-primary" @click="loadUsers">搜索</button>
+                </div>
+                <div class="table-container" v-if="!usersLoading">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>手机号</th>
+                                <th>角色</th>
+                                <th>性别</th>
+                                <th>注册时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="user in users" :key="user.id">
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.phone || '-' }}</td>
+                                <td>
+                                    <span :style="{color: user.role === 'ADMIN' ? '#e53e3e' : '#718096'}">
+                                        {{ user.role === 'ADMIN' ? '管理员' : '普通用户' }}
+                                    </span>
+                                </td>
+                                <td>{{ user.gender || '-' }}</td>
+                                <td>{{ formatDate(user.createTime) }}</td>
+                                <td>
+                                    <button class="btn btn-danger" @click="confirmDeleteUser(user)">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination" v-if="userTotalPages > 1">
+                        <button @click="prevUserPage" :disabled="userPage === 1">上一页</button>
+                        <button v-for="p in userTotalPages" :key="p" 
+                                :class="{active: p === userPage}" 
+                                @click="userPage = p; loadUsers()">
+                            {{ p }}
+                        </button>
+                        <button @click="nextUserPage" :disabled="userPage === userTotalPages">下一页</button>
+                    </div>
+                </div>
+                <div class="loading" v-else>加载中...</div>
+            </div>
+
+            <!-- 课程管理 -->
+            <div v-show="activeTab === 'courses'">
+                <h2>课程管理</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" @click="showAddCourseModal">添加课程</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" v-model="courseKeyword" placeholder="搜索课程标题..." @input="searchCourses">
+                    <button class="btn btn-primary" @click="loadCourses">搜索</button>
+                </div>
+                <div class="table-container" v-if="!coursesLoading">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>标题</th>
+                                <th>分类</th>
+                                <th>难度</th>
+                                <th>讲师</th>
+                                <th>价格</th>
+                                <th>学习人数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="course in courses" :key="course.id">
+                                <td>{{ course.id }}</td>
+                                <td>{{ course.title }}</td>
+                                <td>{{ course.category || '-' }}</td>
+                                <td>{{ course.level || '-' }}</td>
+                                <td>{{ course.teacher || '-' }}</td>
+                                <td>{{ course.price || 0 }}元</td>
+                                <td>{{ course.studentCount || 0 }}</td>
+                                <td>
+                                    <button class="btn btn-primary" @click="editCourse(course)">编辑</button>
+                                    <button class="btn btn-danger" @click="confirmDeleteCourse(course)" style="margin-left: 5px;">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination" v-if="courseTotalPages > 1">
+                        <button @click="prevCoursePage" :disabled="coursePage === 1">上一页</button>
+                        <button v-for="p in courseTotalPages" :key="p" 
+                                :class="{active: p === coursePage}" 
+                                @click="coursePage = p; loadCourses()">
+                            {{ p }}
+                        </button>
+                        <button @click="nextCoursePage" :disabled="coursePage === courseTotalPages">下一页</button>
+                    </div>
+                </div>
+                <div class="loading" v-else>加载中...</div>
+            </div>
+
+            <!-- 数据统计 -->
+            <div v-show="activeTab === 'statistics'">
+                <h2>数据统计</h2>
+                <div class="stats-grid" v-if="statistics">
+                    <div class="stat-card">
+                        <h3>总用户数</h3>
+                        <p class="stat-value">{{ statistics.totalUsers || 0 }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总课程数</h3>
+                        <p class="stat-value">{{ statistics.totalCourses || 0 }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>管理员数量</h3>
+                        <p class="stat-value">{{ statistics.adminCount || 0 }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>选课总数</h3>
+                        <p class="stat-value">{{ statistics.totalEnrollments || 0 }}</p>
+                    </div>
+                </div>
+                <div class="chart-container" id="categoryChart"></div>
+                <div class="chart-container" id="levelChart"></div>
+            </div>
+        </div>
+
+        <!-- 添加/编辑课程模态框 -->
+        <div class="modal" :class="{active: showCourseModal}" @click.self="closeCourseModal">
+            <div class="modal-content">
+                <h2>{{ editingCourse ? '编辑课程' : '添加课程' }}</h2>
+                <form @submit.prevent="saveCourse">
+                    <div class="form-group">
+                        <label>课程标题 *</label>
+                        <input type="text" v-model="courseForm.title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>课程描述</label>
+                        <textarea v-model="courseForm.description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>详细描述</label>
+                        <textarea v-model="courseForm.detailDescription"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select v-model="courseForm.category">
+                            <option value="">请选择</option>
+                            <option value="编程开发">编程开发</option>
+                            <option value="前端开发">前端开发</option>
+                            <option value="后端开发">后端开发</option>
+                            <option value="数据科学">数据科学</option>
+                            <option value="设计创意">设计创意</option>
+                            <option value="商业管理">商业管理</option>
+                            <option value="职业技能">职业技能</option>
+                            <option value="人工智能">人工智能</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>难度</label>
+                        <select v-model="courseForm.level">
+                            <option value="">请选择</option>
+                            <option value="初级">初级</option>
+                            <option value="中级">中级</option>
+                            <option value="高级">高级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>讲师</label>
+                        <input type="text" v-model="courseForm.teacher">
+                    </div>
+                    <div class="form-group">
+                        <label>讲师介绍</label>
+                        <textarea v-model="courseForm.teacherIntro"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>价格</label>
+                        <input type="number" v-model.number="courseForm.price" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>课程时长</label>
+                        <input type="text" v-model="courseForm.duration" placeholder="如：40小时">
+                    </div>
+                    <div class="form-group">
+                        <label>课程封面</label>
+                        <input type="file" @change="handleCoverChange" accept="image/*">
+                    </div>
+                    <div class="btn-group" style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <button type="button" class="btn btn-secondary" @click="closeCourseModal">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    activeTab: 'users',
+                    token: token,
+                    // 用户管理
+                    users: [],
+                    userPage: 1,
+                    userSize: 10,
+                    userKeyword: '',
+                    userTotal: 0,
+                    usersLoading: false,
+                    // 课程管理
+                    courses: [],
+                    coursePage: 1,
+                    courseSize: 10,
+                    courseKeyword: '',
+                    courseTotal: 0,
+                    coursesLoading: false,
+                    showCourseModal: false,
+                    editingCourse: null,
+                    courseForm: {
+                        title: '',
+                        description: '',
+                        detailDescription: '',
+                        category: '',
+                        level: '',
+                        teacher: '',
+                        teacherIntro: '',
+                        price: 0,
+                        duration: ''
+                    },
+                    coverFile: null,
+                    // 统计数据
+                    statistics: null,
+                    categoryChart: null,
+                    levelChart: null
+                }
+            },
+            computed: {
+                userTotalPages() {
+                    return Math.ceil(this.userTotal / this.userSize);
+                },
+                courseTotalPages() {
+                    return Math.ceil(this.courseTotal / this.courseSize);
+                }
+            },
+            mounted() {
+                this.checkAdminPermission();
+                this.loadUsers();
+            },
+            methods: {
+                async checkAdminPermission() {
+                    try {
+                        const response = await axios.get('/api/users/me', {
+                            headers: { Authorization: this.token }
+                        });
+                        if (response.data.role !== 'ADMIN') {
+                            alert('您没有管理员权限');
+                            window.location.href = 'main.html';
+                        }
+                    } catch (error) {
+                        console.error('权限验证失败:', error);
+                        window.location.href = 'login.html';
+                    }
+                },
+                switchTab(tab) {
+                    this.activeTab = tab;
+                    if (tab === 'users') {
+                        this.loadUsers();
+                    } else if (tab === 'courses') {
+                        this.loadCourses();
+                    } else if (tab === 'statistics') {
+                        this.loadStatistics();
+                    }
+                },
+                // 用户管理
+                async loadUsers() {
+                    this.usersLoading = true;
+                    try {
+                        const response = await axios.get('/api/admin/users', {
+                            headers: { Authorization: this.token },
+                            params: {
+                                page: this.userPage,
+                                size: this.userSize,
+                                keyword: this.userKeyword || undefined
+                            }
+                        });
+                        this.users = response.data.list || [];
+                        this.userTotal = response.data.total || 0;
+                    } catch (error) {
+                        console.error('加载用户列表失败:', error);
+                        alert(error.response?.data?.message || '加载用户列表失败');
+                    } finally {
+                        this.usersLoading = false;
+                    }
+                },
+                searchUsers() {
+                    this.userPage = 1;
+                    this.loadUsers();
+                },
+                prevUserPage() {
+                    if (this.userPage > 1) {
+                        this.userPage--;
+                        this.loadUsers();
+                    }
+                },
+                nextUserPage() {
+                    if (this.userPage < this.userTotalPages) {
+                        this.userPage++;
+                        this.loadUsers();
+                    }
+                },
+                confirmDeleteUser(user) {
+                    if (confirm(`确定要删除用户 "${user.username}" 吗？此操作不可恢复！`)) {
+                        this.deleteUser(user.id);
+                    }
+                },
+                async deleteUser(userId) {
+                    try {
+                        await axios.delete(`/api/admin/users/${userId}`, {
+                            headers: { Authorization: this.token }
+                        });
+                        alert('用户删除成功');
+                        this.loadUsers();
+                    } catch (error) {
+                        console.error('删除用户失败:', error);
+                        alert(error.response?.data?.message || '删除用户失败');
+                    }
+                },
+                // 课程管理
+                async loadCourses() {
+                    this.coursesLoading = true;
+                    try {
+                        const response = await axios.get('/api/admin/courses', {
+                            headers: { Authorization: this.token },
+                            params: {
+                                page: this.coursePage,
+                                size: this.courseSize,
+                                keyword: this.courseKeyword || undefined
+                            }
+                        });
+                        this.courses = response.data.list || [];
+                        this.courseTotal = response.data.total || 0;
+                    } catch (error) {
+                        console.error('加载课程列表失败:', error);
+                        alert(error.response?.data?.message || '加载课程列表失败');
+                    } finally {
+                        this.coursesLoading = false;
+                    }
+                },
+                searchCourses() {
+                    this.coursePage = 1;
+                    this.loadCourses();
+                },
+                prevCoursePage() {
+                    if (this.coursePage > 1) {
+                        this.coursePage--;
+                        this.loadCourses();
+                    }
+                },
+                nextCoursePage() {
+                    if (this.coursePage < this.courseTotalPages) {
+                        this.coursePage++;
+                        this.loadCourses();
+                    }
+                },
+                showAddCourseModal() {
+                    this.editingCourse = null;
+                    this.courseForm = {
+                        title: '',
+                        description: '',
+                        detailDescription: '',
+                        category: '',
+                        level: '',
+                        teacher: '',
+                        teacherIntro: '',
+                        price: 0,
+                        duration: ''
+                    };
+                    this.coverFile = null;
+                    this.showCourseModal = true;
+                },
+                editCourse(course) {
+                    this.editingCourse = course;
+                    this.courseForm = {
+                        title: course.title || '',
+                        description: course.description || '',
+                        detailDescription: course.detailDescription || '',
+                        category: course.category || '',
+                        level: course.level || '',
+                        teacher: course.teacher || '',
+                        teacherIntro: course.teacherIntro || '',
+                        price: course.price || 0,
+                        duration: course.duration || ''
+                    };
+                    this.coverFile = null;
+                    this.showCourseModal = true;
+                },
+                closeCourseModal() {
+                    this.showCourseModal = false;
+                    this.editingCourse = null;
+                },
+                handleCoverChange(e) {
+                    this.coverFile = e.target.files[0];
+                },
+                async saveCourse() {
+                    const formData = new FormData();
+                    formData.append('title', this.courseForm.title);
+                    if (this.courseForm.description) formData.append('description', this.courseForm.description);
+                    if (this.courseForm.detailDescription) formData.append('detailDescription', this.courseForm.detailDescription);
+                    if (this.courseForm.category) formData.append('category', this.courseForm.category);
+                    if (this.courseForm.level) formData.append('level', this.courseForm.level);
+                    if (this.courseForm.teacher) formData.append('teacher', this.courseForm.teacher);
+                    if (this.courseForm.teacherIntro) formData.append('teacherIntro', this.courseForm.teacherIntro);
+                    formData.append('price', this.courseForm.price || 0);
+                    if (this.courseForm.duration) formData.append('duration', this.courseForm.duration);
+                    if (this.coverFile) formData.append('cover', this.coverFile);
+
+                    try {
+                        if (this.editingCourse) {
+                            await axios.put(`/api/admin/courses/${this.editingCourse.id}`, formData, {
+                                headers: { Authorization: this.token, 'Content-Type': 'multipart/form-data' }
+                            });
+                            alert('课程更新成功');
+                        } else {
+                            await axios.post('/api/admin/courses', formData, {
+                                headers: { Authorization: this.token, 'Content-Type': 'multipart/form-data' }
+                            });
+                            alert('课程添加成功');
+                        }
+                        this.closeCourseModal();
+                        this.loadCourses();
+                    } catch (error) {
+                        console.error('保存课程失败:', error);
+                        alert(error.response?.data?.message || '保存课程失败');
+                    }
+                },
+                confirmDeleteCourse(course) {
+                    if (confirm(`确定要删除课程 "${course.title}" 吗？此操作不可恢复！`)) {
+                        this.deleteCourse(course.id);
+                    }
+                },
+                async deleteCourse(courseId) {
+                    try {
+                        await axios.delete(`/api/admin/courses/${courseId}`, {
+                            headers: { Authorization: this.token }
+                        });
+                        alert('课程删除成功');
+                        this.loadCourses();
+                    } catch (error) {
+                        console.error('删除课程失败:', error);
+                        alert(error.response?.data?.message || '删除课程失败');
+                    }
+                },
+                // 数据统计
+                async loadStatistics() {
+                    try {
+                        const response = await axios.get('/api/admin/statistics', {
+                            headers: { Authorization: this.token }
+                        });
+                        this.statistics = response.data;
+                        this.$nextTick(() => {
+                            this.renderCharts();
+                        });
+                    } catch (error) {
+                        console.error('加载统计数据失败:', error);
+                        alert(error.response?.data?.message || '加载统计数据失败');
+                    }
+                },
+                renderCharts() {
+                    if (this.statistics && this.statistics.categoryDistribution) {
+                        this.renderCategoryChart();
+                    }
+                    if (this.statistics && this.statistics.levelDistribution) {
+                        this.renderLevelChart();
+                    }
+                },
+                renderCategoryChart() {
+                    const chartDom = document.getElementById('categoryChart');
+                    if (!chartDom) return;
+                    const myChart = echarts.init(chartDom);
+                    const categoryDist = this.statistics.categoryDistribution || {};
+                    const data = Object.keys(categoryDist).map(key => ({
+                        value: categoryDist[key],
+                        name: key
+                    }));
+                    const option = {
+                        title: { text: '课程分类分布', left: 'center' },
+                        tooltip: { trigger: 'item' },
+                        series: [{
+                            type: 'pie',
+                            data: data,
+                            emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
+                        }]
+                    };
+                    myChart.setOption(option);
+                    this.categoryChart = myChart;
+                },
+                renderLevelChart() {
+                    const chartDom = document.getElementById('levelChart');
+                    if (!chartDom) return;
+                    const myChart = echarts.init(chartDom);
+                    const levelDist = this.statistics.levelDistribution || {};
+                    const categories = Object.keys(levelDist);
+                    const values = Object.values(levelDist);
+                    const option = {
+                        title: { text: '课程难度分布', left: 'center' },
+                        tooltip: { trigger: 'axis' },
+                        xAxis: {
+                            type: 'category',
+                            data: categories
+                        },
+                        yAxis: { type: 'value' },
+                        series: [{
+                            data: values,
+                            type: 'bar',
+                            itemStyle: { color: '#667eea' }
+                        }]
+                    };
+                    myChart.setOption(option);
+                    this.levelChart = myChart;
+                },
+                formatDate(dateStr) {
+                    if (!dateStr) return '-';
+                    const date = new Date(dateStr);
+                    return date.toLocaleString('zh-CN');
+                },
+                goBack() {
+                    window.location.href = 'main.html';
+                },
+                logout() {
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
