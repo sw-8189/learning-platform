@@ -67,7 +67,8 @@ const validators = {
 // ================== 注册页 ==================
 (function initRegisterPage() {
     const form = document.getElementById('registerForm');
-    if (!form) return;
+    // 如果register.html中已经处理了表单提交，则跳过这里的处理
+    if (!form || form.hasAttribute('data-submit-handled')) return;
 
     const usernameInput = document.getElementById('username');
     const usernameStatus = document.getElementById('usernameStatus');
@@ -264,6 +265,15 @@ const validators = {
 
     // 表单提交：使用 FormData 发送 multipart/form-data，包括头像
     form.addEventListener('submit', async e => {
+        // 如果register.html已经处理了，立即返回，不执行任何操作
+        if (form.hasAttribute('data-submit-handled') || 
+            form.hasAttribute('data-registered') || 
+            window.registrationSuccess) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        }
         e.preventDefault();
 
         const username = usernameInput.value.trim();

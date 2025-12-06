@@ -121,4 +121,14 @@
     <update id="updateStatus">
         UPDATE user SET status = #{status} WHERE id = #{id}
     </update>
+
+    <!--  获取当前最大用户ID  -->
+    <select id="getMaxId" resultType="java.lang.Long">
+        SELECT IFNULL(MAX(id), 0) FROM user
+    </select>
+
+    <!--  重置AUTO_INCREMENT，使其等于指定值  -->
+    <update id="resetAutoIncrement">
+        ALTER TABLE user AUTO_INCREMENT = #{nextId}
+    </update>
 </mapper>

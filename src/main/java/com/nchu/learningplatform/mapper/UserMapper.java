@@ -39,4 +39,10 @@ public interface UserMapper {
 
     // 管理员功能：更新用户状态
     int updateStatus(@Param("id") Long id, @Param("status") String status);
+
+    // 获取当前最大用户ID
+    Long getMaxId();
+
+    // 重置AUTO_INCREMENT，使其等于指定值
+    void resetAutoIncrement(@Param("nextId") Long nextId);
 }

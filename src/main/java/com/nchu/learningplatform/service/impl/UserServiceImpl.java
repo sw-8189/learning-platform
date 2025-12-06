@@ -7,6 +7,7 @@ import com.nchu.learningplatform.entity.User;
 import com.nchu.learningplatform.mapper.UserMapper;
 import com.nchu.learningplatform.service.UserService;
 import jakarta.annotation.Resource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +86,44 @@ public class UserServiceImpl implements UserService {
         user.setCourseInterest(joinList(request.getCourseInterest()));
         user.setLearningGoal(request.getLearningGoal());
 
-        userMapper.insert(user);
+        try {
+            userMapper.insert(user);
+        } catch (DuplicateKeyException e) {
+            // 处理并发情况下的唯一性约束冲突
+            // 这种情况发生在：两个请求同时通过唯一性检查，然后都尝试插入
+            // 数据库的唯一性约束会阻止第二个插入
+            String exceptionMessage = e.getMessage();
+            if (exceptionMessage != null) {
+                String lowerMessage = exceptionMessage.toLowerCase();
+                if (lowerMessage.contains("username") || lowerMessage.contains("'user.username'")) {
+                    throw new RuntimeException("用户名已存在");
+                } else if (lowerMessage.contains("phone") || lowerMessage.contains("'user.phone'")) {
+                    throw new RuntimeException("手机号已被注册");
+                } else if (lowerMessage.contains("email") || lowerMessage.contains("'user.email'")) {
+                    throw new RuntimeException("邮箱已被注册");
+                }
+            }
+            // 如果无法确定具体字段，抛出通用错误
+            throw new RuntimeException("注册信息冲突，请检查用户名、手机号或邮箱是否已被使用");
+        } catch (Exception e) {
+            // 检查是否是SQL唯一性约束冲突
+            Throwable cause = e.getCause();
+            if (cause != null) {
+                String causeMessage = cause.getMessage();
+                if (causeMessage != null && causeMessage.contains("Duplicate entry")) {
+                    String lowerMessage = causeMessage.toLowerCase();
+                    if (lowerMessage.contains("username") || lowerMessage.contains("'user.username'")) {
+                        throw new RuntimeException("用户名已存在");
+                    } else if (lowerMessage.contains("phone") || lowerMessage.contains("'user.phone'")) {
+                        throw new RuntimeException("手机号已被注册");
+                    } else if (lowerMessage.contains("email") || lowerMessage.contains("'user.email'")) {
+                        throw new RuntimeException("邮箱已被注册");
+                    }
+                }
+            }
+            // 重新抛出原始异常
+            throw e;
+        }
     }
 
     @Override

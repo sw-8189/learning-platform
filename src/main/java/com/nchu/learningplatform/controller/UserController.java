@@ -6,6 +6,7 @@ import com.nchu.learningplatform.entity.User;
 import com.nchu.learningplatform.entity.UserCourse;
 import com.nchu.learningplatform.mapper.CourseMapper;
 import com.nchu.learningplatform.mapper.UserCourseMapper;
+import com.nchu.learningplatform.mapper.UserMapper;
 import com.nchu.learningplatform.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class UserController {
     private CourseMapper courseMapper;
 
     @Resource
-    private com.nchu.learningplatform.mapper.UserMapper userMapper;
+    private UserMapper userMapper;
 
     /**
      * 通过请求头里的 token 获取当前用户信息

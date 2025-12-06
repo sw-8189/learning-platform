@@ -435,6 +435,35 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+// 在script.js加载之前就标记表单已处理，防止重复绑定
+(function() {
+    // 重置注册成功标志（防止之前的注册状态影响新页面）
+    window.registrationSuccess = false;
+    
+    // 立即执行函数，在DOM加载前就设置标记
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            if (form) {
+                form.setAttribute('data-submit-handled', 'true');
+                // 确保移除之前的注册标记
+                form.removeAttribute('data-registered');
+            }
+        });
+    } else {
+        // DOM已经加载完成
+        const form = document.getElementById('registerForm');
+        if (form) {
+            form.setAttribute('data-submit-handled', 'true');
+            // 确保移除之前的注册标记
+            form.removeAttribute('data-registered');
+        }
+    }
+})();
+</script>
+
 <script src="/js/script.js"></script>
 
 <script>
@@ -442,15 +471,17 @@
 // 这里只需要注册页特定的功能代码
 
 // 在script.js执行之前就设置标志，防止重复绑定验证码发送事件
+// 注意：不要在这里设置 data-listener-bound，让 initRegisterPage 来绑定事件
 if (typeof window.sendCodeBtnBound === 'undefined') {
     window.sendCodeBtnBound = false;
 }
 // 立即设置标志，防止script.js中的代码绑定事件
 document.addEventListener('DOMContentLoaded', function() {
-    const sendCodeBtn = document.getElementById('sendCodeBtn');
-    if (sendCodeBtn) {
-        sendCodeBtn.setAttribute('data-listener-bound', 'true');
-        window.sendCodeBtnBound = true;
+    // 不要在这里设置 data-listener-bound，让 initRegisterPage 来绑定事件
+    // 只设置表单标记，防止 script.js 中的重复处理
+    const form = document.getElementById('registerForm');
+    if (form) {
+        form.setAttribute('data-submit-handled', 'true');
     }
 });
 
@@ -536,9 +567,21 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 
 // ================== 注册表单处理 ==================
+// 确保在DOM加载完成后执行
 (function initRegisterPage() {
+    // 如果DOM还未加载完成，等待加载完成
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initRegisterPage);
+        return;
+    }
+    
     const form = document.getElementById('registerForm');
-    if (!form) return;
+    if (!form) {
+        console.error('注册表单未找到，请检查HTML结构');
+        return;
+    }
+    
+    console.log('注册表单初始化完成，事件监听器已绑定');
 
     const usernameInput = document.getElementById('username');
     const usernameStatus = document.getElementById('usernameStatus');
@@ -699,6 +742,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailCodeStatus = document.getElementById('emailCodeStatus');
     let countdownTimer = null;
     let countdownSeconds = 0;
+    
+    // 防止重复提交的标志（必须在事件监听器外部定义）
+    let isSubmitting = false;
 
     function startCountdown(seconds) {
         // 清除之前的定时器，防止多个定时器同时运行导致跳动
@@ -740,29 +786,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 绑定发送验证码按钮事件（只绑定一次，避免重复发送）
-    // 使用全局标志确保只绑定一次
-    if (typeof window.sendCodeBtnBound === 'undefined') {
-        window.sendCodeBtnBound = false;
-    }
-    
     let isSendingCode = false; // 防止重复发送的标志
-    if (sendCodeBtn && !window.sendCodeBtnBound) {
-        window.sendCodeBtnBound = true;
+    
+    // 检查按钮是否已经绑定了事件监听器
+    if (sendCodeBtn && !sendCodeBtn.hasAttribute('data-listener-bound')) {
         sendCodeBtn.setAttribute('data-listener-bound', 'true');
+        console.log('绑定发送验证码按钮事件'); // 调试信息
         
         sendCodeBtn.addEventListener('click', async (e) => {
+            console.log('发送验证码按钮被点击'); // 调试信息
             e.preventDefault(); // 防止表单提交
             e.stopPropagation(); // 阻止事件冒泡
             e.stopImmediatePropagation(); // 阻止同一元素上的其他事件监听器
             
             // 检查按钮是否已禁用（倒计时期间）
-            if (actualSendCodeBtn.disabled || isSendingCode) {
+            if (sendCodeBtn.disabled || isSendingCode) {
+                console.log('按钮已禁用或正在发送中，忽略点击');
                 return;
             }
             
             if (!emailInput) {
                 console.error('邮箱输入框未找到');
                 alert('邮箱输入框未找到');
+                return;
+            }
+            
+            // 检查 validators 是否已定义
+            if (typeof validators === 'undefined') {
+                console.error('validators 未定义，请检查 script.js 是否已加载');
+                alert('页面初始化失败，请刷新页面重试');
                 return;
             }
             
@@ -785,8 +837,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // 设置发送标志，防止重复点击
             isSendingCode = true;
             try {
-                actualSendCodeBtn.disabled = true;
-                actualSendCodeBtn.textContent = '发送中...';
+                sendCodeBtn.disabled = true;
+                sendCodeBtn.textContent = '发送中...';
                 
                 // 使用 URLSearchParams 发送表单数据
                 const formData = new URLSearchParams();
@@ -807,9 +859,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     startCountdown(60);
                 } else {
                     alert(response.data?.message || '发送验证码失败，请稍后重试');
-                    actualSendCodeBtn.disabled = false;
-                    const original = actualSendCodeBtn.getAttribute('data-original-text') || '发送验证码';
-                    actualSendCodeBtn.textContent = original;
+                    sendCodeBtn.disabled = false;
+                    const original = sendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                    sendCodeBtn.textContent = original;
                     isSendingCode = false;
                 }
             } catch (err) {
@@ -822,13 +874,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     const remainingTime = err.response?.data?.remainingTime || 60;
                     startCountdown(remainingTime);
                 } else {
-                    actualSendCodeBtn.disabled = false;
-                    const original = actualSendCodeBtn.getAttribute('data-original-text') || '发送验证码';
-                    actualSendCodeBtn.textContent = original;
+                    sendCodeBtn.disabled = false;
+                    const original = sendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                    sendCodeBtn.textContent = original;
                     isSendingCode = false;
                 }
             }
         }, true); // 使用捕获阶段，确保优先执行
+    } else if (sendCodeBtn) {
+        console.log('发送验证码按钮事件已绑定，跳过重复绑定');
+    } else {
+        console.error('发送验证码按钮未找到');
     }
 
     // 验证码输入验证 + 实时后端校验
@@ -946,8 +1002,44 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 提交
+    // 标记表单已处理，防止script.js中的重复处理
+    form.setAttribute('data-submit-handled', 'true');
+    // 确保重置注册状态（防止之前的注册状态影响）
+    window.registrationSuccess = false;
+    form.removeAttribute('data-registered');
+    
+    // 确保事件监听器正确绑定（使用捕获阶段，确保优先执行）
+    // 使用捕获阶段确保优先执行，防止 script.js 中的事件先执行
     form.addEventListener('submit', async e => {
-        e.preventDefault();
+        console.log('表单提交事件触发'); // 调试信息
+        e.preventDefault(); // 先阻止默认提交
+        e.stopPropagation(); // 阻止事件冒泡，防止 script.js 中的处理
+        e.stopImmediatePropagation(); // 阻止同一元素上的其他事件监听器
+        
+        // 防止重复处理：如果已经在处理中或已成功，立即返回
+        // 注意：只检查 isSubmitting，不检查 window.registrationSuccess（因为可能在页面刷新后仍为true）
+        if (isSubmitting) {
+            console.log('正在提交中，阻止重复提交'); // 调试信息
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return;
+        }
+        // 如果表单已被标记为已注册，也阻止提交
+        if (form.hasAttribute('data-registered')) {
+            console.log('表单已注册，阻止提交'); // 调试信息
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return;
+        }
+        
+        console.log('开始处理表单提交'); // 调试信息
+
+        // 检查必要的函数是否已定义
+        if (typeof validators === 'undefined' || typeof setInputStatus === 'undefined') {
+            console.error('validators 或 setInputStatus 未定义，请检查 script.js 是否已加载');
+            alert('页面初始化失败，请刷新页面重试');
+            return;
+        }
 
         const username = usernameInput.value.trim();
         const phone = phoneInput.value.trim();
@@ -1005,10 +1097,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // 提交注册（使用 FormData 支持文件上传）
-        let isSubmitting = false; // 防止重复提交
-        
+        // 注意：使用外层的 isSubmitting 变量，不要重新定义
         async function submitRegistration() {
-            // 防止重复提交
+            // 防止重复提交（使用外层的 isSubmitting 变量）
             if (isSubmitting) {
                 console.log('注册请求正在处理中，请勿重复提交');
                 return;
@@ -1123,14 +1214,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 const resp = await axios.post(API_REGISTER, formData);
                 
                 // axios 正常响应（状态码 200-299）不会抛出异常，直接在这里处理
-                const message = resp.data?.message || '注册成功，请登录';
-                alert(message);
-                // 立即跳转，避免重复提示
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 500);
+                if (resp.status >= 200 && resp.status < 300) {
+                    const message = resp.data?.message || '注册成功，请登录';
+                    // 标记已成功处理，防止其他监听器处理
+                    window.registrationSuccess = true;
+                    // 立即禁用表单和按钮，防止任何后续提交
+                    if (form) {
+                        form.setAttribute('data-registered', 'true');
+                        const submitBtn = document.getElementById('submitBtn');
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.style.pointerEvents = 'none';
+                        }
+                    }
+                    alert(message);
+                    // 立即跳转，避免重复提示和后续处理
+                    window.location.replace('login.html'); // 使用replace而不是href，避免返回
+                    return; // 立即返回，防止后续代码执行
+                }
                 
             } catch (err) {
+                // 如果已经成功处理过，不再处理错误
+                if (window.registrationSuccess) {
+                    return;
+                }
                 // axios 只有在状态码不在 200-299 范围时才会抛出异常
                 console.error('注册错误详情:', err);
                 console.error('错误响应:', err.response);
@@ -1157,6 +1264,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('注册失败：' + (err.message || '未知错误，请稍后重试'));
                 }
             } finally {
+                // 如果已成功处理并跳转，不重置状态
+                if (window.registrationSuccess) {
+                    return;
+                }
                 // 重置提交状态
                 isSubmitting = false;
                 if (submitBtn) {
@@ -1167,7 +1278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         submitRegistration();
-    });
+    }, true); // 使用捕获阶段，确保优先执行，防止 script.js 中的事件先执行
 })();
 </script>
 

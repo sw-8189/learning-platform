@@ -262,13 +262,55 @@ public class AuthController {
             // 执行注册
             userService.register(request);
             
-            // 注册成功后删除验证码，避免重复使用
-            emailCodeService.deleteCode(trimmedEmail);
+            // 注册成功后删除验证码，避免重复使用（即使删除失败也不影响注册结果）
+            try {
+                emailCodeService.deleteCode(trimmedEmail);
+            } catch (Exception e) {
+                // 删除验证码失败不影响注册成功，只记录日志
+                System.err.println("删除验证码失败，但不影响注册: " + e.getMessage());
+            }
             
             return ResponseEntity.ok(Map.of("message", "注册成功，请登录"));
         } catch (Exception e) {
             e.printStackTrace(); // 打印错误堆栈以便调试
             String errorMessage = e.getMessage();
+            
+            // 处理数据库唯一性约束冲突（并发情况下的重复插入）
+            Throwable cause = e.getCause();
+            if (cause != null) {
+                String causeMessage = cause.getMessage();
+                if (causeMessage != null) {
+                    if (causeMessage.contains("Duplicate entry") && causeMessage.contains("username")) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(Map.of("message", "用户名已被注册，请更换其他用户名"));
+                    } else if (causeMessage.contains("Duplicate entry") && causeMessage.contains("phone")) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(Map.of("message", "手机号已被注册，请使用其他手机号"));
+                    } else if (causeMessage.contains("Duplicate entry") && causeMessage.contains("email")) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(Map.of("message", "邮箱已被注册，请使用其他邮箱"));
+                    }
+                }
+            }
+            
+            // 处理数据库唯一性约束冲突异常（MyBatis/Spring包装的异常）
+            // 检查异常类型和消息
+            String fullExceptionMessage = e.toString() + (e.getMessage() != null ? " " + e.getMessage() : "");
+            if (fullExceptionMessage.contains("DuplicateKeyException") || 
+                fullExceptionMessage.contains("Duplicate entry")) {
+                String exceptionMessage = fullExceptionMessage.toLowerCase();
+                if (exceptionMessage.contains("username") || exceptionMessage.contains("'user.username'")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("message", "用户名已被注册，请更换其他用户名"));
+                } else if (exceptionMessage.contains("phone") || exceptionMessage.contains("'user.phone'")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("message", "手机号已被注册，请使用其他手机号"));
+                } else if (exceptionMessage.contains("email") || exceptionMessage.contains("'user.email'")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("message", "邮箱已被注册，请使用其他邮箱"));
+                }
+            }
+            
             // 提供更友好的错误提示
             if (errorMessage != null) {
                 if (errorMessage.contains("用户名已存在")) {

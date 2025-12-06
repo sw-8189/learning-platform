@@ -5,9 +5,9 @@
 server:
   port: ${SERVER_PORT:8080}
   # 增加请求体大小限制（解决 413 错误）
-  max-http-header-size: 16KB
+  max-http-request-header-size: 16KB
   tomcat:
-    max-http-post-size: 10MB
+    max-http-form-post-size: 10MB
     max-swallow-size: 10MB
 
 spring:
@@ -58,4 +58,6 @@ app:
     course-dir: ${COURSE_UPLOAD_DIR:uploads/course}
     # 社区附件上传目录
     community-dir: ${COMMUNITY_UPLOAD_DIR:uploads/community}
+
+
 

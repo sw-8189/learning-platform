@@ -85,6 +85,18 @@ public class AdminServiceImpl implements AdminService {
         }
         // 删除用户
         userMapper.deleteById(id);
+        // 重置AUTO_INCREMENT，使ID连续
+        try {
+            Long maxId = userMapper.getMaxId();
+            if (maxId == null) {
+                maxId = 0L;
+            }
+            // 设置下一个ID为最大ID+1
+            userMapper.resetAutoIncrement(maxId + 1);
+        } catch (Exception e) {
+            // 如果重置失败，记录日志但不影响删除操作
+            System.err.println("重置AUTO_INCREMENT失败: " + e.getMessage());
+        }
     }
 
     @Override
