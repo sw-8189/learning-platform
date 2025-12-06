@@ -16,12 +16,13 @@
         <result column="learning_preference" property="learningPreference"/>
         <result column="course_interest" property="courseInterest"/>
         <result column="learning_goal" property="learningGoal"/>
+        <result column="status" property="status"/>
     </resultMap>
 
     <!--  插入用户  -->
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user (username, password, phone, email, avatar_url, role, gender, learning_preference, course_interest, learning_goal)
-        VALUES (#{username}, #{password}, #{phone}, #{email}, #{avatarUrl}, #{role}, #{gender}, #{learningPreference}, #{courseInterest}, #{learningGoal})
+        INSERT INTO user (username, password, phone, email, avatar_url, role, gender, learning_preference, course_interest, learning_goal, status)
+        VALUES (#{username}, #{password}, #{phone}, #{email}, #{avatarUrl}, #{role}, #{gender}, #{learningPreference}, #{courseInterest}, #{learningGoal}, #{status})
     </insert>
 
     <!--  根据用户名查询  -->
@@ -32,6 +33,11 @@
     <!--  根据手机号查询  -->
     <select id="findByPhone" resultMap="UserResultMap">
         SELECT * FROM user WHERE phone = #{phone}
+    </select>
+
+    <!--  根据邮箱查询  -->
+    <select id="findByEmail" resultMap="UserResultMap">
+        SELECT * FROM user WHERE email = #{email}
     </select>
 
     <!--  根据用户名或手机号查询  -->
@@ -61,5 +67,58 @@
     <!--  更新密码  -->
     <update id="updatePassword">
         UPDATE user SET password = #{newPassword} WHERE id = #{userId}
+    </update>
+
+    <!--  管理员功能：分页查询用户列表  -->
+    <select id="pageQueryUser" resultMap="UserResultMap">
+        SELECT
+            id,
+            username,
+            phone,
+            email,
+            avatar_url,
+            role,
+            gender,
+            learning_preference,
+            course_interest,
+            learning_goal,
+            status
+        FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    username LIKE CONCAT('%', #{keyword}, '%')
+                    OR phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR email LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!--  管理员功能：统计用户总数  -->
+    <select id="countUser" resultType="long">
+        SELECT COUNT(*)
+        FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    username LIKE CONCAT('%', #{keyword}, '%')
+                    OR phone LIKE CONCAT('%', #{keyword}, '%')
+                    OR email LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+    </select>
+
+    <!--  管理员功能：删除用户  -->
+    <delete id="deleteById">
+        DELETE FROM user WHERE id = #{id}
+    </delete>
+
+    <!--  管理员功能：更新用户状态  -->
+    <update id="updateStatus">
+        UPDATE user SET status = #{status} WHERE id = #{id}
     </update>
 </mapper>

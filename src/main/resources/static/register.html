@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧学习平台 - 用户注册</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/register.css">
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 </head>
-<body>
+<body class="register-page">
 <!-- 导航栏：注册页只保留返回首页 -->
 <nav class="navbar">
     <div class="nav-container">
@@ -72,6 +73,7 @@
                                 </div>
                             </div>
                             <div class="avatar-hint">支持 JPG、PNG 格式，文件大小不超过 2MB。未上传时将使用默认头像。</div>
+                                <div class="avatar-feedback" id="avatarFeedback" role="status" aria-live="polite"></div>
                         </div>
                     </div>
 
@@ -130,29 +132,65 @@
                         </div>
                     </div>
 
+                    <!-- 邮箱验证码 -->
+                    <div class="form-group">
+                        <div class="input-container">
+                            <label for="emailCode" class="form-label">邮箱验证码 <span class="required">*</span></label>
+                            <div class="input-wrapper" style="display: flex; gap: 0.75rem; align-items: stretch;">
+                                <div style="flex: 1; position: relative; display: flex; align-items: center;">
+                                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" style="position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); z-index: 1;">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"
+                                              stroke="#a0aec0" stroke-width="2"/>
+                                        <circle cx="12" cy="16" r="1" stroke="#a0aec0" stroke-width="2"/>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#a0aec0" stroke-width="2"/>
+                                    </svg>
+                                    <input type="text" id="emailCode" name="emailCode" class="form-input"
+                                           placeholder="请输入邮箱验证码" maxlength="6" style="padding-left: 2.5rem;">
+                                    <div class="input-status" id="emailCodeStatus"></div>
+                                </div>
+                                <button type="button" id="sendCodeBtn" class="btn btn-secondary" 
+                                        style="padding: 0.75rem 1.5rem; white-space: nowrap; min-width: 120px; align-self: stretch; height: auto;">
+                                    发送验证码
+                                </button>
+                            </div>
+                            <div class="input-hint">验证码将发送到您的邮箱，有效期为5分钟</div>
+                        </div>
+                    </div>
+
                     <!-- 密码 -->
                     <div class="form-group">
                         <div class="input-container">
                             <label for="password" class="form-label">密码 <span class="required">*</span></label>
                             <div class="input-wrapper">
-                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"
-                                          stroke="#a0aec0" stroke-width="2"/>
-                                    <circle cx="12" cy="16" r="1" stroke="#a0aec0" stroke-width="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#a0aec0" stroke-width="2"/>
-                                </svg>
-                                <input type="password" id="password" name="password" class="form-input"
+                                <input type="password" id="password" name="password" class="form-input no-leading-icon"
                                        placeholder="请输入密码" autocomplete="new-password">
                                 <div class="input-status" id="passwordStatus"></div>
-                                <button type="button" id="passwordToggle" class="toggle-btn">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <button type="button" id="passwordToggle" class="toggle-btn" aria-label="切换密码显示">
+                                    <svg class="eye-icon eye-show" width="18" height="18" viewBox="0 0 24 24" fill="none">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                              stroke="#a0aec0" stroke-width="2"/>
-                                        <circle cx="12" cy="12" r="3" stroke="#a0aec0" stroke-width="2"/>
+                                              stroke="currentColor" stroke-width="2"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    <svg class="eye-icon eye-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" style="display: none;">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                     </svg>
                                 </button>
                             </div>
                             <div class="input-hint">4-8 位，需同时包含字母和数字</div>
+                            <div class="password-feedback" id="passwordFeedback">
+                                <div class="password-strength">
+                                    <div class="strength-bar">
+                                        <span id="passwordStrengthBar"></span>
+                                    </div>
+                                    <span class="strength-text" id="passwordStrengthText">安全性：弱</span>
+                                </div>
+                                <ul class="password-rules">
+                                    <li data-rule="length">至少 6 位长度</li>
+                                    <li data-rule="letter">包含字母</li>
+                                    <li data-rule="number">包含数字</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -161,20 +199,18 @@
                         <div class="input-container">
                             <label for="confirmPassword" class="form-label">确认密码 <span class="required">*</span></label>
                             <div class="input-wrapper">
-                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"
-                                          stroke="#a0aec0" stroke-width="2"/>
-                                    <circle cx="12" cy="16" r="1" stroke="#a0aec0" stroke-width="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#a0aec0" stroke-width="2"/>
-                                </svg>
-                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input"
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input no-leading-icon"
                                        placeholder="请再次输入密码" autocomplete="new-password">
                                 <div class="input-status" id="confirmPasswordStatus"></div>
-                                <button type="button" id="confirmPasswordToggle" class="toggle-btn">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <button type="button" id="confirmPasswordToggle" class="toggle-btn" aria-label="切换密码显示">
+                                    <svg class="eye-icon eye-show" width="18" height="18" viewBox="0 0 24 24" fill="none">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                              stroke="#a0aec0" stroke-width="2"/>
-                                        <circle cx="12" cy="12" r="3" stroke="#a0aec0" stroke-width="2"/>
+                                              stroke="currentColor" stroke-width="2"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    <svg class="eye-icon eye-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" style="display: none;">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                     </svg>
                                 </button>
                             </div>
@@ -247,6 +283,10 @@
                                 <span>编程开发</span>
                             </label>
                             <label class="checkbox-item">
+                                <input type="checkbox" name="courseInterest" value="前端学习">
+                                <span>前端学习</span>
+                            </label>
+                            <label class="checkbox-item">
                                 <input type="checkbox" name="courseInterest" value="数据科学">
                                 <span>数据科学</span>
                             </label>
@@ -293,12 +333,52 @@
                     </div>
                 </div>
 
+                <!-- 账户类型选择 -->
+                <div class="form-section">
+                    <h2 class="section-title section-title-primary">账户类型</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">请选择账户类型 <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="userRole" value="USER" checked>
+                                <span>普通用户</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="userRole" value="ADMIN">
+                                <span>管理员</span>
+                            </label>
+                        </div>
+                        <p class="form-hint" style="margin-top: 0.5rem; color: #718096; font-size: 0.875rem;">
+                            选择管理员身份需要平台验证，默认注册为普通用户
+                        </p>
+                        <div class="form-group" id="adminInviteContainer" style="margin-top: 0.75rem; display: none;">
+                            <label for="adminInviteCode" class="form-label">
+                                管理员邀请码
+                                <button type="button" class="icon-help" id="adminInviteHelp" aria-label="管理员邀请码说明">?</button>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="adminInviteCode" 
+                                class="form-input" 
+                                placeholder="请输入平台提供的管理员邀请码">
+                            <p class="form-hint" style="margin-top: 0.35rem; color: #718096; font-size: 0.85rem;">
+                                仅限已获得平台授权的管理员使用，如需开通请联系平台管理员。
+                            </p>
+                            <div class="admin-invite-tip" id="adminInviteTip">
+                                管理员邀请码配置在后端 <code>src/main/resources/application.yml</code> 中的
+                                <code>app.admin.invite-code</code>。本地默认值为 <strong>admin-2025-secret</strong>。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 协议 & 提交 -->
                 <div class="form-section">
                     <div class="agreement">
                         <label class="checkbox-item">
                             <input type="checkbox" id="agreement">
-                            <span>我已阅读并同意 <a href="#" class="link">用户协议</a> 和 <a href="#" class="link">隐私政策</a></span>
+                            <span>我已阅读并同意 <a href="https://zhuanlan.zhihu.com/p/421832962" target="_blank" class="link">用户协议</a> 和 <a href="https://blog.csdn.net/weixin_55553121/article/details/120492101" target="_blank" class="link">隐私政策</a></span>
                         </label>
                     </div>
 
@@ -358,59 +438,21 @@
 <script src="/js/script.js"></script>
 
 <script>
-// ================== 接口路径 ==================
-const API_BASE = '/api';
-const API_REGISTER = API_BASE + '/auth/register';
+// 注意：API_BASE、API_REGISTER、setInputStatus 和 validators 已在 script.js 中定义
+// 这里只需要注册页特定的功能代码
 
-// ================== 工具函数：表单状态 ==================
-function setInputStatus(inputEl, statusEl, ok, message) {
-    if (!inputEl) return;
-    inputEl.classList.remove('input-error', 'input-success');
-    statusEl && statusEl.classList.remove('status-error', 'status-success');
-
-    if (ok === null) {
-        if (statusEl) statusEl.textContent = '';
-        return;
-    }
-
-    if (ok) {
-        inputEl.classList.add('input-success');
-        if (statusEl) {
-            statusEl.textContent = message || '✓';
-            statusEl.classList.add('status-success');
-        }
-    } else {
-        inputEl.classList.add('input-error');
-        if (statusEl) {
-            statusEl.textContent = message || '请输入有效的内容';
-            statusEl.classList.add('status-error');
-        }
-    }
+// 在script.js执行之前就设置标志，防止重复绑定验证码发送事件
+if (typeof window.sendCodeBtnBound === 'undefined') {
+    window.sendCodeBtnBound = false;
 }
-
-const validators = {
-    username: value => {
-        if (!value) return { ok: false, msg: '用户名不能为空' };
-        if (!/^\w{4,20}$/.test(value)) return { ok: false, msg: '4-20位，字母数字下划线' };
-        return { ok: true, msg: '用户名可用' };
-    },
-    phone: value => {
-        if (!value) return { ok: false, msg: '手机号不能为空' };
-        if (!/^1[3-9]\d{9}$/.test(value)) return { ok: false, msg: '请输入 11 位手机号码' };
-        return { ok: true, msg: '手机号格式正确' };
-    },
-    email: value => {
-        if (!value) return { ok: false, msg: '邮箱不能为空' };
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return { ok: false, msg: '邮箱格式不正确' };
-        return { ok: true, msg: '邮箱格式正确' };
-    },
-    password: value => {
-        if (!value) return { ok: false, msg: '密码不能为空' };
-        if (value.length < 4 || value.length > 8) return { ok: false, msg: '长度 4-8 位' };
-        if (!/[a-zA-Z]/.test(value) || !/\d/.test(value)) return { ok: false, msg: '需包含字母和数字' };
-        return { ok: true, msg: '密码格式正确' };
+// 立即设置标志，防止script.js中的代码绑定事件
+document.addEventListener('DOMContentLoaded', function() {
+    const sendCodeBtn = document.getElementById('sendCodeBtn');
+    if (sendCodeBtn) {
+        sendCodeBtn.setAttribute('data-listener-bound', 'true');
+        window.sendCodeBtnBound = true;
     }
-};
+});
 
 // ================== 头像上传处理 ==================
 (function initAvatarUpload() {
@@ -418,16 +460,70 @@ const validators = {
     const avatarPreview = document.getElementById('avatarPreview');
     const avatarRemove = document.getElementById('avatarRemove');
     const avatarUpload = document.getElementById('avatarUpload');
+    const avatarFeedback = document.getElementById('avatarFeedback');
+    const defaultAvatarSvg = `
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#a0aec0" stroke-width="2"/>
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" fill="#a0aec0"/>
+            <path d="M6 20v-2c0-2.21 1.79-4 4-4h4c2.21 0 4 1.79 4 4v2" fill="#a0aec0"/>
+        </svg>
+    `;
 
-    if (avatarUpload && avatarInput && avatarPreview) {
-        avatarUpload.addEventListener('click', () => avatarInput.click());
+    const updateAvatarMessage = (text = '', type = 'info') => {
+        if (!avatarFeedback) return;
+        avatarFeedback.textContent = text;
+        avatarFeedback.className = `avatar-feedback ${type !== 'info' ? type : ''}`.trim();
+    };
+
+    const resetAvatarState = (message = '', type = 'info') => {
+        if (avatarPreview) {
+            avatarPreview.innerHTML = defaultAvatarSvg;
+        }
+        if (avatarInput) {
+            avatarInput.value = '';
+        }
+        if (avatarRemove) {
+            avatarRemove.style.display = 'none';
+        }
+        updateAvatarMessage(message, type);
+    };
+
+    // 只绑定一次，避免重复绑定导致需要上传2次
+    if (avatarUpload && avatarInput && avatarPreview && !avatarInput.hasAttribute('data-listener-bound')) {
+        avatarInput.setAttribute('data-listener-bound', 'true');
+        avatarUpload.addEventListener('click', () => {
+            updateAvatarMessage('', 'info');
+            avatarInput.click();
+        });
+        avatarInput.addEventListener('click', () => updateAvatarMessage('', 'info'));
         avatarInput.addEventListener('change', () => {
             const file = avatarInput.files[0];
             if (!file) return;
+            updateAvatarMessage('', 'info');
+            
+            // 验证文件大小（限制 2MB）
+            const maxSize = 2 * 1024 * 1024; // 2MB
+            if (file.size > maxSize) {
+                resetAvatarState('头像文件大小不能超过 2MB，请重新选择。', 'error');
+                return;
+            }
+            
+            // 验证文件类型
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            const validExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+            const fileName = file.name.toLowerCase();
+            const isValidType = validTypes.includes(file.type) || 
+                              validExtensions.some(ext => fileName.endsWith(ext));
+            if (!isValidType) {
+                resetAvatarState('头像文件格式不支持，仅支持 JPG、JPEG、PNG、GIF。', 'error');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = e => {
                 avatarPreview.innerHTML = `<img src="${e.target.result}" alt="头像预览">`;
                 if (avatarRemove) avatarRemove.style.display = 'flex';
+                updateAvatarMessage('头像上传成功，可以继续注册。', 'success');
             };
             reader.readAsDataURL(file);
         });
@@ -435,16 +531,7 @@ const validators = {
 
     avatarRemove && avatarRemove.addEventListener('click', e => {
         e.stopPropagation();
-        avatarPreview.innerHTML = `
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="#a0aec0" stroke-width="2"/>
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"
-                      fill="#a0aec0"/>
-                <path d="M6 20v-2c0-2.21 1.79-4 4-4h4c2.21 0 4 1.79 4 4v2" fill="#a0aec0"/>
-            </svg>
-        `;
-        avatarInput.value = '';
-        avatarRemove.style.display = 'none';
+        resetAvatarState('已移除已上传的头像。', 'info');
     });
 })();
 
@@ -464,6 +551,9 @@ const validators = {
 
     const passwordInput = document.getElementById('password');
     const passwordStatus = document.getElementById('passwordStatus');
+    const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+    const passwordStrengthText = document.getElementById('passwordStrengthText');
+    const passwordRules = document.querySelectorAll('.password-rules li');
 
     const confirmPasswordInput = document.getElementById('confirmPassword');
     const confirmPasswordStatus = document.getElementById('confirmPasswordStatus');
@@ -471,6 +561,10 @@ const validators = {
     const passwordToggle = document.getElementById('passwordToggle');
     const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
     const agreementCheckbox = document.getElementById('agreement');
+    const adminInviteContainer = document.getElementById('adminInviteContainer');
+    const adminInviteInput = document.getElementById('adminInviteCode');
+    const adminInviteHelp = document.getElementById('adminInviteHelp');
+    const adminInviteTip = document.getElementById('adminInviteTip');
 
     // 实时校验
     usernameInput && usernameInput.addEventListener('input', () => {
@@ -491,6 +585,7 @@ const validators = {
     passwordInput && passwordInput.addEventListener('input', () => {
         const { ok, msg } = validators.password(passwordInput.value);
         setInputStatus(passwordInput, passwordStatus, ok, msg);
+        updatePasswordUI(passwordInput.value);
 
         if (confirmPasswordInput && confirmPasswordInput.value) {
             const same = confirmPasswordInput.value === passwordInput.value;
@@ -504,34 +599,304 @@ const validators = {
         setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? '两次密码一致' : '两次密码不一致');
     });
 
-    // 显示/隐藏密码
-    if (passwordToggle && passwordInput) {
-        passwordToggle.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+    const bindPasswordToggle = (input, toggleBtn) => {
+        if (!input || !toggleBtn) return;
+        const eyeShow = toggleBtn.querySelector('.eye-show');
+        const eyeHide = toggleBtn.querySelector('.eye-hide');
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentType = input.getAttribute('type') || 'password';
+            const newType = currentType === 'password' ? 'text' : 'password';
+            input.setAttribute('type', newType);
+            toggleBtn.setAttribute('aria-pressed', (newType === 'text').toString());
+            toggleBtn.classList.toggle('is-visible', newType === 'text');
+            if (eyeShow && eyeHide) {
+                if (newType === 'text') {
+                    eyeShow.style.display = 'none';
+                    eyeHide.style.display = 'block';
+                } else {
+                    eyeShow.style.display = 'block';
+                    eyeHide.style.display = 'none';
+                }
+            }
+        });
+    };
+
+    // 确保在DOM加载完成后绑定
+    if (passwordInput && passwordToggle) {
+        bindPasswordToggle(passwordInput, passwordToggle);
+    }
+    if (confirmPasswordInput && confirmPasswordToggle) {
+        bindPasswordToggle(confirmPasswordInput, confirmPasswordToggle);
+    }
+
+    // 管理员邀请码显示/隐藏
+    const roleRadios = document.querySelectorAll('input[name="userRole"]');
+    if (roleRadios && adminInviteContainer && adminInviteInput) {
+        const updateAdminInviteVisibility = () => {
+            const selected = document.querySelector('input[name="userRole"]:checked');
+            if (selected && selected.value === 'ADMIN') {
+                adminInviteContainer.style.display = 'block';
+            } else {
+                adminInviteContainer.style.display = 'none';
+                adminInviteInput.value = '';
+                adminInviteTip && adminInviteTip.classList.remove('show');
+            }
+        };
+        roleRadios.forEach(r => r.addEventListener('change', updateAdminInviteVisibility));
+        updateAdminInviteVisibility();
+    }
+
+    if (adminInviteHelp && adminInviteTip) {
+        adminInviteHelp.addEventListener('click', () => {
+            adminInviteTip.classList.toggle('show');
         });
     }
 
-    if (confirmPasswordToggle && confirmPasswordInput) {
-        confirmPasswordToggle.addEventListener('click', () => {
-            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            confirmPasswordInput.setAttribute('type', type);
+    function updatePasswordUI(value) {
+        if (!passwordStrengthBar || !passwordStrengthText) return;
+
+        const hasLength = value.length >= 6;
+        const hasLetter = /[a-zA-Z]/.test(value);
+        const hasNumber = /\d/.test(value);
+        let score = 0;
+        score += hasLength ? 1 : 0;
+        score += hasLetter ? 1 : 0;
+        score += hasNumber ? 1 : 0;
+
+        const levelMap = [
+            { text: '安全性：弱', color: '#f56565', width: '33%' },
+            { text: '安全性：中', color: '#ed8936', width: '66%' },
+            { text: '安全性：强', color: '#48bb78', width: '100%' }
+        ];
+
+        if (!value) {
+            passwordStrengthBar.style.width = '0%';
+            passwordStrengthBar.style.background = '#e2e8f0';
+            passwordStrengthText.textContent = '安全性：--';
+        } else {
+            const level = levelMap[Math.max(score - 1, 0)];
+            passwordStrengthBar.style.width = level.width;
+            passwordStrengthBar.style.background = level.color;
+            passwordStrengthText.textContent = level.text;
+        }
+
+        passwordRules.forEach(rule => {
+            const ruleType = rule.getAttribute('data-rule');
+            let passed = false;
+            if (ruleType === 'length') passed = hasLength;
+            if (ruleType === 'letter') passed = hasLetter;
+            if (ruleType === 'number') passed = hasNumber;
+            rule.classList.toggle('pass', passed);
+        });
+    }
+    updatePasswordUI('');
+
+    // 发送验证码功能
+    const sendCodeBtn = document.getElementById('sendCodeBtn');
+    const emailCodeInput = document.getElementById('emailCode');
+    const emailCodeStatus = document.getElementById('emailCodeStatus');
+    let countdownTimer = null;
+    let countdownSeconds = 0;
+
+    function startCountdown(seconds) {
+        // 清除之前的定时器，防止多个定时器同时运行导致跳动
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+        }
+        
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+        if (!sendCodeBtn) return;
+        
+        let remaining = seconds;
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.setAttribute('data-original-text', sendCodeBtn.textContent || '发送验证码');
+        // 使用固定宽度的文本格式，避免按钮跳动
+        // 确保按钮宽度固定，不会因为文本长度变化而跳动
+        sendCodeBtn.style.width = '150px';
+        sendCodeBtn.textContent = `${remaining}秒后重试`;
+        
+        // 使用 setInterval 而不是递归的 setTimeout，避免跳动
+        countdownTimer = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+                sendCodeBtn.disabled = false;
+                const original = sendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                sendCodeBtn.textContent = original;
+                sendCodeBtn.style.width = ''; // 恢复CSS中的宽度设置
+                isSendingCode = false; // 重置发送标志
+            } else {
+                // 使用固定格式，避免文本长度变化导致跳动
+                sendCodeBtn.textContent = `${remaining}秒后重试`;
+                // 确保按钮始终保持禁用状态和固定宽度
+                sendCodeBtn.disabled = true;
+                sendCodeBtn.style.width = '150px';
+            }
+        }, 1000);
+    }
+
+    // 绑定发送验证码按钮事件（只绑定一次，避免重复发送）
+    // 使用全局标志确保只绑定一次
+    if (typeof window.sendCodeBtnBound === 'undefined') {
+        window.sendCodeBtnBound = false;
+    }
+    
+    let isSendingCode = false; // 防止重复发送的标志
+    if (sendCodeBtn && !window.sendCodeBtnBound) {
+        window.sendCodeBtnBound = true;
+        sendCodeBtn.setAttribute('data-listener-bound', 'true');
+        
+        sendCodeBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); // 防止表单提交
+            e.stopPropagation(); // 阻止事件冒泡
+            e.stopImmediatePropagation(); // 阻止同一元素上的其他事件监听器
+            
+            // 检查按钮是否已禁用（倒计时期间）
+            if (actualSendCodeBtn.disabled || isSendingCode) {
+                return;
+            }
+            
+            if (!emailInput) {
+                console.error('邮箱输入框未找到');
+                alert('邮箱输入框未找到');
+                return;
+            }
+            
+            const email = emailInput.value.trim();
+            
+            // 验证邮箱格式
+            if (!email) {
+                alert('请先输入邮箱地址');
+                emailInput.focus();
+                return;
+            }
+            
+            const emailValid = validators.email(email);
+            if (!emailValid.ok) {
+                alert('请先输入正确的邮箱地址');
+                emailInput.focus();
+                return;
+            }
+
+            // 设置发送标志，防止重复点击
+            isSendingCode = true;
+            try {
+                actualSendCodeBtn.disabled = true;
+                actualSendCodeBtn.textContent = '发送中...';
+                
+                // 使用 URLSearchParams 发送表单数据
+                const formData = new URLSearchParams();
+                formData.append('email', email);
+                
+                const response = await axios.post('/api/auth/send-code', formData, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+                
+                if (response.status >= 200 && response.status < 300) {
+                    alert('验证码已发送到您的邮箱，请查收');
+                    if (emailCodeInput && emailCodeStatus) {
+                        setInputStatus(emailCodeInput, emailCodeStatus, null, '');
+                    }
+                    // 开始60秒倒计时
+                    startCountdown(60);
+                } else {
+                    alert(response.data?.message || '发送验证码失败，请稍后重试');
+                    actualSendCodeBtn.disabled = false;
+                    const original = actualSendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                    actualSendCodeBtn.textContent = original;
+                    isSendingCode = false;
+                }
+            } catch (err) {
+                console.error('发送验证码失败:', err);
+                const errorMessage = err.response?.data?.message || '发送验证码失败，请稍后重试';
+                alert(errorMessage);
+                
+                // 如果返回429（Too Many Requests），显示倒计时
+                if (err.response?.status === 429) {
+                    const remainingTime = err.response?.data?.remainingTime || 60;
+                    startCountdown(remainingTime);
+                } else {
+                    actualSendCodeBtn.disabled = false;
+                    const original = actualSendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                    actualSendCodeBtn.textContent = original;
+                    isSendingCode = false;
+                }
+            }
+        }, true); // 使用捕获阶段，确保优先执行
+    }
+
+    // 验证码输入验证 + 实时后端校验
+    let emailCodeServerValid = false;
+    if (emailCodeInput && emailCodeStatus) {
+        emailCodeInput.addEventListener('input', async () => {
+            const code = emailCodeInput.value.trim();
+            emailCodeServerValid = false;
+            if (!code) {
+                setInputStatus(emailCodeInput, emailCodeStatus, null, '');
+                return;
+            }
+            if (!/^\d{6}$/.test(code)) {
+                setInputStatus(emailCodeInput, emailCodeStatus, false, '请输入6位数字验证码');
+                return;
+            }
+
+            // 先本地通过格式校验，再请求后端实时验证
+            const email = emailInput ? emailInput.value.trim() : '';
+            if (!email) {
+                setInputStatus(emailCodeInput, emailCodeStatus, false, '请先输入邮箱并获取验证码');
+                return;
+            }
+
+            try {
+                // 使用 URLSearchParams 发送表单数据
+                const formData = new URLSearchParams();
+                formData.append('email', email);
+                formData.append('emailCode', code);
+                
+                const resp = await axios.post('/api/auth/check-code', formData, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+                if (resp.status >= 200 && resp.status < 300) {
+                    emailCodeServerValid = true;
+                    setInputStatus(emailCodeInput, emailCodeStatus, true, '验证码正确');
+                }
+            } catch (err) {
+                emailCodeServerValid = false;
+                const msg = err.response?.data?.message || '验证码错误或已过期，请重新输入';
+                setInputStatus(emailCodeInput, emailCodeStatus, false, msg);
+            }
         });
     }
 
     // 重置按钮额外处理一下状态样式
     const resetBtn = document.getElementById('resetBtn');
-    resetBtn && resetBtn.addEventListener('click', () => {
+    resetBtn && resetBtn.addEventListener('click', (e) => {
+        // 阻止默认的表单重置行为，手动处理所有重置
+        e.preventDefault();
+        
         [
             [usernameInput, usernameStatus],
             [phoneInput, phoneStatus],
             [emailInput, emailStatus],
             [passwordInput, passwordStatus],
-            [confirmPasswordInput, confirmPasswordStatus]
+            [confirmPasswordInput, confirmPasswordStatus],
+            [emailCodeInput, emailCodeStatus]
         ].forEach(([input, status]) => {
             if (input) {
                 input.value = '';
                 input.classList.remove('input-error', 'input-success');
+                // 重置密码输入框类型
+                if (input.type === 'text' && (input.id === 'password' || input.id === 'confirmPassword')) {
+                    input.type = 'password';
+                }
             }
             if (status) {
                 status.textContent = '';
@@ -539,6 +904,45 @@ const validators = {
             }
         });
         if (agreementCheckbox) agreementCheckbox.checked = false;
+        
+        // 重置头像
+        const avatarInput = document.getElementById('avatar');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const avatarRemove = document.getElementById('avatarRemove');
+        if (avatarInput) {
+            avatarInput.value = '';
+            // 清除文件选择
+            avatarInput.files = null;
+        }
+        if (avatarPreview) {
+            avatarPreview.innerHTML = `
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="#a0aec0" stroke-width="2"/>
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"
+                          fill="#a0aec0"/>
+                    <path d="M6 20v-2c0-2.21 1.79-4 4-4h4c2.21 0 4 1.79 4 4v2" fill="#a0aec0"/>
+                </svg>
+            `;
+        }
+        if (avatarRemove) avatarRemove.style.display = 'none';
+        
+        // 重置单选和多选
+        document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.id !== 'agreement') {
+                checkbox.checked = false;
+            }
+        });
+        
+        // 重置验证码按钮状态
+        if (sendCodeBtn) {
+            sendCodeBtn.disabled = false;
+            sendCodeBtn.textContent = '发送验证码';
+        }
+        if (countdownTimer) {
+            clearTimeout(countdownTimer);
+            countdownTimer = null;
+        }
     });
 
     // 提交
@@ -569,7 +973,20 @@ const validators = {
             return;
         }
 
-        if (!v1.ok || !v2.ok || !v3.ok || !v4.ok || !same) {
+        // 验证验证码（本地格式验证，实际验证在后端进行）
+        const emailCode = emailCodeInput.value.trim();
+        const emailCodeValid = emailCode && /^\d{6}$/.test(emailCode);
+        if (emailCodeInput) {
+            if (emailCodeValid) {
+                setInputStatus(emailCodeInput, emailCodeStatus, emailCodeServerValid ? true : null, 
+                    emailCodeServerValid ? '验证码正确' : '请输入6位数字验证码');
+            } else {
+                setInputStatus(emailCodeInput, emailCodeStatus, false, '请输入6位数字验证码');
+            }
+        }
+
+        // 不强制要求异步验证完成，后端会再次验证
+        if (!v1.ok || !v2.ok || !v3.ok || !v4.ok || !same || !emailCodeValid) {
             alert('请先修正表单中的红色错误项');
             return;
         }
@@ -587,48 +1004,169 @@ const validators = {
             return;
         }
 
-        // 获取头像数据
-        let avatarUrl = null;
-        if (avatarInput.files[0]) {
-            // 读取头像文件并转换为base64
-            const file = avatarInput.files[0];
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                avatarUrl = e.target.result;
-                submitRegistration();
-            };
-            reader.readAsDataURL(file);
-            return; // 等待文件读取完成后再提交
-        }
-
-        submitRegistration();
-
+        // 提交注册（使用 FormData 支持文件上传）
+        let isSubmitting = false; // 防止重复提交
+        
         async function submitRegistration() {
-            const payload = {
-                username,
-                phone,
-                email,
-                password,
-                gender: genderRadio.value,
-                learningPreference,
-                courseInterest,
-                learningGoal: learningGoalRadio.value,
-                avatarUrl // 添加头像URL
-            };
-
-            try {
-                const resp = await axios.post(API_REGISTER, payload);
-                if (resp.status >= 200 && resp.status < 300) {
-                    alert('注册成功，请登录');
-                    window.location.href = 'login.html';
-                } else {
-                    alert('注册失败，请稍后重试');
+            // 防止重复提交
+            if (isSubmitting) {
+                console.log('注册请求正在处理中，请勿重复提交');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const emailCode = emailCodeInput.value.trim();
+            
+            // 先进行所有验证（在设置提交状态之前）
+            if (!username || !phone || !email || !password || !genderRadio || !learningGoalRadio) {
+                alert('请确保所有必填项都已填写');
+                return;
+            }
+            
+            if (!emailCode) {
+                alert('请输入邮箱验证码');
+                emailCodeInput.focus();
+                return;
+            }
+            if (!/^\d{6}$/.test(emailCode)) {
+                alert('验证码格式不正确，请输入6位数字');
+                emailCodeInput.focus();
+                return;
+            }
+            
+            if (learningPreference.length === 0) {
+                alert('请至少选择一个学习偏好');
+                return;
+            }
+            if (courseInterest.length === 0) {
+                alert('请至少选择一个课程兴趣');
+                return;
+            }
+            
+            // 验证头像文件（如果有）
+            const avatarInput = document.getElementById('avatar');
+            if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                const file = avatarInput.files[0];
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                if (file.size > maxSize) {
+                    alert('头像文件大小不能超过2MB，请选择更小的文件');
+                    return;
                 }
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                const validExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+                const fileName = file.name.toLowerCase();
+                const isValidType = validTypes.includes(file.type) || 
+                                  validExtensions.some(ext => fileName.endsWith(ext));
+                if (!isValidType) {
+                    alert('头像文件格式不支持，仅支持 JPG、JPEG、PNG、GIF 格式');
+                    return;
+                }
+            }
+            
+            // 所有验证通过，设置提交状态
+            isSubmitting = true;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '注册中...';
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', username.trim());
+                formData.append('phone', phone.trim());
+                formData.append('email', email.trim());
+                formData.append('password', password);
+                formData.append('gender', genderRadio.value);
+                formData.append('learningGoal', learningGoalRadio.value);
+                formData.append('emailCode', emailCode);
+                
+                // 添加用户角色
+                const userRoleRadio = document.querySelector('input[name="userRole"]:checked');
+                if (userRoleRadio) {
+                    formData.append('userRole', userRoleRadio.value);
+                    // 如果选择管理员，附加管理员邀请码
+                    if (userRoleRadio.value === 'ADMIN' && adminInviteInput) {
+                        const invite = adminInviteInput.value.trim();
+                        if (!invite) {
+                            alert('请选择管理员身份时必须填写管理员邀请码');
+                            isSubmitting = false;
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = '注册';
+                            }
+                            adminInviteInput.focus();
+                            return;
+                        }
+                        formData.append('adminInviteCode', invite);
+                    }
+                }
+                
+                learningPreference.forEach(pref => {
+                    formData.append('learningPreference', pref);
+                });
+                courseInterest.forEach(interest => {
+                    formData.append('courseInterest', interest);
+                });
+                
+                // 添加头像文件（如果有）
+                if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                    formData.append('avatar', avatarInput.files[0]);
+                }
+                
+                // 调试：打印FormData内容（仅开发时使用）
+                console.log('提交注册数据:');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + (pair[1] instanceof File ? pair[1].name : pair[1]));
+                }
+                
+                // 注意：使用 FormData 时，不要手动设置 Content-Type，让浏览器自动设置（包括 boundary）
+                const resp = await axios.post(API_REGISTER, formData);
+                
+                // axios 正常响应（状态码 200-299）不会抛出异常，直接在这里处理
+                const message = resp.data?.message || '注册成功，请登录';
+                alert(message);
+                // 立即跳转，避免重复提示
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+                
             } catch (err) {
-                console.error(err);
-                alert(err.response?.data?.message || '注册失败，请检查信息或稍后再试');
+                // axios 只有在状态码不在 200-299 范围时才会抛出异常
+                console.error('注册错误详情:', err);
+                console.error('错误响应:', err.response);
+                console.error('错误响应数据:', err.response?.data);
+                
+                // 处理错误响应
+                if (err.response) {
+                    const errorData = err.response.data || {};
+                    const errorMessage = errorData.message || '注册失败，请检查信息或稍后再试';
+                    
+                    // 提供更详细的错误提示
+                    if (errorMessage.includes('已被注册') || errorMessage.includes('已存在')) {
+                        alert('注册失败：' + errorMessage + '\n\n请检查：\n1. 用户名是否已被使用\n2. 手机号是否已被注册\n3. 邮箱是否已被注册');
+                    } else if (errorMessage.includes('不能为空') || errorMessage.includes('至少选择')) {
+                        alert('注册失败：' + errorMessage + '\n\n请确保所有必填项都已正确填写');
+                    } else {
+                        alert('注册失败：' + errorMessage);
+                    }
+                } else if (err.request) {
+                    // 请求已发出但没有收到响应
+                    alert('注册请求发送失败，请检查网络连接后重试');
+                } else {
+                    // 其他错误
+                    alert('注册失败：' + (err.message || '未知错误，请稍后重试'));
+                }
+            } finally {
+                // 重置提交状态
+                isSubmitting = false;
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '注册';
+                }
             }
         }
+        
+        submitRegistration();
     });
 })();
 </script>

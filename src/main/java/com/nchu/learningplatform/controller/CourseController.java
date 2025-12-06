@@ -24,10 +24,14 @@ public class CourseController {
     @GetMapping
     public PageResult<Course> list(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "8") Integer size,
-            @RequestParam(required = false) String keyword
+            @RequestParam(defaultValue = "9") Integer size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String learningPreference,
+            @RequestParam(required = false) String courseInterest,
+            @RequestParam(required = false) String learningGoal
     ) {
-        return courseService.pageQuery(page, size, keyword);
+        return ((com.nchu.learningplatform.service.impl.CourseServiceImpl) courseService)
+                .pageQuery(page, size, keyword, learningPreference, courseInterest, learningGoal);
     }
 
     @GetMapping("/{id}")
@@ -44,7 +48,41 @@ public class CourseController {
         if (userId == null) {
             return ResponseEntity.status(401).body(Map.of("message", "未登录"));
         }
-        courseService.joinCourse(userId, id);
-        return ResponseEntity.ok(Map.of("message", "已加入我的课程"));
+        try {
+            courseService.joinCourse(userId, id);
+            return ResponseEntity.ok(Map.of("message", "已加入我的课程"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}/quit")
+    public ResponseEntity<?> quit(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token
+    ) {
+        Long userId = authController.getUserIdByToken(token);
+        if (userId == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "未登录"));
+        }
+        try {
+            courseService.quitCourse(userId, id);
+            return ResponseEntity.ok(Map.of("message", "已退选课程"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/recommended")
+    public PageResult<Course> getRecommended(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "9") Integer size
+    ) {
+        Long userId = authController.getUserIdByToken(token);
+        if (userId == null) {
+            return new PageResult<>(0, page, size, java.util.Collections.emptyList());
+        }
+        return courseService.getRecommendedCourses(userId, page, size);
     }
 }

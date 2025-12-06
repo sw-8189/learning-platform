@@ -1,4 +1,3 @@
-// learning-platform/src/main/java/com/nchu/learningplatform/entity/Course.java
 package com.nchu.learningplatform.entity;
 
 import lombok.Data;
@@ -24,4 +23,28 @@ public class Course {
     private String teacher;
 
     private Double price;
+
+    /** 课程标签：多个标签用逗号分隔，包含学习偏好和课程兴趣 */
+    private String tags;
+
+    /** 课程详细描述 */
+    private String detailDescription;
+
+    /** 讲师介绍 */
+    private String teacherIntro;
+
+    /** 课程大纲，JSON格式存储 */
+    private String courseOutline;
+
+    /** 课程图片，JSON格式存储多个图片URL */
+    private String courseImages;
+
+    /** 课程时长，如：40小时 */
+    private String duration;
+
+    /** 学习人数 */
+    private Integer studentCount;
+
+    /** 课程评分，0-5分 */
+    private Double rating;
 }
