@@ -1,0 +1,43 @@
+# 测试环境配置
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: false
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  
+  mail:
+    host: localhost
+    port: 1025
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+# 应用配置
+app:
+  upload:
+    avatar-dir: ${java.io.tmpdir}/test-uploads/avatar
+  admin:
+    invite-code: test-admin-invite-code
+
+# 日志配置
+logging:
+  level:
+    com.nchu.learningplatform: DEBUG
+    org.springframework.web: INFO
+    org.mybatis: DEBUG
+
