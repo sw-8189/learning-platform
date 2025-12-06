@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nchu.learningplatform.mapper.CommentLikeMapper">
+
+    <insert id="insert">
+        INSERT INTO comment_like (comment_id, user_id)
+        VALUES (#{commentId}, #{userId})
+    </insert>
+
+    <select id="findByCommentIdAndUserId" resultType="com.nchu.learningplatform.entity.CommentLike">
+        SELECT * FROM comment_like
+        WHERE comment_id = #{commentId} AND user_id = #{userId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM comment_like
+        WHERE comment_id = #{commentId} AND user_id = #{userId}
+    </delete>
+
+</mapper>
+

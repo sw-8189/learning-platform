@@ -9,11 +9,19 @@
         <id column="id" property="id"/>
         <result column="title" property="title"/>
         <result column="description" property="description"/>
+        <result column="detail_description" property="detailDescription"/>
         <result column="level" property="level"/>
         <result column="category" property="category"/>
         <result column="cover_url" property="coverUrl"/>
         <result column="teacher" property="teacher"/>
+        <result column="teacher_intro" property="teacherIntro"/>
         <result column="price" property="price"/>
+        <result column="tags" property="tags"/>
+        <result column="course_outline" property="courseOutline"/>
+        <result column="course_images" property="courseImages"/>
+        <result column="duration" property="duration"/>
+        <result column="student_count" property="studentCount"/>
+        <result column="rating" property="rating"/>
     </resultMap>
 
     <!-- 分页查询课程列表 -->
@@ -26,14 +34,25 @@
         category,
         cover_url,
         teacher,
-        price
+        price,
+        tags
         FROM course
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (
                 title LIKE CONCAT('%', #{keyword}, '%')
                 OR description LIKE CONCAT('%', #{keyword}, '%')
+                OR tags LIKE CONCAT('%', #{keyword}, '%')
                 )
+            </if>
+            <if test="learningPreference != null and learningPreference != ''">
+                AND tags LIKE CONCAT('%', #{learningPreference}, '%')
+            </if>
+            <if test="courseInterest != null and courseInterest != ''">
+                AND tags LIKE CONCAT('%', #{courseInterest}, '%')
+            </if>
+            <if test="learningGoal != null and learningGoal != ''">
+                AND tags LIKE CONCAT('%', #{learningGoal}, '%')
             </if>
         </where>
         ORDER BY id DESC
@@ -49,7 +68,17 @@
                 AND (
                 title LIKE CONCAT('%', #{keyword}, '%')
                 OR description LIKE CONCAT('%', #{keyword}, '%')
+                OR tags LIKE CONCAT('%', #{keyword}, '%')
                 )
+            </if>
+            <if test="learningPreference != null and learningPreference != ''">
+                AND tags LIKE CONCAT('%', #{learningPreference}, '%')
+            </if>
+            <if test="courseInterest != null and courseInterest != ''">
+                AND tags LIKE CONCAT('%', #{courseInterest}, '%')
+            </if>
+            <if test="learningGoal != null and learningGoal != ''">
+                AND tags LIKE CONCAT('%', #{learningGoal}, '%')
             </if>
         </where>
     </select>
@@ -60,13 +89,113 @@
             id,
             title,
             description,
+            detail_description,
             level,
             category,
             cover_url,
             teacher,
-            price
+            teacher_intro,
+            price,
+            tags,
+            course_outline,
+            course_images,
+            duration,
+            student_count,
+            rating
         FROM course
         WHERE id = #{id}
+    </select>
+
+    <!--  管理员功能：插入课程  -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course (
+            title, description, detail_description, level, category, cover_url,
+            teacher, teacher_intro, price, tags, course_outline, course_images,
+            duration, student_count, rating
+        ) VALUES (
+            #{title}, #{description}, #{detailDescription}, #{level}, #{category}, #{coverUrl},
+            #{teacher}, #{teacherIntro}, #{price}, #{tags}, #{courseOutline}, #{courseImages},
+            #{duration}, #{studentCount}, #{rating}
+        )
+    </insert>
+
+    <!--  管理员功能：更新课程  -->
+    <update id="update">
+        UPDATE course
+        <set>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="detailDescription != null">detail_description = #{detailDescription},</if>
+            <if test="level != null and level != ''">level = #{level},</if>
+            <if test="category != null and category != ''">category = #{category},</if>
+            <if test="coverUrl != null and coverUrl != ''">cover_url = #{coverUrl},</if>
+            <if test="teacher != null and teacher != ''">teacher = #{teacher},</if>
+            <if test="teacherIntro != null">teacher_intro = #{teacherIntro},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="courseOutline != null">course_outline = #{courseOutline},</if>
+            <if test="courseImages != null">course_images = #{courseImages},</if>
+            <if test="duration != null and duration != ''">duration = #{duration},</if>
+            <if test="studentCount != null">student_count = #{studentCount},</if>
+            <if test="rating != null">rating = #{rating},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!--  管理员功能：删除课程  -->
+    <delete id="deleteById">
+        DELETE FROM course WHERE id = #{id}
+    </delete>
+
+    <!--  管理员功能：分页查询所有课程（不带筛选条件）  -->
+    <select id="pageQueryAll" resultMap="CourseResultMap">
+        SELECT
+            id,
+            title,
+            description,
+            detail_description,
+            level,
+            category,
+            cover_url,
+            teacher,
+            teacher_intro,
+            price,
+            tags,
+            course_outline,
+            course_images,
+            duration,
+            student_count,
+            rating,
+            create_time
+        FROM course
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    title LIKE CONCAT('%', #{keyword}, '%')
+                    OR description LIKE CONCAT('%', #{keyword}, '%')
+                    OR tags LIKE CONCAT('%', #{keyword}, '%')
+                    OR teacher LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!--  管理员功能：统计所有课程总数  -->
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM course
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    title LIKE CONCAT('%', #{keyword}, '%')
+                    OR description LIKE CONCAT('%', #{keyword}, '%')
+                    OR tags LIKE CONCAT('%', #{keyword}, '%')
+                    OR teacher LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
     </select>
 
 </mapper>

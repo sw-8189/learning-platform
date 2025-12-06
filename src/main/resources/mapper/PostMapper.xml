@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nchu.learningplatform.mapper.PostMapper">
+
+    <resultMap id="PostResultMap" type="com.nchu.learningplatform.entity.Post">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="type" property="type"/>
+        <result column="category" property="category"/>
+        <result column="course_id" property="courseId"/>
+        <result column="tags" property="tags"/>
+        <result column="attachment_url" property="attachmentUrl"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="favorite_count" property="favoriteCount"/>
+        <result column="status" property="status"/>
+        <result column="visibility" property="visibility"/>
+        <result column="is_top" property="isTop"/>
+        <result column="is_resolved" property="isResolved"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="username" property="username"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="course_title" property="courseTitle"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post (user_id, title, content, type, category, course_id, tags, attachment_url, status, visibility, is_top, is_resolved)
+        VALUES (#{userId}, #{title}, #{content}, #{type}, #{category}, #{courseId}, #{tags}, #{attachmentUrl}, #{status}, #{visibility}, #{isTop}, #{isResolved})
+    </insert>
+
+    <select id="findById" resultMap="PostResultMap">
+        SELECT p.*, u.username, u.avatar_url, c.title as course_title
+        FROM post p
+        LEFT JOIN user u ON p.user_id = u.id
+        LEFT JOIN course c ON p.course_id = c.id
+        WHERE p.id = #{id} AND p.status = 'published'
+        <choose>
+            <when test="currentUserId != null">
+                AND (p.visibility = 'PUBLIC' OR p.user_id = #{currentUserId})
+            </when>
+            <otherwise>
+                AND p.visibility = 'PUBLIC'
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="pageQuery" resultMap="PostResultMap">
+        SELECT p.*, u.username, u.avatar_url, c.title as course_title
+        FROM post p
+        LEFT JOIN user u ON p.user_id = u.id
+        LEFT JOIN course c ON p.course_id = c.id
+        <where>
+            p.status = 'published'
+            <choose>
+                <when test="currentUserId != null">
+                    AND (p.visibility = 'PUBLIC' OR (p.visibility = 'PRIVATE' AND p.user_id = #{currentUserId}))
+                </when>
+                <otherwise>
+                    AND p.visibility = 'PUBLIC'
+                </otherwise>
+            </choose>
+            <if test="type != null and type != ''">
+                AND p.type = #{type}
+            </if>
+            <if test="category != null and category != ''">
+                AND p.category = #{category}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (p.title LIKE CONCAT('%', #{keyword}, '%') OR p.content LIKE CONCAT('%', #{keyword}, '%') OR p.tags LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="userId != null">
+                AND p.user_id = #{userId}
+            </if>
+            <if test="courseId != null">
+                AND p.course_id = #{courseId}
+            </if>
+        </where>
+        ORDER BY p.is_top DESC, p.create_time DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+        FROM post p
+        <where>
+            p.status = 'published'
+            <choose>
+                <when test="currentUserId != null">
+                    AND (p.visibility = 'PUBLIC' OR (p.visibility = 'PRIVATE' AND p.user_id = #{currentUserId}))
+                </when>
+                <otherwise>
+                    AND p.visibility = 'PUBLIC'
+                </otherwise>
+            </choose>
+            <if test="type != null and type != ''">
+                AND p.type = #{type}
+            </if>
+            <if test="category != null and category != ''">
+                AND p.category = #{category}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (p.title LIKE CONCAT('%', #{keyword}, '%') OR p.content LIKE CONCAT('%', #{keyword}, '%') OR p.tags LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="userId != null">
+                AND p.user_id = #{userId}
+            </if>
+            <if test="courseId != null">
+                AND p.course_id = #{courseId}
+            </if>
+        </where>
+    </select>
+
+    <update id="update">
+        UPDATE post
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="attachmentUrl != null">attachment_url = #{attachmentUrl},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="visibility != null">visibility = #{visibility},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
+            <if test="isResolved != null">is_resolved = #{isResolved}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE post SET status = 'deleted' WHERE id = #{id}
+    </update>
+
+    <update id="incrementViewCount">
+        UPDATE post SET view_count = view_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="incrementLikeCount">
+        UPDATE post SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementLikeCount">
+        UPDATE post SET like_count = GREATEST(like_count - 1, 0) WHERE id = #{id}
+    </update>
+
+    <update id="incrementCommentCount">
+        UPDATE post SET comment_count = comment_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="incrementFavoriteCount">
+        UPDATE post SET favorite_count = favorite_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementFavoriteCount">
+        UPDATE post SET favorite_count = GREATEST(favorite_count - 1, 0) WHERE id = #{id}
+    </update>
+
+    <select id="findHotPosts" resultMap="PostResultMap">
+        SELECT p.*, u.username, u.avatar_url, c.title as course_title
+        FROM post p
+        LEFT JOIN user u ON p.user_id = u.id
+        LEFT JOIN course c ON p.course_id = c.id
+        WHERE p.status = 'published'
+        <choose>
+            <when test="currentUserId != null">
+                AND (p.visibility = 'PUBLIC' OR (p.visibility = 'PRIVATE' AND p.user_id = #{currentUserId}))
+            </when>
+            <otherwise>
+                AND p.visibility = 'PUBLIC'
+            </otherwise>
+        </choose>
+        ORDER BY (p.like_count * 2 + p.comment_count + p.view_count / 10) DESC, p.create_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findTopPosts" resultMap="PostResultMap">
+        SELECT p.*, u.username, u.avatar_url, c.title as course_title
+        FROM post p
+        LEFT JOIN user u ON p.user_id = u.id
+        LEFT JOIN course c ON p.course_id = c.id
+        WHERE p.status = 'published' AND p.is_top = 1
+        <choose>
+            <when test="currentUserId != null">
+                AND (p.visibility = 'PUBLIC' OR (p.visibility = 'PRIVATE' AND p.user_id = #{currentUserId}))
+            </when>
+            <otherwise>
+                AND p.visibility = 'PUBLIC'
+            </otherwise>
+        </choose>
+        ORDER BY p.create_time DESC
+    </select>
+
+    <!-- 用户点赞的帖子 -->
+    <select id="findLikedPostsByUser" resultMap="PostResultMap">
+        SELECT p.*, u.username, u.avatar_url, c.title AS course_title
+        FROM post_like pl
+        JOIN post p ON pl.post_id = p.id
+        LEFT JOIN user u ON p.user_id = u.id
+        LEFT JOIN course c ON p.course_id = c.id
+        WHERE pl.user_id = #{userId}
+          AND p.status = 'published'
+          AND (p.visibility = 'PUBLIC' OR p.user_id = #{userId})
+        ORDER BY pl.create_time DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countLikedPostsByUser" resultType="long">
+        SELECT COUNT(*)
+        FROM post_like pl
+        JOIN post p ON pl.post_id = p.id
+        WHERE pl.user_id = #{userId}
+          AND p.status = 'published'
+          AND (p.visibility = 'PUBLIC' OR p.user_id = #{userId})
+    </select>
+
+    <!-- 用户收藏的帖子 -->
+    <select id="findFavoritePostsByUser" resultMap="PostResultMap">
+        SELECT p.*, u.username, u.avatar_url, c.title AS course_title
+        FROM favorite f
+        JOIN post p ON f.post_id = p.id
+        LEFT JOIN user u ON p.user_id = u.id
+        LEFT JOIN course c ON p.course_id = c.id
+        WHERE f.user_id = #{userId}
+          AND p.status = 'published'
+          AND (p.visibility = 'PUBLIC' OR p.user_id = #{userId})
+        ORDER BY f.create_time DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countFavoritePostsByUser" resultType="long">
+        SELECT COUNT(*)
+        FROM favorite f
+        JOIN post p ON f.post_id = p.id
+        WHERE f.user_id = #{userId}
+          AND p.status = 'published'
+          AND (p.visibility = 'PUBLIC' OR p.user_id = #{userId})
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM post WHERE status = 'published'
+    </select>
+
+</mapper>
+

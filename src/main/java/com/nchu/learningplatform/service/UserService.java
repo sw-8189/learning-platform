@@ -16,4 +16,11 @@ public interface UserService {
     void updateUserInfo(User user);
 
     void updatePassword(Long userId, String oldPassword, String newPassword);
+
+    /**
+     * 检查邮箱是否已存在
+     * @param email 邮箱
+     * @return 是否存在
+     */
+    boolean existsByEmail(String email);
 }

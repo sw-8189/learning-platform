@@ -8,46 +8,181 @@
     <link rel="stylesheet" href="/css/main.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body class="gradient-bg">
 <div id="app" class="app-layout">
     <!-- 左侧侧边栏 -->
-    <aside class="sidebar glass-sidebar">
+    <aside class="sidebar glass-sidebar" :class="{collapsed: sidebarCollapsed}">
+        <!-- 顶部固定区：品牌 + 折叠按钮 -->
         <div class="sidebar-header">
-            <div class="nav-brand">
+            <div class="nav-brand" @mouseenter="handleBrandHover" @mouseleave="handleBrandLeave">
                 <span class="brand-logo">📚</span>
-                <span class="brand-text">智慧学习平台</span>
+                <span class="brand-text" v-show="!sidebarCollapsed">智慧学习平台</span>
+            </div>
+            <button class="sidebar-toggle" @click="toggleSidebar" :title="sidebarCollapsed ? '展开' : '折叠'">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="toggle-icon">
+                    <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 功能主区（可滚动） -->
+        <div class="sidebar-content" ref="sidebarContent">
+            <!-- 模块1：个人信息（父模块 + 子模块） -->
+            <div class="sidebar-module">
+                <div class="module-title" v-show="!sidebarCollapsed">个人信息</div>
+                <div class="sidebar-parent" 
+                     :class="{expanded: profileExpanded, active: activeTab === 'profile'}"
+                     @click="toggleProfileModule"
+                     @mouseenter="handleParentHover"
+                     @mouseleave="handleParentLeave">
+                    <div class="parent-content">
+                        <span class="parent-icon">👤</span>
+                        <span class="parent-text" v-show="!sidebarCollapsed">个人中心</span>
+                        <svg class="parent-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" v-show="!sidebarCollapsed">
+                            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <transition name="submenu">
+                    <ul class="sidebar-submenu" v-show="profileExpanded && !sidebarCollapsed">
+                        <li class="sidebar-subitem" 
+                            :class="{active: activeSubTab === 'profile-info'}"
+                            @click.stop="switchSubTab('profile-info')"
+                            @mouseenter="handleSubitemHover"
+                            @mouseleave="handleSubitemLeave">
+                            <span class="subitem-dot"></span>
+                            <span class="subitem-text">我的信息</span>
+                        </li>
+                        <li class="sidebar-subitem" 
+                            :class="{active: activeSubTab === 'profile-course'}"
+                            @click.stop="switchSubTab('profile-course')"
+                            @mouseenter="handleSubitemHover"
+                            @mouseleave="handleSubitemLeave">
+                            <span class="subitem-dot"></span>
+                            <span class="subitem-text">我的课程</span>
+                        </li>
+                        <li class="sidebar-subitem" 
+                            :class="{active: activeSubTab === 'profile-messages'}"
+                            @click.stop="switchSubTab('profile-messages')"
+                            @mouseenter="handleSubitemHover"
+                            @mouseleave="handleSubitemLeave">
+                            <span class="subitem-dot"></span>
+                            <span class="subitem-text">消息中心</span>
+                            <span v-if="unreadNotificationCount > 0 || unreadMessageCount > 0" class="message-badge">
+                                {{ (unreadNotificationCount + unreadMessageCount) > 99 ? '99+' : (unreadNotificationCount + unreadMessageCount) }}
+                            </span>
+                        </li>
+                    </ul>
+                </transition>
+            </div>
+
+            <!-- 分隔线 -->
+            <div class="sidebar-divider" v-show="!sidebarCollapsed"></div>
+
+            <!-- 模块2：核心功能（一级菜单项） -->
+            <div class="sidebar-module core-module">
+                <div class="sidebar-item core-item" 
+                     :class="{active: activeTab === 'course-center', loading: courseLoading}"
+                     @click="switchTab('course-center')"
+                     @mouseenter="handleCoreItemHover"
+                     @mouseleave="handleCoreItemLeave">
+                    <svg class="item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="item-text" v-show="!sidebarCollapsed">课程中心</span>
+                    <div class="loading-spinner" v-if="courseLoading && !sidebarCollapsed">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="url(#spinnerGradient)" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                <animate attributeName="stroke-dasharray" dur="1s" values="0 31.416;15.708 15.708;0 31.416;0 31.416" repeatCount="indefinite"/>
+                                <animate attributeName="stroke-dashoffset" dur="1s" values="0;-15.708;-31.416;-31.416" repeatCount="indefinite"/>
+                            </circle>
+                            <defs>
+                                <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#3182ce;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#63b3ed;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+                <div class="sidebar-item core-item" 
+                     :class="{active: activeTab === 'community'}"
+                     @click="switchTab('community')"
+                     @mouseenter="handleCoreItemHover"
+                     @mouseleave="handleCoreItemLeave">
+                    <svg class="item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="item-text" v-show="!sidebarCollapsed">学习社区</span>
+                </div>
+            </div>
+
+            <!-- 分隔线 -->
+            <div class="sidebar-divider" v-show="!sidebarCollapsed && user.role === 'ADMIN'"></div>
+
+            <!-- 模块3：管理后台（仅管理员可见） -->
+            <div class="sidebar-module" v-if="user.role === 'ADMIN'" ref="adminModule">
+                <div class="module-title" v-show="!sidebarCollapsed">管理功能</div>
+                <div class="sidebar-parent" 
+                     :class="{expanded: adminExpanded, active: activeTab === 'admin'}"
+                     @click="toggleAdminModule"
+                     @mouseenter="handleParentHover"
+                     @mouseleave="handleParentLeave">
+                    <div class="parent-content">
+                        <span class="parent-icon">⚙️</span>
+                        <span class="parent-text" v-show="!sidebarCollapsed">管理后台</span>
+                        <svg class="parent-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" v-show="!sidebarCollapsed">
+                            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <transition name="submenu">
+                    <ul class="sidebar-submenu" v-show="adminExpanded && !sidebarCollapsed">
+                        <li class="sidebar-subitem" 
+                            :class="{active: activeSubTab === 'admin-users'}"
+                            @click.stop="switchSubTab('admin-users')"
+                            @mouseenter="handleSubitemHover"
+                            @mouseleave="handleSubitemLeave">
+                            <span class="subitem-dot"></span>
+                            <span class="subitem-text">用户管理</span>
+                        </li>
+                        <li class="sidebar-subitem" 
+                            :class="{active: activeSubTab === 'admin-courses'}"
+                            @click.stop="switchSubTab('admin-courses')"
+                            @mouseenter="handleSubitemHover"
+                            @mouseleave="handleSubitemLeave">
+                            <span class="subitem-dot"></span>
+                            <span class="subitem-text">课程管理</span>
+                        </li>
+                        <li class="sidebar-subitem" 
+                            :class="{active: activeSubTab === 'admin-statistics'}"
+                            @click.stop="switchSubTab('admin-statistics')"
+                            @mouseenter="handleSubitemHover"
+                            @mouseleave="handleSubitemLeave">
+                            <span class="subitem-dot"></span>
+                            <span class="subitem-text">数据统计</span>
+                        </li>
+                    </ul>
+                </transition>
             </div>
         </div>
-        <ul class="sidebar-menu">
-            <li class="sidebar-item" :class="{active: activeTab === 'profile'}" @click="switchTab('profile')">
-                个人中心
-            </li>
-            <ul class="sidebar-submenu">
-                <li class="sidebar-subitem" :class="{active: activeSubTab === 'profile-info'}" @click="switchSubTab('profile-info')">
-                    我的信息
-                </li>
-                <li class="sidebar-subitem" :class="{active: activeSubTab === 'profile-course'}" @click="switchSubTab('profile-course')">
-                    我的课程
-                </li>
-            </ul>
-            <li class="sidebar-item" :class="{active: activeTab === 'course-center'}" @click="switchTab('course-center')">
-                课程中心
-            </li>
-            <li class="sidebar-item" :class="{active: activeTab === 'community'}" @click="switchTab('community')">
-                学习社区
-            </li>
-            <li class="sidebar-item" :class="{active: activeTab === 'admin'}" id="adminMenuItem" style="display: none;">
-                管理后台
-            </li>
-        </ul>
+
+        <!-- 底部固定区：退出登录 + 版本信息 -->
         <div class="sidebar-footer">
-            <button id="logoutBtn" class="ghost-btn full" @click="logout">退出登录</button>
+            <button class="logout-btn" @click="logout" @mouseenter="handleLogoutHover" @mouseleave="handleLogoutLeave">
+                <span v-show="!sidebarCollapsed">退出登录</span>
+                <span v-show="sidebarCollapsed" title="退出登录">🚪</span>
+            </button>
+            <div class="version-info" v-show="!sidebarCollapsed">v1.0.0</div>
         </div>
     </aside>
 
     <!-- 右侧主内容 -->
     <main class="main-content">
+
         <!-- 我的信息 -->
         <section v-show="activeTab === 'profile' && activeSubTab === 'profile-info'" class="tab-panel active glass-panel">
             <h2 class="panel-title">我的信息</h2>
@@ -87,11 +222,11 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">学习偏好</span>
-                        <span class="info-value">{{ user.learningPreference || '-' }}</span>
+                        <span class="info-value">{{ parsedLearningPreference }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">课程兴趣</span>
-                        <span class="info-value">{{ user.courseInterest || '-' }}</span>
+                        <span class="info-value">{{ parsedCourseInterest }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">学习目标</span>
@@ -102,7 +237,6 @@
 
             <div class="glass-panel form-panel">
                 <h3 class="panel-title">编辑个人信息</h3>
-
                 <form id="profileForm" class="inline-form" @submit.prevent="updateUserInfo">
                     <!-- 头像上传 -->
                     <div class="form-group avatar-group">
@@ -133,195 +267,1811 @@
                     <div class="form-group">
                         <label class="form-label">性别</label>
                         <div class="radio-group">
-                            <label class="radio-item">
-                                <input type="radio" name="editGender" value="男" v-model="editUser.gender"> 男
-                            </label>
-                            <label class="radio-item">
-                                <input type="radio" name="editGender" value="女" v-model="editUser.gender"> 女
-                            </label>
-                            <label class="radio-item">
-                                <input type="radio" name="editGender" value="保密" v-model="editUser.gender"> 保密
-                            </label>
+                            <div class="radio-item">
+                                <input type="radio" v-model="editUser.gender" value="男" id="genderMale">
+                                <label for="genderMale">男</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" v-model="editUser.gender" value="女" id="genderFemale">
+                                <label for="genderFemale">女</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" v-model="editUser.gender" value="保密" id="genderOther">
+                                <label for="genderOther">保密</label>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 学习偏好（多选） -->
+                    <!-- 学习偏好 -->
                     <div class="form-group">
                         <label class="form-label">学习偏好</label>
-                        <div class="checkbox-group grid-3">
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="视觉学习" v-model="editUser.learningPreference"> 视觉学习
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="听觉学习" v-model="editUser.learningPreference"> 听觉学习
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="动手实践" v-model="editUser.learningPreference"> 动手实践
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="阅读写作" v-model="editUser.learningPreference"> 阅读写作
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="社交学习" v-model="editUser.learningPreference"> 社交学习
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="独立学习" v-model="editUser.learningPreference"> 独立学习
-                            </label>
+                        <div class="checkbox-group grid-4">
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.learningPreference" value="视觉学习" id="visualLearning">
+                                <label for="visualLearning">视觉学习</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.learningPreference" value="阅读写作" id="readingWriting">
+                                <label for="readingWriting">阅读写作</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.learningPreference" value="听觉学习" id="auditoryLearning">
+                                <label for="auditoryLearning">听觉学习</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.learningPreference" value="独立学习" id="independentLearning">
+                                <label for="independentLearning">独立学习</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.learningPreference" value="动手实践" id="handsOnPractice">
+                                <label for="handsOnPractice">动手实践</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.learningPreference" value="社交学习" id="socialLearning">
+                                <label for="socialLearning">社交学习</label>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 课程兴趣（多选） -->
                     <div class="form-group">
                         <label class="form-label">课程兴趣</label>
                         <div class="checkbox-group grid-3">
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="编程开发" v-model="editUser.courseInterest"> 编程开发
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="数据科学" v-model="editUser.courseInterest"> 数据科学
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="人工智能" v-model="editUser.courseInterest"> 人工智能
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="设计创意" v-model="editUser.courseInterest"> 设计创意
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="商业管理" v-model="editUser.courseInterest"> 商业管理
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" value="职业技能" v-model="editUser.courseInterest"> 职业技能
-                            </label>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.courseInterest" value="编程开发" id="programming">
+                                <label for="programming">编程开发</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.courseInterest" value="前端学习" id="frontend">
+                                <label for="frontend">前端学习</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.courseInterest" value="数据科学" id="dataScience">
+                                <label for="dataScience">数据科学</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.courseInterest" value="人工智能" id="ai">
+                                <label for="ai">人工智能</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.courseInterest" value="设计创意" id="design">
+                                <label for="design">设计创意</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.courseInterest" value="商业管理" id="business">
+                                <label for="business">商业管理</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" v-model="editUser.courseInterest" value="职业技能" id="skill">
+                                <label for="skill">职业技能</label>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 学习目标（单选） -->
+                    <!-- 学习目标 -->
                     <div class="form-group">
                         <label class="form-label">学习目标</label>
                         <div class="radio-group grid-4">
-                            <label class="radio-item">
-                                <input type="radio" name="editLearningGoal" value="职业提升" v-model="editUser.learningGoal"> 职业提升
-                            </label>
-                            <label class="radio-item">
-                                <input type="radio" name="editLearningGoal" value="技能拓展" v-model="editUser.learningGoal"> 技能拓展
-                            </label>
-                            <label class="radio-item">
-                                <input type="radio" name="editLearningGoal" value="学术深造" v-model="editUser.learningGoal"> 学术深造
-                            </label>
-                            <label class="radio-item">
-                                <input type="radio" name="editLearningGoal" value="兴趣爱好" v-model="editUser.learningGoal"> 兴趣爱好
-                            </label>
+                            <div class="radio-item">
+                                <input type="radio" v-model="editUser.learningGoal" value="职业提升" id="careerDevelopment">
+                                <label for="careerDevelopment">职业提升</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" v-model="editUser.learningGoal" value="技能拓展" id="skillExpansion">
+                                <label for="skillExpansion">技能拓展</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" v-model="editUser.learningGoal" value="学术深造" id="academicAdvancement">
+                                <label for="academicAdvancement">学术深造</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" v-model="editUser.learningGoal" value="兴趣爱好" id="hobby">
+                                <label for="hobby">兴趣爱好</label>
+                            </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="primary-btn">保存修改</button>
-                    <div v-if="updateMessage" class="success-text">{{ updateMessage }}</div>
-                    <div v-if="updateError" class="error-text">{{ updateError }}</div>
+                    <div class="form-actions">
+                        <button type="submit" class="primary-btn">保存更改</button>
+                    </div>
                 </form>
-            </div>
 
-
-            <div class="glass-panel form-panel">
-                <h3 class="panel-title">修改密码</h3>
-                <form id="passwordForm" class="inline-form" @submit.prevent="updatePassword">
-                    <div class="form-group">
-                        <label for="oldPassword" class="form-label">当前密码</label>
-                        <input type="password" id="oldPassword" v-model="passwordForm.oldPassword" placeholder="请输入当前密码" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="newPassword" class="form-label">新密码</label>
-                        <input type="password" id="newPassword" v-model="passwordForm.newPassword" placeholder="至少 8 位，建议包含字母与数字" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmNewPassword" class="form-label">确认新密码</label>
-                        <input type="password" id="confirmNewPassword" v-model="passwordForm.confirmNewPassword" placeholder="再次输入新密码" class="form-input">
-                    </div>
-                    <button type="submit" class="primary-btn">修改密码</button>
-                    <div v-if="passwordMessage" class="success-text">{{ passwordMessage }}</div>
-                    <div v-if="passwordError" class="error-text">{{ passwordError }}</div>
-                </form>
+                <!-- 修改密码表单 -->
+                <div class="glass-panel form-panel" style="margin-top: 2rem;">
+                    <h3 class="panel-title">修改密码</h3>
+                    <form id="passwordForm" class="inline-form" @submit.prevent="updatePassword">
+                        <div class="form-group">
+                            <label class="form-label">原密码</label>
+                            <div class="input-wrapper password-input-wrapper">
+                                <input type="password" v-model="passwordForm.oldPassword" ref="oldPasswordInput" class="form-input password-input" placeholder="请输入原密码" required>
+                                <button type="button" @click="togglePassword('oldPassword')" class="toggle-btn password-toggle">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#a0aec0" stroke-width="2"/>
+                                        <circle cx="12" cy="12" r="3" stroke="#a0aec0" stroke-width="2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">新密码</label>
+                            <div class="input-wrapper password-input-wrapper">
+                                <input type="password" v-model="passwordForm.newPassword" ref="newPasswordInput" class="form-input password-input" placeholder="请输入新密码（4-8位，包含字母和数字）" required>
+                                <button type="button" @click="togglePassword('newPassword')" class="toggle-btn password-toggle">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#a0aec0" stroke-width="2"/>
+                                        <circle cx="12" cy="12" r="3" stroke="#a0aec0" stroke-width="2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">确认新密码</label>
+                            <div class="input-wrapper password-input-wrapper">
+                                <input type="password" v-model="passwordForm.confirmPassword" ref="confirmPasswordInput" class="form-input password-input" placeholder="请再次输入新密码" required>
+                                <button type="button" @click="togglePassword('confirmPassword')" class="toggle-btn password-toggle">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#a0aec0" stroke-width="2"/>
+                                        <circle cx="12" cy="12" r="3" stroke="#a0aec0" stroke-width="2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="primary-btn">修改密码</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
 
         <!-- 我的课程 -->
-        <section v-show="activeTab === 'profile' && activeSubTab === 'profile-course'" class="tab-panel glass-panel">
+        <section v-show="activeTab === 'profile' && activeSubTab === 'profile-course'" class="tab-panel active glass-panel">
             <h2 class="panel-title">我的课程</h2>
-            <p class="panel-subtitle">你正在学习或已加入的课程。</p>
-            <div id="my-course-list" class="card-grid">
-                <div v-for="course in myCourses" :key="course.id" class="feature-card">
+            <p class="panel-subtitle">您已报名的课程</p>
+
+            <div class="my-learning-panel">
+                <div class="learning-panel-header">
+                    <div>
+                        <h3>我的学习情况</h3>
+                        <p>实时掌握课程加入和学习分布，及时调整学习计划</p>
+                    </div>
+                    <button 
+                        type="button" 
+                        class="ghost-btn refresh-learning-btn" 
+                        @click.stop="loadLearningStatistics" 
+                        :disabled="learningStatsLoading">
+                        {{ learningStatsLoading ? '刷新中...' : '刷新数据' }}
+                    </button>
+                </div>
+
+                <div v-if="learningStatsLoading" class="learning-loading">
+                    <div class="loading-spinner"></div>
+                    <p>统计数据加载中...</p>
+                </div>
+
+                <div v-else-if="learningStats" class="learning-metrics-grid">
+                    <div class="learning-metric-card primary">
+                        <span class="metric-label">已加入课程</span>
+                        <span class="metric-value">{{ learningStats.courseCount || 0 }}</span>
+                        <span class="metric-tip">累计加入记录</span>
+                    </div>
+                    <div class="learning-metric-card secondary">
+                        <span class="metric-label">最近学习时间</span>
+                        <span class="metric-value small">{{ learningStats.latestJoinTime || '暂无' }}</span>
+                        <span class="metric-tip">保持学习节奏</span>
+                    </div>
+                </div>
+
+                <div v-else class="learning-empty">
+                    <p>暂无学习数据，加入课程后即可查看统计信息。</p>
+                </div>
+
+                <div v-if="learningStats && !learningStatsLoading" class="learning-charts-grid">
+                    <div class="learning-chart-card">
+                        <div class="chart-card-header">
+                            <h4>课程分类分布</h4>
+                            <span>掌握学习重心</span>
+                        </div>
+                        <div id="categoryChart" class="learning-chart"></div>
+                    </div>
+                    <div class="learning-chart-card">
+                        <div class="chart-card-header">
+                            <h4>课程难度分布</h4>
+                            <span>平衡学习强度</span>
+                        </div>
+                        <div id="levelChart" class="learning-chart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="userCourses.length === 0" class="no-data">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h6m-6 3h6m-6 3h6" stroke="#a0aec0" stroke-width="2"/>
+                </svg>
+                <p>暂无课程</p>
+            </div>
+
+            <div v-else class="card-grid">
+                <div v-for="course in userCourses" :key="course.id" class="feature-card course-card" @click="viewCourseDetail(course.id, 'my-courses')">
                     <div class="course-image">
-                        <img :src="course.coverUrl || '/image/course/default-course.png'" :alt="course.title">
+                        <img :src="course.coverUrl || '/image/course/default-cover.png'" alt="课程封面">
                     </div>
                     <h3 class="course-title">{{ course.title }}</h3>
                     <p class="course-description">{{ course.description }}</p>
-                    <div class="course-meta">
-                        <span class="course-level">{{ course.level }}</span>
-                        <span class="course-category">{{ course.category }}</span>
+                    <!-- 课程标签 -->
+                    <div class="course-tags" v-if="course.tags">
+                        <span 
+                            v-for="tag in parseTags(course.tags)" 
+                            :key="tag" 
+                            class="course-tag">
+                            {{ tag }}
+                        </span>
                     </div>
-                    <div class="course-teacher">讲师：{{ course.teacher }}</div>
-                </div>
-                <div v-if="myCourses.length === 0" class="no-courses">
-                    您还没有加入任何课程
+                    <div class="course-meta">
+                        <span class="meta-item">{{ course.level }} | {{ course.category }}</span>
+                        <span class="meta-item">讲师：{{ course.teacher }}</span>
+                    </div>
+                    <div class="course-actions" style="margin-top: 1rem;" @click.stop>
+                        <button 
+                            @click="quitCourse(course.id)"
+                            class="btn btn-secondary"
+                            style="width: 100%; padding: 0.5rem;">
+                            退选课程
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- 课程中心 -->
-        <section v-show="activeTab === 'course-center'" class="tab-panel glass-panel">
+        <section v-show="activeTab === 'course-center'" class="tab-panel active glass-panel">
             <h2 class="panel-title">课程中心</h2>
-            <p class="panel-subtitle">根据你的基础与目标推荐合适课程。</p>
+            <p class="panel-subtitle">探索丰富的学习资源</p>
 
-            <div class="search-bar">
-                <input type="text" v-model="searchKeyword" placeholder="搜索课程..." @keyup.enter="searchCourses">
-                <button @click="searchCourses" class="btn btn-primary">搜索</button>
-            </div>
-
-            <div id="course-list" class="card-grid">
-                <div v-for="course in courses" :key="course.id" class="feature-card">
-                    <div class="course-image">
-                        <img :src="course.coverUrl || '/image/course/default-course.png'" :alt="course.title">
-                    </div>
-                    <h3 class="course-title">{{ course.title }}</h3>
-                    <p class="course-description">{{ course.description }}</p>
-                    <div class="course-meta">
-                        <span class="course-level">{{ course.level }}</span>
-                        <span class="course-category">{{ course.category }}</span>
-                    </div>
-                    <div class="course-teacher">讲师：{{ course.teacher }}</div>
-                    <div class="course-price">¥{{ course.price }}</div>
-                    <button @click="joinCourse(course.id)" class="btn btn-primary join-course-btn">加入课程</button>
+            <!-- 标签分类 -->
+            <div class="form-group">
+                <div class="tab-buttons" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <button 
+                        :class="['tab-btn', { active: courseTab === 'recommended' }]"
+                        @click="switchCourseTab('recommended')"
+                        style="padding: 0.5rem 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white; cursor: pointer;"
+                        :style="courseTab === 'recommended' ? 'background: #3182ce; color: white; border-color: #3182ce;' : ''">
+                        为你推荐
+                    </button>
+                    <button 
+                        :class="['tab-btn', { active: courseTab === 'all' }]"
+                        @click="switchCourseTab('all')"
+                        style="padding: 0.5rem 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white; cursor: pointer;"
+                        :style="courseTab === 'all' ? 'background: #3182ce; color: white; border-color: #3182ce;' : ''">
+                        全部课程
+                    </button>
                 </div>
             </div>
 
-            <div class="pagination">
-                <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
-                <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
-                <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+            <!-- 搜索栏 -->
+            <div class="search-bar-container">
+                <div class="search-row">
+                    <input 
+                        type="text" 
+                        id="courseSearch" 
+                        v-model="keyword" 
+                        class="search-input" 
+                        placeholder="请输入课程名称" 
+                        @keyup.enter="queryCourses">
+                    <select v-model="searchLearningPreference" class="search-select">
+                        <option value="">学习偏好：全部</option>
+                        <option value="视觉学习">视觉学习</option>
+                        <option value="阅读写作">阅读写作</option>
+                        <option value="听觉学习">听觉学习</option>
+                        <option value="独立学习">独立学习</option>
+                        <option value="动手实践">动手实践</option>
+                        <option value="社交学习">社交学习</option>
+                    </select>
+                    <select v-model="searchCourseInterest" class="search-select">
+                        <option value="">课程兴趣：全部</option>
+                        <option value="编程开发">编程开发</option>
+                        <option value="前端学习">前端学习</option>
+                        <option value="数据科学">数据科学</option>
+                        <option value="人工智能">人工智能</option>
+                        <option value="设计创意">设计创意</option>
+                        <option value="商业管理">商业管理</option>
+                        <option value="职业技能">职业技能</option>
+                    </select>
+                    <select v-model="searchLearningGoal" class="search-select">
+                        <option value="">学习目标：全部</option>
+                        <option value="职业提升">职业提升</option>
+                        <option value="技能拓展">技能拓展</option>
+                        <option value="学术深造">学术深造</option>
+                        <option value="兴趣爱好">兴趣爱好</option>
+                    </select>
+                    <button type="button" @click="queryCourses" class="search-btn-primary">搜索</button>
+                    <button type="button" @click="resetSearch" class="search-btn-reset">重置</button>
+                </div>
+            </div>
+
+            <!-- 课程列表 -->
+            <div v-if="courses.length === 0" class="no-data">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h6m-6 3h6m-6 3h6" stroke="#a0aec0" stroke-width="2"/>
+                </svg>
+                <p>暂无课程</p>
+            </div>
+
+            <div v-else class="card-grid">
+                <div v-for="course in courses" :key="course.id" class="feature-card course-card" @click="viewCourseDetail(course.id, 'course-center')">
+                    <div class="course-image">
+                        <img :src="course.coverUrl || '/image/course/default-cover.png'" alt="课程封面">
+                    </div>
+                    <h3 class="course-title">{{ course.title }}</h3>
+                    <p class="course-description">{{ course.description }}</p>
+                    <!-- 课程标签 -->
+                    <div class="course-tags" v-if="course.tags">
+                        <span 
+                            v-for="tag in parseTags(course.tags)" 
+                            :key="tag" 
+                            class="course-tag">
+                            {{ tag }}
+                        </span>
+                    </div>
+                    <div class="course-meta">
+                        <span class="meta-item">{{ course.level }} | {{ course.category }}</span>
+                        <span class="meta-item">讲师：{{ course.teacher }}</span>
+                    </div>
+                    <div class="course-actions" style="margin-top: 1rem;" @click.stop>
+                        <button 
+                            v-if="!isCourseJoined(course.id)"
+                            @click="joinCourse(course.id)"
+                            class="primary-btn"
+                            style="width: 100%; padding: 0.5rem;">
+                            加入课程
+                        </button>
+                        <button 
+                            v-else
+                            disabled
+                            class="primary-btn"
+                            style="width: 100%; padding: 0.5rem; background: #a0aec0; cursor: not-allowed;">
+                            已加入
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div v-if="courseTotal > 0" class="pagination-container">
+                <div class="pagination-info">共{{ courseTotal }}条</div>
+                <div class="pagination-controls">
+                    <button 
+                        @click="changePage(page - 1)"
+                        :disabled="page <= 1"
+                        class="pagination-btn"
+                        :class="{disabled: page <= 1}">
+                        &lt;
+                    </button>
+                    <template v-for="p in getPageNumbers()">
+                        <button 
+                            v-if="p !== '...'"
+                            :key="p"
+                            @click="changePage(p)"
+                            class="pagination-btn"
+                            :class="{active: p === page}">
+                            {{ p }}
+                        </button>
+                        <span v-else :key="'ellipsis-' + p" class="pagination-ellipsis">...</span>
+                    </template>
+                    <button 
+                        @click="changePage(page + 1)"
+                        :disabled="page >= totalPages"
+                        class="pagination-btn"
+                        :class="{disabled: page >= totalPages}">
+                        &gt;
+                    </button>
+                </div>
+                <div class="pagination-jump">
+                    <span>前往</span>
+                    <input 
+                        type="number" 
+                        v-model.number="jumpPage" 
+                        @keyup.enter="jumpToPage"
+                        class="pagination-input" 
+                        :min="1" 
+                        :max="totalPages">
+                    <span>页</span>
+                </div>
             </div>
         </section>
 
         <!-- 学习社区 -->
-        <section v-show="activeTab === 'community'" class="tab-panel glass-panel">
-            <h2 class="panel-title">学习社区</h2>
-            <p class="panel-subtitle">与其他学习者一起讨论问题、分享经验、互相鼓励。</p>
-            <div class="community-placeholder">
-                社区功能建设中，后续可以接入讨论区 / 评论系统 / 积分体系等。
+        <section v-show="activeTab === 'community'" class="tab-panel active glass-panel community-panel">
+            <!-- 顶部功能区 -->
+            <div class="community-header">
+                <div class="community-search-bar">
+                    <input 
+                        type="text" 
+                        v-model="communityKeyword" 
+                        @keyup.enter="searchCommunityPosts"
+                        placeholder="搜索帖子、用户、话题..." 
+                        class="search-input">
+                    <button @click="searchCommunityPosts" class="search-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="community-actions">
+                    <button @click="showCreatePostModal = true" class="primary-btn create-post-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        发布帖子
+                    </button>
+                </div>
+            </div>
+
+            <!-- 分类导航 -->
+            <div class="community-tabs-container">
+                <div class="community-tabs" ref="communityTabs">
+                <button 
+                    v-for="tab in communityTabs" 
+                    :key="tab.value"
+                    @click="switchCommunityTab(tab.value)"
+                    :class="['community-tab', {active: communityActiveTab === tab.value}]">
+                    {{ tab.label }}
+                </button>
+                </div>
+            </div>
+
+            <!-- 分类标签（横向滚动） -->
+            <div class="category-tags" v-if="communityActiveTab === 'recommended' || communityActiveTab === 'discussion'">
+                <button 
+                    v-for="category in courseCategories" 
+                    :key="category"
+                    @click="selectCategory(category)"
+                    :class="['category-tag', {active: selectedCategory === category}]">
+                    {{ category }}
+                </button>
+            </div>
+
+            <!-- 帖子列表 -->
+            <div v-if="communityPostsLoading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>加载中...</p>
+            </div>
+
+            <div v-else-if="communityPosts.length === 0" class="no-data">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="#a0aec0" stroke-width="2"/>
+                </svg>
+                <p>暂无帖子</p>
+            </div>
+
+            <div v-else class="posts-list">
+                <div v-for="post in communityPosts" :key="post.id" class="post-card" @click="viewPostDetail(post.id)">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <img :src="post.avatarUrl || '/image/avatar/default-avatar.png'" :alt="post.username" class="author-avatar" @click.stop="openMessageDialog(post.userId, post.username, post.avatarUrl)" style="cursor: pointer;" title="点击私信">
+                            <div class="author-info">
+                                <span class="author-name">{{ post.username }}</span>
+                                <span class="post-time">{{ formatTime(post.createTime) }}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <div class="post-type-badge" :class="post.type">
+                            {{ post.type === 'discussion' ? '讨论' : post.type === 'question' ? '问答' : '经验' }}
+                            </div>
+                            <span v-if="post.visibility === 'PRIVATE'" class="privacy-badge" title="私密帖子">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M19 11H5m-2 0a2 2 0 012-2h14a2 2 0 012 2m-2 0a2 2 0 01-2 2H7a2 2 0 01-2-2m0 0V9a2 2 0 012-2h10a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                私密
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="post-title">{{ post.title }}</h3>
+                    <div class="post-content-preview" v-html="truncateContent(post.content, 200)"></div>
+                    
+                    <div class="post-tags" v-if="post.tags">
+                        <span v-for="tag in parseTags(post.tags)" :key="tag" class="post-tag">#{{ tag }}</span>
+                    </div>
+                    
+                    <div class="post-footer">
+                        <div class="post-stats">
+                            <span class="stat-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                {{ post.viewCount || 0 }}
+                            </span>
+                            <span class="stat-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                {{ post.commentCount || 0 }}
+                            </span>
+                        </div>
+                        <div class="post-actions" @click.stop>
+                            <button 
+                                @click="toggleLikePost(post.id, post.isLiked)"
+                                :class="['action-btn', 'like-btn', {active: post.isLiked}]">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" :fill="post.isLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                {{ post.likeCount || 0 }}
+                            </button>
+                            <button 
+                                @click="toggleFavoritePost(post.id, post.isFavorited)"
+                                :class="['action-btn', 'favorite-btn', {active: post.isFavorited}]">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" :fill="post.isFavorited ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="post-attachment-card" v-if="post.attachmentUrl" @click.stop>
+                        <div class="attachment-icon-badge">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M16.5 6.5l-7.07 7.07a2.5 2.5 0 01-3.54-3.54L12 3.93a4 4 0 015.66 5.66L11 16.24" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="attachment-info">
+                            <p class="attachment-label">附件可下载</p>
+                            <a 
+                                :href="post.attachmentUrl" 
+                                target="_blank" 
+                                download 
+                                class="attachment-link" 
+                                @click.stop>
+                                {{ post.attachmentFileName || '点击下载附件' }}
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="post-course-link" v-if="post.courseTitle" @click.stop="viewCourseDetail(post.courseId, 'community')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        关联课程：{{ post.courseTitle }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div v-if="communityTotal > 0" class="pagination-container">
+                <button @click="loadCommunityPosts(communityPage - 1)" :disabled="communityPage === 1" class="pagination-btn">上一页</button>
+                <span class="pagination-info">第 {{ communityPage }} 页，共 {{ Math.ceil(communityTotal / communityPageSize) }} 页</span>
+                <button @click="loadCommunityPosts(communityPage + 1)" :disabled="communityPage >= Math.ceil(communityTotal / communityPageSize)" class="pagination-btn">下一页</button>
             </div>
         </section>
 
-        <!-- 管理后台 -->
-        <section v-show="activeTab === 'admin'" class="tab-panel glass-panel">
-            <h2 class="panel-title">管理后台</h2>
-            <p class="panel-subtitle">
-                当前仅作为占位示例。后续可以在此增加用户管理、课程管理、统计报表等模块。
-            </p>
-            <div class="community-placeholder">
-                管理员功能开发中……（仅 ADMIN 角色可以看到本入口）
+        <!-- 帖子详情页 -->
+        <section v-show="activeTab === 'post-detail'" class="tab-panel active glass-panel post-detail-panel">
+            <div class="post-detail-header">
+                <button @click="backToCommunity" class="back-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    返回社区
+                </button>
+            </div>
+
+            <div v-if="postDetailLoading" class="loading-container">
+                <div class="loading-spinner-large"></div>
+                <p>加载中...</p>
+            </div>
+
+            <div v-else-if="postDetail" class="post-detail-content">
+                <div class="post-detail-card">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <img :src="postDetail.avatarUrl || '/image/avatar/default-avatar.png'" :alt="postDetail.username" class="author-avatar" @click.stop="openMessageDialog(postDetail.userId, postDetail.username, postDetail.avatarUrl)" style="cursor: pointer;" title="点击私信">
+                            <div class="author-info">
+                                <span class="author-name">{{ postDetail.username }}</span>
+                                <span class="post-time">{{ formatTime(postDetail.createTime) }}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <div class="post-type-badge" :class="postDetail.type">
+                            {{ postDetail.type === 'discussion' ? '讨论' : postDetail.type === 'question' ? '问答' : '经验' }}
+                            </div>
+                            <span v-if="postDetail.visibility === 'PRIVATE'" class="privacy-badge" title="私密帖子">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M19 11H5m-2 0a2 2 0 012-2h14a2 2 0 012 2m-2 0a2 2 0 01-2 2H7a2 2 0 01-2-2m0 0V9a2 2 0 012-2h10a2 2 0 012 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                私密
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h1 class="post-detail-title">{{ postDetail.title }}</h1>
+                    <div class="post-detail-content-text" v-html="formatDescription(postDetail.content)"></div>
+                    
+                    <div class="post-tags" v-if="postDetail.tags">
+                        <span v-for="tag in parseTags(postDetail.tags)" :key="tag" class="post-tag">#{{ tag }}</span>
+                    </div>
+
+                    <div class="detail-attachment-card" v-if="postDetail.attachmentUrl">
+                        <div class="detail-attachment-info">
+                            <div class="attachment-icon-badge large">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                    <path d="M7 10l5 5 5-5M12 3v12M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="attachment-label">附件下载</p>
+                                <p class="attachment-file-name">{{ postDetail.attachmentFileName || '点击下载附件' }}</p>
+                            </div>
+                        </div>
+                        <a :href="postDetail.attachmentUrl" target="_blank" download class="download-attachment-btn">
+                            下载附件
+                        </a>
+                    </div>
+                    
+                    <div class="post-detail-footer">
+                        <div class="post-stats">
+                            <span class="stat-item">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                {{ postDetail.viewCount || 0 }} 浏览
+                            </span>
+                            <span class="stat-item">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                {{ postDetail.commentCount || 0 }} 评论
+                            </span>
+                        </div>
+                        <div class="post-actions" @click.stop>
+                            <button 
+                                @click="toggleLikePost(postDetail.id, postDetail.isLiked)"
+                                :class="['action-btn', 'like-btn', 'large', {active: postDetail.isLiked}]">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" :fill="postDetail.isLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                {{ postDetail.likeCount || 0 }}
+                            </button>
+                            <button 
+                                @click="toggleFavoritePost(postDetail.id, postDetail.isFavorited)"
+                                :class="['action-btn', 'favorite-btn', 'large', {active: postDetail.isFavorited}]">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" :fill="postDetail.isFavorited ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                收藏
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="post-course-link" v-if="postDetail.courseTitle" @click="viewCourseDetail(postDetail.courseId, 'community')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        关联课程：{{ postDetail.courseTitle }}
+                    </div>
+                </div>
+
+                <!-- 评论区 -->
+                <div class="comments-section">
+                    <h3 class="comments-title">评论 ({{ postDetail.commentCount || 0 }})</h3>
+                    
+                    <div class="comment-form" v-if="token">
+                        <textarea v-model="newCommentContent" placeholder="写下你的评论..." class="comment-input"></textarea>
+                        <button @click="submitComment" class="primary-btn comment-submit-btn">发表评论</button>
+                    </div>
+                    
+                    <div v-if="postCommentsLoading" class="loading-container">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    
+                    <div v-else-if="postComments.length === 0" class="no-comments">
+                        <p>暂无评论，快来发表第一条评论吧！</p>
+                    </div>
+                    
+                    <div v-else class="comments-list">
+                        <div v-for="comment in postComments" :key="comment.id" class="comment-item">
+                            <div class="comment-header">
+                                <img :src="comment.avatarUrl || '/image/avatar/default-avatar.png'" :alt="comment.username" class="comment-avatar" @click.stop="openMessageDialog(comment.userId, comment.username, comment.avatarUrl)" style="cursor: pointer;" title="点击私信">
+                                <div class="comment-author">
+                                    <span class="comment-author-name">{{ comment.username }}</span>
+                                    <span class="comment-time">{{ formatTime(comment.createTime) }}</span>
+                                </div>
+                                <div class="comment-actions">
+                                    <button 
+                                        @click="toggleLikeComment(comment.id, comment.isLiked)"
+                                        :class="['comment-like-btn', {active: comment.isLiked}]">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" :fill="comment.isLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"/>
+                                        </svg>
+                                        {{ comment.likeCount || 0 }}
+                                    </button>
+                                    <button @click="replyToComment(comment)" class="comment-reply-btn">回复</button>
+                                    <button 
+                                        v-if="postDetail.userId === user.id && postDetail.type === 'question' && !comment.isBestAnswer"
+                                        @click="setBestAnswer(comment.id)"
+                                        class="best-answer-btn">设为最佳答案</button>
+                                    <span v-if="comment.isBestAnswer" class="best-answer-badge">✓ 最佳答案</span>
+                                </div>
+                            </div>
+                            <div class="comment-content" v-html="formatDescription(comment.content)"></div>
+                            
+                            <!-- 回复列表 -->
+                            <div v-if="comment.replies && comment.replies.length > 0" class="replies-list">
+                                <div v-for="reply in comment.replies" :key="reply.id" class="reply-item">
+                                    <img :src="reply.avatarUrl || '/image/avatar/default-avatar.png'" :alt="reply.username" class="reply-avatar" @click.stop="openMessageDialog(reply.userId, reply.username, reply.avatarUrl)" style="cursor: pointer;" title="点击私信">
+                                    <div class="reply-content">
+                                        <span class="reply-author">{{ reply.username }}</span>
+                                        <span class="reply-text" v-html="formatDescription(reply.content)"></span>
+                                        <span class="reply-time">{{ formatTime(reply.createTime) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 回复输入框 -->
+                            <div v-if="replyingTo === comment.id" class="reply-form">
+                                <textarea v-model="replyContent" placeholder="写下你的回复..." class="reply-input"></textarea>
+                                <div class="reply-actions">
+                                    <button @click="cancelReply" class="cancel-btn">取消</button>
+                                    <button @click="submitReply(comment.id)" class="primary-btn">发表回复</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 消息中心 -->
+        <section v-show="activeTab === 'profile' && activeSubTab === 'profile-messages'" class="tab-panel active glass-panel">
+            <div class="messages-center-header">
+                <h2 class="panel-title">消息中心</h2>
+                <p class="panel-subtitle">查看通知和私信，与用户交流</p>
+            </div>
+            
+            <!-- 标签切换 -->
+            <div class="messages-tabs">
+                <button 
+                    @click="messagesActiveTab = 'notifications'" 
+                    :class="['messages-tab', {active: messagesActiveTab === 'notifications'}]">
+                    通知
+                    <span v-if="unreadNotificationCount > 0" class="tab-badge">{{ unreadNotificationCount > 99 ? '99+' : unreadNotificationCount }}</span>
+                </button>
+                <button 
+                    @click="messagesActiveTab = 'messages'" 
+                    :class="['messages-tab', {active: messagesActiveTab === 'messages'}]">
+                    私信
+                    <span v-if="unreadMessageCount > 0" class="tab-badge">{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}</span>
+                </button>
+            </div>
+
+            <!-- 通知列表 -->
+            <div v-show="messagesActiveTab === 'notifications'" class="messages-content">
+                <div class="messages-actions">
+                    <button @click="markAllNotificationsRead" class="primary-outline-btn">全部已读</button>
+                    <button @click="loadNotifications" class="ghost-btn">刷新</button>
+                </div>
+                <div v-if="notificationsLoading" class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>加载中...</p>
+                </div>
+                <div v-else-if="notifications.length === 0" class="empty-state">
+                    <img src="/image/学习路径.png" alt="empty" class="empty-illustration">
+                    <p>暂无通知</p>
+                </div>
+                <div v-else class="notifications-list">
+                    <div v-for="notification in notifications" :key="notification.id" 
+                         :class="['notification-item-card', {unread: !notification.isRead}, 'notification-type-' + (notification.type || 'default')]"
+                         @click="handleNotificationClick(notification)">
+                        <img :src="notification.fromAvatarUrl || '/image/avatar/default-avatar.png'" :alt="notification.fromUsername" class="notification-avatar">
+                        <div class="notification-content">
+                            <div class="notification-header-row">
+                                <span class="notification-username">{{ notification.fromUsername || '系统' }}</span>
+                                <span class="notification-type-badge" :class="'type-' + (notification.type || 'default')">
+                                    {{ getNotificationTypeLabel(notification.type) }}
+                                </span>
+                                <span class="notification-time">{{ formatTime(notification.createTime) }}</span>
+                            </div>
+                            <p class="notification-text">{{ notification.content }}</p>
+                        </div>
+                        <div v-if="!notification.isRead" class="unread-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 私信列表 -->
+            <div v-show="messagesActiveTab === 'messages'" class="messages-content">
+                <div class="messages-search-section">
+                    <div class="search-user-box">
+                        <input 
+                            type="text" 
+                            v-model="messageSearchKeyword" 
+                            @keyup.enter="searchUsersForMessage"
+                            placeholder="搜索用户名..." 
+                            class="search-input">
+                        <button @click="searchUsersForMessage" class="primary-btn">搜索</button>
+                    </div>
+                    <div v-if="messageSearchResults.length > 0" class="search-results">
+                        <div class="search-results-title">搜索结果</div>
+                        <div class="user-list">
+                            <div v-for="user in messageSearchResults" :key="user.id" 
+                                 class="user-item">
+                                <img :src="user.avatarUrl || '/image/avatar/default-avatar.png'" :alt="user.username" class="user-avatar">
+                                <div class="user-info">
+                                    <span class="user-name">{{ user.username }}</span>
+                                    <span class="user-email">{{ user.email || '未填写邮箱' }}</span>
+                                </div>
+                                <button @click.stop="openMessageDialog(user.id, user.username, user.avatarUrl)" 
+                                        class="message-user-btn primary-btn small">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    私信
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="conversations-section">
+                    <div class="section-header">
+                        <h3>我的会话</h3>
+                        <button @click="loadConversations" class="ghost-btn small">刷新</button>
+                    </div>
+                    <div v-if="conversationsLoading" class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                    <div v-else-if="conversations.length === 0" class="empty-state">
+                        <img src="/image/学习路径.png" alt="empty" class="empty-illustration">
+                        <p>还没有会话，搜索用户开始聊天吧</p>
+                    </div>
+                    <div v-else class="conversations-list">
+                        <div v-for="conv in conversations" :key="conv.id" 
+                             class="conversation-item"
+                             @click="openConversation(conv)">
+                            <img :src="getConversationAvatar(conv) || '/image/avatar/default-avatar.png'" 
+                                 :alt="getConversationName(conv)" 
+                                 class="conversation-avatar">
+                            <div class="conversation-content">
+                                <div class="conversation-header-row">
+                                    <span class="conversation-name">{{ getConversationName(conv) }}</span>
+                                    <span class="conversation-time">{{ formatTime(conv.createTime) }}</span>
+                                </div>
+                                <p class="conversation-preview">{{ conv.content }}</p>
+                            </div>
+                            <div v-if="getConversationUnreadCount(conv) > 0" class="conversation-unread-badge">
+                                {{ getConversationUnreadCount(conv) > 99 ? '99+' : getConversationUnreadCount(conv) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 管理员页面：用户管理 -->
+        <section v-show="activeTab === 'admin' && activeSubTab === 'admin-users'" class="tab-panel active glass-panel admin-panel">
+            <div class="admin-panel-header">
+                <div class="admin-header-text">
+                    <h2>用户管理</h2>
+                    <p>快速查找、筛选并维护平台用户信息</p>
+                </div>
+                <div class="admin-actions">
+                    <button type="button" class="primary-outline-btn" @click="openAnnouncementModal">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M3 11h18M12 4v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        发布公告
+                    </button>
+                </div>
+            </div>
+            <div class="admin-search-box">
+                <input
+                        type="text"
+                        v-model="adminUserKeyword"
+                        placeholder="搜索用户名、邮箱或手机号..."
+                        @keyup.enter="loadAdminUsers(1)"
+                        class="admin-search-input">
+                <button @click="loadAdminUsers(1)" class="primary-btn">搜索</button>
+            </div>
+            <div v-if="adminUsersLoading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>加载中...</p>
+            </div>
+            <div v-else>
+                <div v-if="!adminUsers.length" class="admin-empty-state">
+                    <img src="/image/learning-path.png" alt="empty" class="empty-illustration">
+                    <p>暂时没有用户数据</p>
+                </div>
+                <div v-else class="admin-card-list">
+                    <div class="admin-user-card" v-for="user in adminUsers" :key="user.id">
+                        <div class="user-card-header">
+                            <div class="user-avatar">
+                                <img :src="user.avatarUrl || '/image/avatar/default-avatar.png'" alt="avatar"
+                                     onerror="this.onerror=null;this.src='/image/avatar/default-avatar.png';">
+                                <span class="user-id">ID {{ user.id }}</span>
+                            </div>
+                            <div class="user-basic">
+                                <div class="user-name-row">
+                                    <h3>{{ user.username }}</h3>
+                                    <span class="role-badge" :class="{admin: user.role === 'ADMIN'}">
+                                        {{ user.role === 'ADMIN' ? '管理员' : '普通用户' }}
+                                    </span>
+                                </div>
+                                <p class="user-email">{{ user.email || '未填写邮箱' }}</p>
+                            </div>
+                            <div class="user-card-actions">
+                                <button 
+                                    v-if="user.status !== 'FROZEN'" 
+                                    @click="confirmFreezeUser(user)" 
+                                    class="warning-btn ghost">
+                                    冻结
+                                </button>
+                                <button 
+                                    v-else 
+                                    @click="confirmUnfreezeUser(user)" 
+                                    class="success-btn ghost">
+                                    恢复
+                                </button>
+                                <button @click="confirmDeleteUser(user)" class="danger-btn ghost">删除</button>
+                            </div>
+                        </div>
+                        <div class="user-card-body">
+                            <div class="info-item">
+                                <span class="info-label">手机号</span>
+                                <span class="info-value">{{ user.phone || '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">性别</span>
+                                <span class="info-value">{{ user.gender || '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">注册时间</span>
+                                <span class="info-value">{{ formatDate(user.createTime) }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">学习偏好</span>
+                                <span class="info-tags" v-if="user.learningPreference">
+                                    <span v-for="tag in parseArray(user.learningPreference)" :key="tag" class="tag-pill">{{ tag }}</span>
+                                </span>
+                                <span class="info-value" v-else>-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">账号状态</span>
+                                <span class="info-value" :class="{'status-frozen': user.status === 'FROZEN', 'status-active': user.status !== 'FROZEN'}">
+                                    {{ user.status === 'FROZEN' ? '已冻结' : '正常' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagination-container" v-if="adminUserTotal > adminUserSize">
+                    <div class="pagination-info">共{{ adminUserTotal }}条，第 {{ adminUserPage }} 页，共 {{ Math.ceil(adminUserTotal / adminUserSize) }} 页</div>
+                    <div class="pagination-controls">
+                        <button @click="loadAdminUsers(adminUserPage - 1)" :disabled="adminUserPage <= 1" class="pagination-btn" :class="{disabled: adminUserPage <= 1}">上一页</button>
+                        <template v-for="p in getAdminUserPageNumbers()">
+                            <button
+                                v-if="p !== '...'"
+                                :key="p"
+                                @click="loadAdminUsers(p)"
+                                class="pagination-btn"
+                                :class="{active: p === adminUserPage}">
+                                {{ p }}
+                            </button>
+                            <span v-else :key="'ellipsis-user-' + p" class="pagination-ellipsis">...</span>
+                        </template>
+                        <button @click="loadAdminUsers(adminUserPage + 1)" :disabled="adminUserPage >= Math.ceil(adminUserTotal / adminUserSize)" class="pagination-btn" :class="{disabled: adminUserPage >= Math.ceil(adminUserTotal / adminUserSize)}">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 管理员页面：课程管理 -->
+        <section v-show="activeTab === 'admin' && activeSubTab === 'admin-courses'" class="tab-panel active glass-panel admin-panel">
+            <div class="admin-panel-header">
+                <div class="admin-header-text">
+                    <h2>课程管理</h2>
+                    <p>从这里维护课程内容、封面与标签，让资源更精彩</p>
+                </div>
+                <div class="admin-actions">
+                    <button type="button" class="primary-outline-btn" @click="openAdminCourseEditor()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M3 11h18M12 4v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        新增课程
+                    </button>
+                    <button type="button" class="ghost-btn" @click="openAnnouncementModal">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3v6m0 0l3-3m-3 3L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        发送公告
+                    </button>
+                </div>
+            </div>
+            <div class="admin-search-box">
+                <input
+                        type="text"
+                        v-model="adminCourseKeyword"
+                        placeholder="搜索课程名称..."
+                        @keyup.enter="loadAdminCourses(1)"
+                        class="admin-search-input">
+                <button @click="loadAdminCourses(1)" class="primary-btn">搜索</button>
+            </div>
+            <div v-if="adminCoursesLoading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>加载中...</p>
+            </div>
+            <div v-else>
+                <div v-if="!adminCourses.length" class="admin-empty-state">
+                    <img src="/image/学习路径.png" alt="empty course" class="empty-illustration">
+                    <p>暂时没有课程数据</p>
+                </div>
+                <div v-else class="admin-card-list course-card-list">
+                    <div class="admin-course-card" v-for="course in adminCourses" :key="course.id">
+                        <div class="course-cover" @click="openAdminCourseEditor(course)">
+                            <img :src="course.coverUrl || '/image/course/frontend.jpg'" alt="course cover"
+                                 onerror="this.onerror=null;this.src='/image/course/frontend.jpg';">
+                            <span class="course-category-badge">{{ course.category || '未分类' }}</span>
+                        </div>
+                        <div class="course-card-body">
+                            <div class="course-card-header" @click="openAdminCourseEditor(course)">
+                                <h3>{{ course.title }}</h3>
+                                <span class="course-level-badge">{{ course.level || '不限' }}</span>
+                            </div>
+                            <p class="course-teacher-line">
+                                <strong>讲师：</strong>{{ course.teacher || '待定' }}
+                            </p>
+                            <div class="course-stats-row">
+                                <div class="stat-cell">
+                                    <span class="stat-label">价格</span>
+                                    <span class="stat-value price">¥{{ course.price || 0 }}</span>
+                                </div>
+                                <div class="stat-cell">
+                                    <span class="stat-label">学习人数</span>
+                                    <span class="stat-value">{{ course.studentCount || 0 }}</span>
+                                </div>
+                                <div class="stat-cell">
+                                    <span class="stat-label">时长</span>
+                                    <span class="stat-value">{{ course.duration || '-' }}</span>
+                                </div>
+                            </div>
+                            <div class="course-card-footer">
+                                <div class="course-tags" v-if="course.tags">
+                                    <span v-for="tag in parseArray(course.tags)" :key="tag" class="tag-pill">{{ tag }}</span>
+                                </div>
+                                <div class="course-card-actions">
+                                    <button @click.stop="openAdminCourseEditor(course)" class="primary-btn small">编辑</button>
+                                    <button @click.stop="confirmDeleteCourse(course)" class="danger-btn ghost small">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagination-container" v-if="adminCourseTotal > 0">
+                    <div class="pagination-info">共{{ adminCourseTotal }}条</div>
+                    <div class="pagination-controls">
+                        <button
+                            @click="changeAdminCoursePage(adminCoursePage - 1)"
+                            :disabled="adminCoursePage <= 1"
+                            class="pagination-btn"
+                            :class="{disabled: adminCoursePage <= 1}">
+                            &lt;
+                        </button>
+                        <template v-for="p in getAdminCoursePageNumbers()">
+                            <button
+                                v-if="p !== '...'"
+                                :key="p"
+                                @click="changeAdminCoursePage(p)"
+                                class="pagination-btn"
+                                :class="{active: p === adminCoursePage}">
+                                {{ p }}
+                            </button>
+                            <span v-else :key="'ellipsis-admin-' + p" class="pagination-ellipsis">...</span>
+                        </template>
+                        <button
+                            @click="changeAdminCoursePage(adminCoursePage + 1)"
+                            :disabled="adminCoursePage >= adminCourseTotalPages"
+                            class="pagination-btn"
+                            :class="{disabled: adminCoursePage >= adminCourseTotalPages}">
+                            &gt;
+                        </button>
+                    </div>
+                    <div class="pagination-jump">
+                        <span>前往</span>
+                        <input
+                            type="number"
+                            v-model.number="adminCourseJumpPage"
+                            @keyup.enter="jumpToAdminCoursePage"
+                            class="pagination-input"
+                            :min="1"
+                            :max="adminCourseTotalPages">
+                        <span>页</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 管理员页面：数据统计 -->
+        <section v-show="activeTab === 'admin' && activeSubTab === 'admin-statistics'" class="tab-panel active glass-panel admin-panel">
+            <div class="admin-panel-header">
+                <div class="admin-header-text">
+                    <h2>数据统计</h2>
+                    <p>实时掌握平台用户、课程与学习行为，辅助决策</p>
+                </div>
+                <div class="admin-actions">
+                    <button type="button" class="primary-outline-btn" @click="loadAdminStatistics">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20 20v-6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 15a7 7 0 0 0 12 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19 9a7 7 0 0 0-12-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        刷新数据
+                    </button>
+                </div>
+            </div>
+            <div v-if="adminStatisticsLoading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>加载中...</p>
+            </div>
+            <div v-else-if="adminStatisticsError" class="admin-error-state">
+                <p>{{ adminStatisticsError }}</p>
+                <button class="primary-btn" @click="loadAdminStatistics">重新加载</button>
+            </div>
+            <div v-else-if="adminStatistics" class="admin-statistics">
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <h3>总用户数</h3>
+                        <p class="stat-value">{{ adminStatistics.totalUsers || 0 }}</p>
+                    </div>
+                    <div class="admin-stat-card">
+                        <h3>总课程数</h3>
+                        <p class="stat-value">{{ adminStatistics.totalCourses || 0 }}</p>
+                    </div>
+                    <div class="admin-stat-card">
+                        <h3>总帖子数</h3>
+                        <p class="stat-value">{{ adminStatistics.totalPosts || 0 }}</p>
+                    </div>
+                    <div class="admin-stat-card">
+                        <h3>总评论数</h3>
+                        <p class="stat-value">{{ adminStatistics.totalComments || 0 }}</p>
+                    </div>
+                </div>
+                <!-- 第一行：课程分类 & 难度分布 -->
+                <div class="admin-chart-row">
+                    <div class="admin-chart-container half">
+                        <div id="adminCategoryChart" style="width: 100%; height: 360px;"></div>
+                    </div>
+                    <div class="admin-chart-container half">
+                        <div id="adminLevelChart" style="width: 100%; height: 360px;"></div>
+                    </div>
+                </div>
+                <!-- 第二行：学习偏好 & 课程兴趣分布 -->
+                <div class="admin-chart-row">
+                    <div class="admin-chart-container half">
+                        <div id="adminPreferenceChart" style="width: 100%; height: 320px;"></div>
+                    </div>
+                    <div class="admin-chart-container half">
+                        <div id="adminInterestChart" style="width: 100%; height: 320px;"></div>
+                    </div>
+                </div>
+                <!-- 第三行：热门课程 TOP5 -->
+                <div class="admin-chart-container">
+                    <div id="adminPopularCourseChart" style="width: 100%; height: 380px;"></div>
+                </div>
+            </div>
+            <div v-else class="admin-empty-state">
+                <p>暂无统计数据</p>
+            </div>
+        </section>
+
+        <!-- 管理员课程编辑弹窗 -->
+        <div v-if="showAdminCourseModal" class="modal-backdrop" @click.self="closeAdminCourseModal">
+            <div class="modal admin-course-modal">
+                <h3 class="modal-title">{{ editingAdminCourse ? '编辑课程信息' : '新增课程' }}</h3>
+                <form @submit.prevent="saveAdminCourse">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">课程封面</label>
+                            <div class="admin-course-cover-upload">
+                                <div class="cover-preview">
+                                    <img :src="adminCourseForm.coverUrl || '/image/course/frontend.jpg'" alt="封面预览"
+                                         onerror="this.onerror=null;this.src='/image/course/frontend.jpg';">
+                                </div>
+                                <label class="file-upload-btn">
+                                    <input type="file" accept="image/*" @change="handleAdminCourseCoverChange" style="display: none;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    选择文件
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">课程名称</label>
+                            <input v-model="adminCourseForm.title" type="text" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">课程简介</label>
+                            <textarea v-model="adminCourseForm.description" class="form-textarea" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">课程详情</label>
+                            <textarea v-model="adminCourseForm.detailDescription" class="form-textarea admin-course-detail-textarea" rows="6" placeholder="可填写更完整的课程介绍、教学目标等"></textarea>
+                        </div>
+                        <div class="form-row two-cols">
+                            <div class="form-group">
+                                <label class="form-label">分类（对应课程兴趣）</label>
+                                <select v-model="adminCourseForm.category" class="form-input form-select">
+                                    <option value="">请选择分类</option>
+                                    <option value="编程开发">编程开发</option>
+                                    <option value="前端学习">前端学习</option>
+                                    <option value="数据科学">数据科学</option>
+                                    <option value="人工智能">人工智能</option>
+                                    <option value="设计创意">设计创意</option>
+                                    <option value="商业管理">商业管理</option>
+                                    <option value="职业技能">职业技能</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">难度</label>
+                                <select v-model="adminCourseForm.level" class="form-input form-select">
+                                    <option value="">请选择难度</option>
+                                    <option value="入门">入门</option>
+                                    <option value="初级">初级</option>
+                                    <option value="进阶">进阶</option>
+                                    <option value="高级">高级</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row two-cols">
+                            <div class="form-group">
+                                <label class="form-label">讲师</label>
+                                <input v-model="adminCourseForm.teacher" type="text" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">价格</label>
+                                <input v-model.number="adminCourseForm.price" type="number" min="0" step="0.01" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">时长</label>
+                            <input v-model="adminCourseForm.duration" type="text" class="form-input" placeholder="例如 48小时">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">标签（可多选，对应学习偏好和学习目标）</label>
+                            <div class="admin-course-tags-container">
+                                <div class="admin-course-tags-section">
+                                    <div class="admin-course-tags-label">学习偏好：</div>
+                                    <div class="checkbox-group grid-3">
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'视觉学习'" v-model="adminCourseForm.selectedTags">
+                                            <span>视觉学习</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'听觉学习'" v-model="adminCourseForm.selectedTags">
+                                            <span>听觉学习</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'动手实践'" v-model="adminCourseForm.selectedTags">
+                                            <span>动手实践</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'阅读写作'" v-model="adminCourseForm.selectedTags">
+                                            <span>阅读写作</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'社交学习'" v-model="adminCourseForm.selectedTags">
+                                            <span>社交学习</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'独立学习'" v-model="adminCourseForm.selectedTags">
+                                            <span>独立学习</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="admin-course-tags-section">
+                                    <div class="admin-course-tags-label">学习目标：</div>
+                                    <div class="checkbox-group grid-4">
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'职业提升'" v-model="adminCourseForm.selectedTags">
+                                            <span>职业提升</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'技能拓展'" v-model="adminCourseForm.selectedTags">
+                                            <span>技能拓展</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'学术深造'" v-model="adminCourseForm.selectedTags">
+                                            <span>学术深造</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" :value="'兴趣爱好'" v-model="adminCourseForm.selectedTags">
+                                            <span>兴趣爱好</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">课程详情页图片</label>
+                            <div class="course-images-manager">
+                                <div class="course-images-list" v-if="adminCourseForm.courseImages && adminCourseForm.courseImages.length > 0">
+                                    <div v-for="(image, index) in adminCourseForm.courseImages" :key="index" class="course-image-item">
+                                        <div class="course-image-preview">
+                                            <img :src="image.url || image" :alt="'课程图片' + (index + 1)" 
+                                                 onerror="this.onerror=null;this.src='/image/course/frontend.jpg';">
+                                        </div>
+                                        <div class="course-image-actions">
+                                            <button type="button" class="image-action-btn replace-btn" @click="replaceCourseImage(index)" title="替换图片">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2"/>
+                                                </svg>
+                                                替换
+                                            </button>
+                                            <button type="button" class="image-action-btn delete-btn" @click="removeCourseImage(index)" title="删除图片">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="2"/>
+                                                </svg>
+                                                删除
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="course-images-upload">
+                                    <button type="button" class="add-image-btn" @click="addCourseImage">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"/>
+                                        </svg>
+                                        添加图片
+                                    </button>
+                                    <input type="file" ref="courseImageInput" accept="image/*" multiple @change="handleCourseImageAdd" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="secondary-btn" @click="closeAdminCourseModal">取消</button>
+                        <button type="submit" class="primary-btn">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 公告发送弹窗 -->
+        <div v-if="showAnnouncementModal" class="modal-backdrop" @click.self="closeAnnouncementModal">
+            <div class="modal announcement-modal">
+                <h3 class="modal-title">发布全站公告</h3>
+                <form @submit.prevent="sendAnnouncement">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">公告标题</label>
+                            <input v-model="announcementForm.title" type="text" class="form-input" placeholder="请输入公告标题" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">公告内容</label>
+                            <textarea v-model="announcementForm.content" class="form-textarea" rows="5" placeholder="向所有用户传达的重要信息..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="secondary-btn" @click="closeAnnouncementModal">取消</button>
+                        <button type="submit" class="primary-btn" :disabled="announcementSending">
+                            {{ announcementSending ? '发送中...' : '发送公告' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 私信对话框：左侧会话列表 + 右侧聊天窗口 -->
+        <div v-if="showMessageModal" class="modal-backdrop" @click.self="closeMessageModal">
+            <div class="modal message-modal">
+                <div class="message-layout">
+                    <!-- 左侧会话列表 -->
+                    <aside class="message-sidebar">
+                        <div class="message-sidebar-header">
+                            <h3>会话列表</h3>
+                            <button class="ghost-btn extra-small" @click.stop="loadConversations">刷新</button>
+                        </div>
+                        <div class="message-sidebar-body">
+                            <div v-if="conversationsLoading" class="message-loading">
+                                <div class="loading-spinner"></div>
+                                <p>加载会话中...</p>
+                            </div>
+                            <div v-else-if="conversations.length === 0" class="message-empty">
+                                <p>暂无会话，去社区或课程中和同学们聊聊吧</p>
+                            </div>
+                            <div v-else class="message-conversation-list">
+                                <div
+                                    v-for="conv in conversations"
+                                    :key="conv.id"
+                                    class="message-conversation-item"
+                                    :class="{ active: currentChatUser && getConversationName(conv) === currentChatUser.username }"
+                                    @click.stop="openConversation(conv)"
+                                >
+                                    <img
+                                        :src="getConversationAvatar(conv) || '/image/avatar/default-avatar.png'"
+                                        :alt="getConversationName(conv)"
+                                        class="message-conversation-avatar"
+                                    >
+                                    <div class="message-conversation-main">
+                                        <div class="message-conversation-top">
+                                            <span class="message-conversation-name">{{ getConversationName(conv) }}</span>
+                                            <span class="message-conversation-time">{{ formatTime(conv.createTime) }}</span>
+                                        </div>
+                                        <div class="message-conversation-preview">
+                                            {{ conv.content }}
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-if="getConversationUnreadCount(conv) > 0"
+                                        class="message-conversation-unread"
+                                    >
+                                        {{ getConversationUnreadCount(conv) > 99 ? '99+' : getConversationUnreadCount(conv) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- 右侧聊天窗口 -->
+                    <section class="message-main">
+                        <div class="message-header">
+                            <div class="message-user-info" v-if="currentChatUser && currentChatUser.username">
+                                <img :src="currentChatUser.avatarUrl || '/image/avatar/default-avatar.png'"
+                                     :alt="currentChatUser.username"
+                                     class="message-user-avatar">
+                                <div>
+                                    <h3 class="message-user-name">{{ currentChatUser.username }}</h3>
+                                    <p class="message-user-status">在线</p>
+                                </div>
+                            </div>
+                            <div class="message-user-info" v-else>
+                                <div>
+                                    <h3 class="message-user-name">选择一个会话开始聊天</h3>
+                                    <p class="message-user-status">在左侧选择联系人，或从社区中点击“私信”按钮</p>
+                                </div>
+                            </div>
+                            <button @click="closeMessageModal" class="message-close-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="message-body" ref="messageBody">
+                            <div v-if="messageLoading" class="message-loading">
+                                <div class="loading-spinner"></div>
+                                <p>加载消息中...</p>
+                            </div>
+                            <div v-else-if="!currentChatUser || !currentChatUser.username" class="message-empty">
+                                <p>从左侧选择一个会话，或在社区中点击用户头像旁的“私信”开始聊天。</p>
+                            </div>
+                            <div v-else-if="messages.length === 0" class="message-empty">
+                                <p>还没有消息，开始对话吧！</p>
+                            </div>
+                            <div v-else class="messages-list">
+                                <div v-for="message in messages" :key="message.id" 
+                                     :class="['message-item', { 'message-sent': message.senderId === user.id, 'message-received': message.senderId !== user.id }]">
+                                    <div class="message-content">
+                                        <p class="message-text">{{ message.content }}</p>
+                                        <div class="message-meta">
+                                            <span class="message-time">{{ formatTime(message.createTime) }}</span>
+                                            <span v-if="message.senderId === user.id" class="message-read-status">
+                                                <svg v-if="message.isRead" width="14" height="14" viewBox="0 0 24 24" fill="none" class="read-icon">
+                                                    <path d="M20 6L9 17l-5-5" stroke="#3182ce" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                                <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" class="unread-icon">
+                                                    <circle cx="12" cy="12" r="10" stroke="#a0aec0" stroke-width="2"/>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-footer">
+                            <textarea 
+                                v-model="newMessageContent" 
+                                @keydown.enter.exact.prevent="sendMessage"
+                                @keydown.enter.shift.exact="newMessageContent += '\n'"
+                                placeholder="输入消息..." 
+                                class="message-input"
+                                rows="2"></textarea>
+                            <button @click="sendMessage" class="message-send-btn" :disabled="!currentChatUser || !newMessageContent.trim() || sendingMessage">
+                                <svg v-if="!sendingMessage" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span v-else>发送中...</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- 课程详情页 -->
+        <section v-show="activeTab === 'course-detail'" class="tab-panel active glass-panel course-detail-panel">
+            <div class="course-detail-header">
+                <button @click="backToCourseCenter" class="back-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{ courseDetailSource === 'my-courses' ? '返回我的课程' : '返回课程中心' }}
+                </button>
+            </div>
+
+            <div v-if="courseDetailLoading" class="loading-container">
+                <div class="loading-spinner-large"></div>
+                <p>加载课程详情中...</p>
+            </div>
+
+            <div v-else-if="courseDetail" class="course-detail-content">
+                <!-- 课程头部信息 -->
+                <div class="course-detail-hero">
+                    <div class="course-detail-cover">
+                        <img :src="courseDetail.coverUrl || '/image/course/default-cover.png'" alt="课程封面">
+                    </div>
+                    <div class="course-detail-info">
+                        <h1 class="course-detail-title">{{ courseDetail.title }}</h1>
+                        <p class="course-detail-subtitle">{{ courseDetail.description }}</p>
+                        
+                        <!-- 课程标签 -->
+                        <div class="course-detail-tags" v-if="courseDetail.tags">
+                            <span 
+                                v-for="tag in parseTags(courseDetail.tags)" 
+                                :key="tag" 
+                                class="course-detail-tag">
+                                {{ tag }}
+                            </span>
+                        </div>
+
+                        <!-- 课程元信息 -->
+                        <div class="course-detail-meta-grid">
+                            <div class="meta-card">
+                                <span class="meta-label">难度级别</span>
+                                <span class="meta-value">{{ courseDetail.level }}</span>
+                            </div>
+                            <div class="meta-card">
+                                <span class="meta-label">课程分类</span>
+                                <span class="meta-value">{{ courseDetail.category }}</span>
+                            </div>
+                            <div class="meta-card" v-if="courseDetail.duration">
+                                <span class="meta-label">课程时长</span>
+                                <span class="meta-value">{{ courseDetail.duration }}</span>
+                            </div>
+                            <div class="meta-card" v-if="courseDetail.studentCount">
+                                <span class="meta-label">学习人数</span>
+                                <span class="meta-value">{{ courseDetail.studentCount }}人</span>
+                            </div>
+                            <div class="meta-card" v-if="courseDetail.rating">
+                                <span class="meta-label">课程评分</span>
+                                <span class="meta-value rating-value">
+                                    <span class="stars">{{ getStars(courseDetail.rating) }}</span>
+                                    {{ courseDetail.rating.toFixed(1) }}
+                                </span>
+                            </div>
+                            <div class="meta-card">
+                                <span class="meta-label">讲师</span>
+                                <span class="meta-value">{{ courseDetail.teacher }}</span>
+                            </div>
+                        </div>
+
+                        <!-- 价格和操作按钮 -->
+                        <div class="course-detail-actions">
+                            <div class="course-price" v-if="courseDetail.price > 0">
+                                <span class="price-label">价格：</span>
+                                <span class="price-value">¥{{ courseDetail.price.toFixed(2) }}</span>
+                            </div>
+                            <div class="course-price" v-else>
+                                <span class="price-label">免费课程</span>
+                            </div>
+                            <button 
+                                v-if="!isCourseJoined(courseDetail.id)"
+                                @click="joinCourse(courseDetail.id)"
+                                class="join-course-btn">
+                                加入课程
+                            </button>
+                            <button 
+                                v-else
+                                disabled
+                                class="join-course-btn joined">
+                                已加入
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 课程详细描述 -->
+                <div class="course-detail-section" v-if="courseDetail.courseImages && parseCourseImages(courseDetail.courseImages).length">
+                    <h2 class="section-title">课程图集</h2>
+                    <div class="course-gallery-wrapper">
+                        <div class="course-gallery-grid">
+                            <div 
+                                class="course-gallery-card" 
+                                v-for="(image, index) in parseCourseImages(courseDetail.courseImages)" 
+                                :key="image + index">
+                                <div class="course-gallery-img" @click="viewImage(image)">
+                                    <img :src="image" :alt="courseDetail.title + '图集' + (index + 1)" @error="handleImageError">
+                                    <span class="course-gallery-zoom">查看大图</span>
+                                </div>
+                                <div class="course-gallery-card-footer">
+                                    <span>图 {{ index + 1 }}</span>
+                                    <button type="button" class="gallery-preview-btn" @click.stop="viewImage(image)">预览</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-detail-section" v-if="courseDetail.detailDescription">
+                    <h2 class="section-title">课程介绍</h2>
+                    <div class="section-content" v-html="formatDescription(courseDetail.detailDescription)"></div>
+                </div>
+
+                <!-- 课程大纲 -->
+                <div class="course-detail-section" v-if="courseDetail.courseOutline">
+                    <h2 class="section-title">课程大纲</h2>
+                    <div class="course-outline">
+                        <div 
+                            v-for="(chapter, index) in parseCourseOutline(courseDetail.courseOutline)" 
+                            :key="index"
+                            class="outline-chapter">
+                            <div class="chapter-header">
+                                <span class="chapter-number">{{ index + 1 }}</span>
+                                <span class="chapter-title">{{ chapter.title }}</span>
+                            </div>
+                            <ul class="chapter-lessons" v-if="chapter.lessons">
+                                <li v-for="(lesson, lessonIndex) in chapter.lessons" :key="lessonIndex" class="lesson-item">
+                                    <span class="lesson-icon">▶</span>
+                                    <span class="lesson-title">{{ lesson.title }}</span>
+                                    <span class="lesson-duration" v-if="lesson.duration">{{ lesson.duration }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 讲师介绍 -->
+                <div class="course-detail-section" v-if="courseDetail.teacherIntro">
+                    <h2 class="section-title">讲师介绍</h2>
+                    <div class="teacher-intro">
+                        <div class="teacher-avatar">
+                            <span>{{ courseDetail.teacher ? courseDetail.teacher.charAt(0) : '师' }}</span>
+                        </div>
+                        <div class="teacher-info">
+                            <h3 class="teacher-name">{{ courseDetail.teacher }}</h3>
+                            <div class="section-content" v-html="formatDescription(courseDetail.teacherIntro)"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div v-else class="error-container">
+                <p>课程详情加载失败，请稍后重试</p>
+                <button @click="backToCourseCenter" class="primary-btn">{{ courseDetailSource === 'my-courses' ? '返回我的课程' : '返回课程中心' }}</button>
             </div>
         </section>
     </main>
+
+    <!-- 发布帖子模态框 -->
+    <div v-if="showCreatePostModal" class="modal-overlay" @click.self="showCreatePostModal = false">
+        <div class="modal-content create-post-modal">
+            <div class="modal-header">
+                <h2>发布帖子</h2>
+                <button @click="showCreatePostModal = false" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>标题</label>
+                    <input v-model="newPost.title" type="text" placeholder="请输入帖子标题" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>类型</label>
+                    <select v-model="newPost.type" class="form-select">
+                        <option value="discussion">讨论</option>
+                        <option value="question">问答</option>
+                        <option value="experience">经验分享</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select v-model="newPost.category" class="form-select">
+                        <option value="">请选择分类</option>
+                        <option v-for="cat in courseCategories" :key="cat" :value="cat">{{ cat }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>关联课程（可选）</label>
+                    <select v-model="newPost.courseId" class="form-select">
+                        <option :value="null">不关联课程</option>
+                        <option v-for="course in userCourses" :key="course.id" :value="course.id">{{ course.title }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea v-model="newPost.content" placeholder="写下你的想法..." rows="10" class="form-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>标签（用逗号分隔）</label>
+                    <input v-model="newPost.tags" type="text" placeholder="例如：Python, 学习, 问题" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>可见性</label>
+                    <select v-model="newPost.visibility" class="form-select">
+                        <option value="PUBLIC">公开 - 所有人可见</option>
+                        <option value="PRIVATE">私密 - 仅自己可见</option>
+                    </select>
+                    <p class="form-helper-text">选择"私密"后，只有您自己可以看到这条帖子</p>
+            </div>
+                <div class="form-group">
+                    <label>附件（可选）</label>
+                    <div 
+                        class="attachment-upload-area" 
+                        :class="{'has-file': postAttachmentName}" 
+                        @click="triggerAttachmentSelect"
+                        tabindex="0">
+                        <div class="upload-icon-wrapper">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+            </div>
+                        <div class="upload-info">
+                            <p class="upload-title">
+                                {{ postAttachmentName ? '已选择：' + postAttachmentName : '拖拽或点击上传文件' }}
+                            </p>
+                            <p class="upload-desc">
+                                支持任意文件类型，最大 10MB，发布后其他用户可下载查看。
+                            </p>
+        </div>
+                        <button 
+                            v-if="postAttachmentName" 
+                            type="button" 
+                            class="remove-attachment-btn" 
+                            @click.stop="clearPostAttachment">
+                            清除
+                        </button>
+                        <input 
+                            ref="postAttachmentInput" 
+                            type="file" 
+                            class="attachment-input" 
+                            @change="handlePostAttachmentChange">
+    </div>
+                    <p v-if="postAttachmentError" class="attachment-helper error-text">{{ postAttachmentError }}</p>
+            </div>
+        </div>
+            <div class="modal-footer">
+                <button @click="showCreatePostModal = false" class="cancel-btn">取消</button>
+                <button @click="submitPost" class="primary-btn">发布</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片查看模态框 -->
+    <div v-if="viewingImage && typeof viewingImage === 'string' && viewingImage.trim() && viewingImage.trim() !== 'null' && viewingImage.trim() !== 'undefined' && viewingImage.trim() !== ''" 
+         class="image-modal" 
+         @click.self="closeImageModal" 
+         @keydown.esc="closeImageModal" 
+         tabindex="0"
+         style="z-index: 10000;">
+        <div class="image-modal-content" @click.stop>
+            <button class="image-modal-close" 
+                    @click="closeImageModal" 
+                    @mousedown.prevent
+                    aria-label="关闭" 
+                    title="关闭 (ESC)"
+                    style="z-index: 10001; position: relative; cursor: pointer;">
+                ×
+            </button>
+            <img :src="viewingImage" alt="课程图片" @error="handleImageError" @load="handleImageLoad">
+        </div>
+    </div>
+
 </div>
 
-<script src="/js/main.js"></script>
+<script src="/js/main-app.js"></script>
 </body>
 </html>

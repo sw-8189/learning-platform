@@ -1,0 +1,89 @@
+/* 登录页面专用样式 */
+/* Page-specific styles to ensure login inputs have consistent width and password toggle behavior */
+.login-card .input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-card .input-wrapper .input-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    opacity: 0.9;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* 确保输入框光标在图标后方 */
+.login-card .form-input:focus {
+    padding-left: 3rem;
+}
+
+.login-card .form-input {
+    flex: 1 1 auto;
+    min-width: 220px; /* ensure reasonable minimum */
+    height: 44px;
+    padding: 8px 2.75rem 8px 3rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Ensure username and password inputs share same visual width by using flex layout */
+.login-card .input-status { 
+    min-width: 48px; 
+    text-align: right; 
+    display: none; /* 隐藏状态显示，避免与密码图标混淆 */
+}
+
+/* Password toggle button */
+.password-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #718096;
+    padding: 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    opacity: 0.7;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    opacity: 1;
+    color: #4a5568;
+}
+
+.password-toggle:focus { 
+    outline: none; 
+}
+
+.password-toggle .eye-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.password-toggle .eye-hide {
+    display: none;
+}
+
+.password-toggle.is-visible .eye-show {
+    display: none;
+}
+
+.password-toggle.is-visible .eye-hide {
+    display: block;
+}
+

@@ -6,9 +6,13 @@ import com.nchu.learningplatform.entity.Course;
 
 public interface CourseService {
 
-    PageResult<Course> pageQuery(Integer page, Integer size, String keyword);
+    PageResult<Course> pageQuery(Integer page, Integer size, String keyword, String learningPreference, String courseInterest, String learningGoal);
 
     Course getById(Long id);
 
     void joinCourse(Long userId, Long courseId);
+
+    void quitCourse(Long userId, Long courseId);
+
+    PageResult<Course> getRecommendedCourses(Long userId, Integer page, Integer size);
 }

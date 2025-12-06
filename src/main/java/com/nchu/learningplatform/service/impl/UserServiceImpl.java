@@ -24,6 +24,32 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void register(RegisterRequest request) {
+        // 参数验证
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("用户名不能为空");
+        }
+        if (request.getPhone() == null || request.getPhone().trim().isEmpty()) {
+            throw new RuntimeException("手机号不能为空");
+        }
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("邮箱不能为空");
+        }
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new RuntimeException("密码不能为空");
+        }
+        if (request.getGender() == null || request.getGender().trim().isEmpty()) {
+            throw new RuntimeException("性别不能为空");
+        }
+        if (request.getLearningGoal() == null || request.getLearningGoal().trim().isEmpty()) {
+            throw new RuntimeException("学习目标不能为空");
+        }
+        if (request.getLearningPreference() == null || request.getLearningPreference().isEmpty()) {
+            throw new RuntimeException("请至少选择一个学习偏好");
+        }
+        if (request.getCourseInterest() == null || request.getCourseInterest().isEmpty()) {
+            throw new RuntimeException("请至少选择一个课程兴趣");
+        }
+
         // 唯一性校验
         if (userMapper.findByUsername(request.getUsername()) != null) {
             throw new RuntimeException("用户名已存在");
@@ -31,13 +57,19 @@ public class UserServiceImpl implements UserService {
         if (userMapper.findByPhone(request.getPhone()) != null) {
             throw new RuntimeException("手机号已被注册");
         }
+        if (userMapper.findByEmail(request.getEmail()) != null) {
+            throw new RuntimeException("邮箱已被注册");
+        }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
-        user.setRole("USER");
+        // 设置角色，如果未指定则默认为USER
+        user.setRole(request.getRole() != null && !request.getRole().trim().isEmpty() 
+                    ? request.getRole().trim().toUpperCase() 
+                    : "USER");
         user.setGender(request.getGender());
 
         // 头像：前端没传就用默认
@@ -46,6 +78,8 @@ public class UserServiceImpl implements UserService {
         } else {
             user.setAvatarUrl(request.getAvatarUrl());
         }
+        // 设置用户状态为正常
+        user.setStatus("ACTIVE");
 
         user.setLearningPreference(joinList(request.getLearningPreference()));
         user.setCourseInterest(joinList(request.getCourseInterest()));
@@ -59,6 +93,10 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.findByUsernameOrPhone(request.getUsernameOrPhone());
         if (user == null || !user.getPassword().equals(request.getPassword())) {
             throw new RuntimeException("用户名或密码错误");
+        }
+        // 检查用户状态
+        if ("FROZEN".equals(user.getStatus())) {
+            throw new RuntimeException("账号已被冻结，请联系管理员");
         }
         return user;
     }
@@ -86,6 +124,11 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("原密码错误");
         }
         userMapper.updatePassword(userId, newPassword);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userMapper.findByEmail(email) != null;
     }
 
     private String joinList(List<String> list) {

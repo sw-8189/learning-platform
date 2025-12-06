@@ -39,4 +39,7 @@ public class RegisterRequest {
     /** 学习目标（单选） */
     @NotBlank(message = "学习目标不能为空")
     private String learningGoal;
+
+    /** 用户角色：USER（普通用户）或 ADMIN（管理员），默认为USER */
+    private String role;
 }

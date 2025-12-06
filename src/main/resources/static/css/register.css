@@ -1,0 +1,139 @@
+/* 注册页面专用样式 */
+
+/* 邮箱验证码输入框图标垂直居中优化 */
+.register-page .input-wrapper[style*="display: flex"] {
+    display: flex !important;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.register-page .input-wrapper[style*="display: flex"] > div[style*="flex: 1"] {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.register-page .input-wrapper[style*="display: flex"] .input-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.register-page .input-wrapper[style*="display: flex"] .form-input {
+    padding-left: 2.5rem;
+    width: 100%;
+}
+
+/* 发送验证码按钮样式优化 - 简约风格 */
+.register-page #sendCodeBtn {
+    padding: 0.7rem 1.25rem;
+    white-space: nowrap;
+    min-width: 150px; /* 增加最小宽度，确保倒计时文本（如"60秒后重试"）不会导致跳动 */
+    width: 150px; /* 固定宽度，避免文本变化时跳动 */
+    align-self: stretch;
+    height: auto;
+    border-radius: 0.6rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; /* 只过渡颜色，不过渡尺寸 */
+    background: #f7fafc;
+    border: 1.5px solid #cbd5e0;
+    color: #4a5568;
+    cursor: pointer;
+    text-align: center; /* 确保文本居中 */
+    box-sizing: border-box; /* 确保padding不会影响宽度计算 */
+    flex-shrink: 0; /* 防止按钮被压缩 */
+}
+
+.register-page #sendCodeBtn:hover:not(:disabled) {
+    background: #edf2f7;
+    border-color: #a0aec0;
+    color: #2d3748;
+}
+
+.register-page #sendCodeBtn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.register-page #sendCodeBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f7fafc;
+    border-color: #e2e8f0;
+    color: #718096;
+    font-size: 0.85rem;
+}
+
+/* 整体布局优化 */
+.register-page .container {
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+}
+
+.register-page .register-card-narrow {
+    max-width: 750px;
+    padding: 2rem 2.5rem;
+}
+
+/* 表单元素间距优化 */
+.register-page .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.register-page .form-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.register-page .form-section:first-of-type {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+}
+
+.register-page .input-container {
+    width: 100%;
+}
+
+.register-page .input-hint {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+    .register-page .register-card-narrow {
+        max-width: 95%;
+        padding: 1.5rem 1.25rem;
+    }
+    
+    .register-page .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .register-page .form-section {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-page .register-card-narrow {
+        padding: 1.25rem 1rem;
+    }
+    
+    .register-page #sendCodeBtn {
+        min-width: 100px;
+        padding: 0.65rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+

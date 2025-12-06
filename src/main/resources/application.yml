@@ -1,20 +1,61 @@
 # learning-platform/src/main/resources/application.yml
+# 默认配置，支持环境变量覆盖
+# 可通过设置环境变量或使用application-{profile}.yml来覆盖配置
+
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+  # 增加请求体大小限制（解决 413 错误）
+  max-http-header-size: 16KB
+  tomcat:
+    max-http-post-size: 10MB
+    max-swallow-size: 10MB
 
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
   datasource:
-    url: jdbc:mysql://localhost:3306/learning_platform?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
+    # 支持环境变量配置，默认值用于开发环境
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:learning_platform}?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  
+  # 增加文件上传和请求体大小限制
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.nchu.learningplatform.entity
   configuration:
     map-underscore-to-camel-case: true
+
+# 应用自定义配置（支持环境变量）
+app:
+  mail:
+    # 发件人地址（可通过环境变量 MAIL_USER 覆盖）
+    user: ${MAIL_USER:shiwei_0607@qq.com}
+    # 发件人授权码（可通过环境变量 MAIL_PASSWORD 覆盖）
+    password: ${MAIL_PASSWORD:viovvkgpucktcajj}
+
+  admin:
+    # 管理员邀请码（可通过环境变量 ADMIN_INVITE_CODE 覆盖）
+    invite-code: ${ADMIN_INVITE_CODE:admin-2025-secret}
+  
+  # 文件上传配置
+  upload:
+    # 头像上传目录（相对路径，基于项目根目录）
+    avatar-dir: ${AVATAR_UPLOAD_DIR:uploads/avatar}
+    # 课程封面上传目录
+    course-dir: ${COURSE_UPLOAD_DIR:uploads/course}
+    # 社区附件上传目录
+    community-dir: ${COMMUNITY_UPLOAD_DIR:uploads/community}
+

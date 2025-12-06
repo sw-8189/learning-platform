@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 learningGoal: '',
                 avatarUrl: ''
             },
+            avatarFile: null, // 新增：保存选中的文件
             passwordForm: {
                 oldPassword: '',
                 newPassword: '',
@@ -39,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.loadMyCourses();
         },
         methods: {
+
             switchTab(tab) {
                 this.activeTab = tab;
                 if (tab === 'profile') {
@@ -82,18 +84,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // 预览头像
+                this.avatarFile = file;
                 const reader = new FileReader();
                 reader.onload = e => {
-                    this.editUser.avatarUrl = e.target.result;
+                    this.editUser.avatarUrl = e.target.result; // 仅用于预览
                 };
                 reader.readAsDataURL(file);
             },
 
+            // main.js 中的 updateUserInfo 方法
             async updateUserInfo() {
                 try {
-                    // 处理学习偏好和课程兴趣数组转换为字符串
+                    let avatarPath = null;
+                    // 若选了文件，先上传得到短路径（后端 /api/users/me/avatar 会返回 {avatarUrl: "/uploads/xxx"}）
+                    if (this.avatarFile) {
+                        const form = new FormData();
+                        form.append('avatar', this.avatarFile);
+                        const res = await axios.post('/api/users/me/avatar', form, {
+                            headers: {
+                                Authorization: this.token,
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
+                        avatarPath = res.data.avatarUrl;
+                    }
+
+                    // 构造发送的数据：将数组 join 为字符串，avatar 使用上传后返回的短路径或保持原值（如果原值是 data: 开头则应被拒绝，后端也会校验）
                     const userData = {
                         ...this.editUser,
+                        avatarUrl: avatarPath || this.editUser.avatarUrl,
                         learningPreference: Array.isArray(this.editUser.learningPreference)
                             ? this.editUser.learningPreference.join(',')
                             : this.editUser.learningPreference,
@@ -102,35 +121,57 @@ document.addEventListener('DOMContentLoaded', function() {
                             : this.editUser.courseInterest
                     };
 
-                    const response = await axios.put('/api/users/me', userData, {
+                    // 如果 avatarUrl 看起来像 data:，不要提交（附加客户端防护）
+                    if (typeof userData.avatarUrl === 'string' && userData.avatarUrl.startsWith('data:')) {
+                        alert('检测到头像为 base64 数据，请使用头像上传按钮上传文件后再保存。');
+                        return;
+                    }
+
+                    await axios.put('/api/users/me', userData, {
                         headers: { Authorization: this.token }
                     });
 
                     this.updateMessage = '信息更新成功';
                     this.updateError = '';
 
-                    // 更新用户信息展示部分
-                    Object.assign(this.user, this.editUser);
+                    // 更新展示
+                    Object.assign(this.user, {
+                        ...userData,
+                        avatarUrl: userData.avatarUrl || this.user.avatarUrl
+                    });
 
-                    setTimeout(() => {
-                        this.updateMessage = '';
-                    }, 3000);
+                    // 清空临时文件
+                    this.avatarFile = null;
+
+                    setTimeout(() => { this.updateMessage = ''; }, 3000);
                 } catch (error) {
                     this.updateError = error.response?.data?.message || '信息更新失败';
                     this.updateMessage = '';
                 }
             },
 
+
             async updatePassword() {
-                if (this.passwordForm.newPassword !== this.passwordForm.confirmNewPassword) {
+                const { oldPassword, newPassword, confirmNewPassword } = this.passwordForm;
+                if (!oldPassword || !newPassword || !confirmNewPassword) {
+                    this.passwordError = '请完整填写所有密码字段';
+                    return;
+                }
+                if (newPassword !== confirmNewPassword) {
                     this.passwordError = '两次输入的新密码不一致';
+                    return;
+                }
+                // 密码规则：4-8 位，必须包含字母和数字
+                const pwdRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,8}$/;
+                if (!pwdRegex.test(newPassword)) {
+                    this.passwordError = '新密码需为4-8位，且同时包含字母和数字';
                     return;
                 }
 
                 try {
-                    const response = await axios.put('/api/users/me/password', {
-                        oldPassword: this.passwordForm.oldPassword,
-                        newPassword: this.passwordForm.newPassword
+                    await axios.put('/api/users/me/password', {
+                        oldPassword,
+                        newPassword
                     }, {
                         headers: { Authorization: this.token }
                     });
@@ -140,14 +181,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.passwordForm.oldPassword = '';
                     this.passwordForm.newPassword = '';
                     this.passwordForm.confirmNewPassword = '';
-                    setTimeout(() => {
-                        this.passwordMessage = '';
-                    }, 3000);
+                    setTimeout(() => { this.passwordMessage = ''; }, 3000);
                 } catch (error) {
                     this.passwordError = error.response?.data?.message || '密码修改失败';
                     this.passwordMessage = '';
                 }
             },
+            // main.js
             async loadCourses() {
                 try {
                     const response = await axios.get('/api/courses', {
@@ -163,6 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('获取课程列表失败:', error);
                 }
             },
+
             async loadMyCourses() {
                 try {
                     const response = await axios.get('/api/users/me/courses', {
@@ -173,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('获取我的课程失败:', error);
                 }
             },
+
             async joinCourse(courseId) {
                 try {
                     const response = await axios.post(`/api/courses/${courseId}/join`, {}, {

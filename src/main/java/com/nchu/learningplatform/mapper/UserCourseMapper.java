@@ -13,4 +13,10 @@ public interface UserCourseMapper {
     int insert(UserCourse userCourse);
 
     List<UserCourse> findByUserId(@Param("userId") Long userId);
+
+    List<UserCourse> findByCourseId(@Param("courseId") Long courseId);
+
+    int deleteByUserIdAndCourseId(@Param("userId") Long userId, @Param("courseId") Long courseId);
+
+    int deleteByCourseId(@Param("courseId") Long courseId);
 }

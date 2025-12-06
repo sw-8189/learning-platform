@@ -1,22 +1,7 @@
-//package com.nchu.learningplatform;
-//
-//import org.springframework.boot.SpringApplication;
-//import org.springframework.boot.autoconfigure.SpringBootApplication;
-//
-//@SpringBootApplication
-//public class LearningPlatformApplication {
-//
-//    public static void main(String[] args) {
-//        SpringApplication.run(LearningPlatformApplication.class, args);
-//    }
-//
-//}
-
 package com.nchu.learningplatform;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -26,8 +11,7 @@ import java.net.URI;
 public class LearningPlatformApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context =
-                SpringApplication.run(LearningPlatformApplication.class, args);
+        SpringApplication.run(LearningPlatformApplication.class, args);
 
         // 启动完成后尝试自动打开浏览器
         try {
