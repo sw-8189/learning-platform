@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理后台 - 智慧学习平台</title>
+    <title>Admin Dashboard - Smart Learning Platform</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
     <style>
-        /* 管理员页面专用样式 */
+        /* Admin Page Specific Styles */
         .admin-container {
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -239,41 +239,41 @@
     <div id="app" class="admin-container">
         <!-- 头部 -->
         <div class="admin-header">
-            <h1>管理后台</h1>
+            <h1>Admin Dashboard</h1>
             <div>
-                <button class="btn btn-secondary" @click="goBack">返回主页</button>
-                <button class="btn btn-secondary" @click="logout" style="margin-left: 10px;">退出登录</button>
+                <button class="btn btn-secondary" @click="goBack">Back to Home</button>
+                <button class="btn btn-secondary" @click="logout" style="margin-left: 10px;">Logout</button>
             </div>
         </div>
 
         <!-- 导航 -->
         <div class="admin-nav">
-            <button class="nav-btn" :class="{active: activeTab === 'users'}" @click="switchTab('users')">用户管理</button>
-            <button class="nav-btn" :class="{active: activeTab === 'courses'}" @click="switchTab('courses')">课程管理</button>
-            <button class="nav-btn" :class="{active: activeTab === 'statistics'}" @click="switchTab('statistics')">数据统计</button>
+            <button class="nav-btn" :class="{active: activeTab === 'users'}" @click="switchTab('users')">User Management</button>
+            <button class="nav-btn" :class="{active: activeTab === 'courses'}" @click="switchTab('courses')">Course Management</button>
+            <button class="nav-btn" :class="{active: activeTab === 'statistics'}" @click="switchTab('statistics')">Statistics</button>
         </div>
 
         <!-- 内容区 -->
         <div class="admin-content">
-            <!-- 用户管理 -->
+            <!-- User Management -->
             <div v-show="activeTab === 'users'">
-                <h2>用户管理</h2>
+                <h2>User Management</h2>
                 <div class="search-box">
-                    <input type="text" v-model="userKeyword" placeholder="搜索用户名、邮箱或手机号..." @input="searchUsers">
-                    <button class="btn btn-primary" @click="loadUsers">搜索</button>
+                    <input type="text" v-model="userKeyword" placeholder="Search username, email or phone..." @input="searchUsers">
+                    <button class="btn btn-primary" @click="loadUsers">Search</button>
                 </div>
                 <div class="table-container" v-if="!usersLoading">
                     <table>
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>用户名</th>
-                                <th>邮箱</th>
-                                <th>手机号</th>
-                                <th>角色</th>
-                                <th>性别</th>
-                                <th>注册时间</th>
-                                <th>操作</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Gender</th>
+                                <th>Registration Time</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -284,52 +284,52 @@
                                 <td>{{ user.phone || '-' }}</td>
                                 <td>
                                     <span :style="{color: user.role === 'ADMIN' ? '#e53e3e' : '#718096'}">
-                                        {{ user.role === 'ADMIN' ? '管理员' : '普通用户' }}
+                                        {{ user.role === 'ADMIN' ? 'Admin' : 'Regular User' }}
                                     </span>
                                 </td>
                                 <td>{{ user.gender || '-' }}</td>
                                 <td>{{ formatDate(user.createTime) }}</td>
                                 <td>
-                                    <button class="btn btn-danger" @click="confirmDeleteUser(user)">删除</button>
+                                    <button class="btn btn-danger" @click="confirmDeleteUser(user)">Delete</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                     <div class="pagination" v-if="userTotalPages > 1">
-                        <button @click="prevUserPage" :disabled="userPage === 1">上一页</button>
+                        <button @click="prevUserPage" :disabled="userPage === 1">Previous</button>
                         <button v-for="p in userTotalPages" :key="p" 
                                 :class="{active: p === userPage}" 
                                 @click="userPage = p; loadUsers()">
                             {{ p }}
                         </button>
-                        <button @click="nextUserPage" :disabled="userPage === userTotalPages">下一页</button>
+                        <button @click="nextUserPage" :disabled="userPage === userTotalPages">Next</button>
                     </div>
                 </div>
                 <div class="loading" v-else>加载中...</div>
             </div>
 
-            <!-- 课程管理 -->
+            <!-- Course Management -->
             <div v-show="activeTab === 'courses'">
-                <h2>课程管理</h2>
+                <h2>Course Management</h2>
                 <div style="margin-bottom: 20px;">
-                    <button class="btn btn-primary" @click="showAddCourseModal">添加课程</button>
+                    <button class="btn btn-primary" @click="showAddCourseModal">Add Course</button>
                 </div>
                 <div class="search-box">
-                    <input type="text" v-model="courseKeyword" placeholder="搜索课程标题..." @input="searchCourses">
-                    <button class="btn btn-primary" @click="loadCourses">搜索</button>
+                    <input type="text" v-model="courseKeyword" placeholder="Search course title..." @input="searchCourses">
+                    <button class="btn btn-primary" @click="loadCourses">Search</button>
                 </div>
                 <div class="table-container" v-if="!coursesLoading">
                     <table>
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>标题</th>
-                                <th>分类</th>
-                                <th>难度</th>
-                                <th>讲师</th>
-                                <th>价格</th>
-                                <th>学习人数</th>
-                                <th>操作</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Level</th>
+                                <th>Instructor</th>
+                                <th>Price</th>
+                                <th>Enrolled Students</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -342,43 +342,43 @@
                                 <td>{{ course.price || 0 }}元</td>
                                 <td>{{ course.studentCount || 0 }}</td>
                                 <td>
-                                    <button class="btn btn-primary" @click="editCourse(course)">编辑</button>
-                                    <button class="btn btn-danger" @click="confirmDeleteCourse(course)" style="margin-left: 5px;">删除</button>
+                                    <button class="btn btn-primary" @click="editCourse(course)">Edit</button>
+                                    <button class="btn btn-danger" @click="confirmDeleteCourse(course)" style="margin-left: 5px;">Delete</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                     <div class="pagination" v-if="courseTotalPages > 1">
-                        <button @click="prevCoursePage" :disabled="coursePage === 1">上一页</button>
+                        <button @click="prevCoursePage" :disabled="coursePage === 1">Previous</button>
                         <button v-for="p in courseTotalPages" :key="p" 
                                 :class="{active: p === coursePage}" 
                                 @click="coursePage = p; loadCourses()">
                             {{ p }}
                         </button>
-                        <button @click="nextCoursePage" :disabled="coursePage === courseTotalPages">下一页</button>
+                        <button @click="nextCoursePage" :disabled="coursePage === courseTotalPages">Next</button>
                     </div>
                 </div>
                 <div class="loading" v-else>加载中...</div>
             </div>
 
-            <!-- 数据统计 -->
+            <!-- Statistics -->
             <div v-show="activeTab === 'statistics'">
-                <h2>数据统计</h2>
+                <h2>Statistics</h2>
                 <div class="stats-grid" v-if="statistics">
                     <div class="stat-card">
-                        <h3>总用户数</h3>
+                        <h3>Total Users</h3>
                         <p class="stat-value">{{ statistics.totalUsers || 0 }}</p>
                     </div>
                     <div class="stat-card">
-                        <h3>总课程数</h3>
+                        <h3>Total Courses</h3>
                         <p class="stat-value">{{ statistics.totalCourses || 0 }}</p>
                     </div>
                     <div class="stat-card">
-                        <h3>管理员数量</h3>
+                        <h3>Admin Count</h3>
                         <p class="stat-value">{{ statistics.adminCount || 0 }}</p>
                     </div>
                     <div class="stat-card">
-                        <h3>选课总数</h3>
+                        <h3>Total Enrollments</h3>
                         <p class="stat-value">{{ statistics.totalEnrollments || 0 }}</p>
                     </div>
                 </div>
@@ -387,69 +387,69 @@
             </div>
         </div>
 
-        <!-- 添加/编辑课程模态框 -->
+        <!-- Add/Edit Course Modal -->
         <div class="modal" :class="{active: showCourseModal}" @click.self="closeCourseModal">
             <div class="modal-content">
-                <h2>{{ editingCourse ? '编辑课程' : '添加课程' }}</h2>
+                <h2>{{ editingCourse ? 'Edit Course' : 'Add Course' }}</h2>
                 <form @submit.prevent="saveCourse">
                     <div class="form-group">
-                        <label>课程标题 *</label>
+                        <label>Course Title *</label>
                         <input type="text" v-model="courseForm.title" required>
                     </div>
                     <div class="form-group">
-                        <label>课程描述</label>
+                        <label>Course Description</label>
                         <textarea v-model="courseForm.description"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>详细描述</label>
+                        <label>Detailed Description</label>
                         <textarea v-model="courseForm.detailDescription"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>分类</label>
+                        <label>Category</label>
                         <select v-model="courseForm.category">
-                            <option value="">请选择</option>
-                            <option value="编程开发">编程开发</option>
-                            <option value="前端开发">前端开发</option>
-                            <option value="后端开发">后端开发</option>
-                            <option value="数据科学">数据科学</option>
-                            <option value="设计创意">设计创意</option>
-                            <option value="商业管理">商业管理</option>
-                            <option value="职业技能">职业技能</option>
-                            <option value="人工智能">人工智能</option>
+                            <option value="">Select</option>
+                            <option value="编程开发">Programming Development</option>
+                            <option value="前端开发">Frontend Development</option>
+                            <option value="后端开发">Backend Development</option>
+                            <option value="数据科学">Data Science</option>
+                            <option value="设计创意">Design & Creativity</option>
+                            <option value="商业管理">Business Management</option>
+                            <option value="职业技能">Professional Skills</option>
+                            <option value="人工智能">Artificial Intelligence</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>难度</label>
+                        <label>Level</label>
                         <select v-model="courseForm.level">
-                            <option value="">请选择</option>
-                            <option value="初级">初级</option>
-                            <option value="中级">中级</option>
-                            <option value="高级">高级</option>
+                            <option value="">Select</option>
+                            <option value="初级">Beginner</option>
+                            <option value="中级">Intermediate</option>
+                            <option value="高级">Advanced</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>讲师</label>
+                        <label>Instructor</label>
                         <input type="text" v-model="courseForm.teacher">
                     </div>
                     <div class="form-group">
-                        <label>讲师介绍</label>
+                        <label>Instructor Introduction</label>
                         <textarea v-model="courseForm.teacherIntro"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>价格</label>
+                        <label>Price</label>
                         <input type="number" v-model.number="courseForm.price" step="0.01" min="0">
                     </div>
                     <div class="form-group">
-                        <label>课程时长</label>
-                        <input type="text" v-model="courseForm.duration" placeholder="如：40小时">
+                        <label>Duration</label>
+                        <input type="text" v-model="courseForm.duration" placeholder="e.g., 40 hours">
                     </div>
                     <div class="form-group">
-                        <label>课程封面</label>
+                        <label>Course Cover</label>
                         <input type="file" @change="handleCoverChange" accept="image/*">
                     </div>
                     <div class="btn-group" style="margin-top: 20px;">
-                        <button type="submit" class="btn btn-primary">保存</button>
-                        <button type="button" class="btn btn-secondary" @click="closeCourseModal">取消</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" @click="closeCourseModal">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -468,14 +468,14 @@
                 return {
                     activeTab: 'users',
                     token: token,
-                    // 用户管理
+                    // User Management
                     users: [],
                     userPage: 1,
                     userSize: 10,
                     userKeyword: '',
                     userTotal: 0,
                     usersLoading: false,
-                    // 课程管理
+                    // Course Management
                     courses: [],
                     coursePage: 1,
                     courseSize: 10,
@@ -496,7 +496,7 @@
                         duration: ''
                     },
                     coverFile: null,
-                    // 统计数据
+                    // Statistics
                     statistics: null,
                     categoryChart: null,
                     levelChart: null
@@ -521,11 +521,11 @@
                             headers: { Authorization: this.token }
                         });
                         if (response.data.role !== 'ADMIN') {
-                            alert('您没有管理员权限');
+                            alert('You do not have admin permissions');
                             window.location.href = 'main.html';
                         }
                     } catch (error) {
-                        console.error('权限验证失败:', error);
+                        console.error('Permission verification failed:', error);
                         window.location.href = 'login.html';
                     }
                 },
@@ -539,7 +539,7 @@
                         this.loadStatistics();
                     }
                 },
-                // 用户管理
+                // User Management
                 async loadUsers() {
                     this.usersLoading = true;
                     try {
@@ -554,8 +554,8 @@
                         this.users = response.data.list || [];
                         this.userTotal = response.data.total || 0;
                     } catch (error) {
-                        console.error('加载用户列表失败:', error);
-                        alert(error.response?.data?.message || '加载用户列表失败');
+                        console.error('Failed to load user list:', error);
+                        alert(error.response?.data?.message || 'Failed to load user list');
                     } finally {
                         this.usersLoading = false;
                     }
@@ -577,7 +577,7 @@
                     }
                 },
                 confirmDeleteUser(user) {
-                    if (confirm(`确定要删除用户 "${user.username}" 吗？此操作不可恢复！`)) {
+                    if (confirm(`Are you sure you want to delete user "${user.username}"? This action cannot be undone!`)) {
                         this.deleteUser(user.id);
                     }
                 },
@@ -586,14 +586,14 @@
                         await axios.delete(`/api/admin/users/${userId}`, {
                             headers: { Authorization: this.token }
                         });
-                        alert('用户删除成功');
+                        alert('User deleted successfully');
                         this.loadUsers();
                     } catch (error) {
-                        console.error('删除用户失败:', error);
-                        alert(error.response?.data?.message || '删除用户失败');
+                        console.error('Failed to delete user:', error);
+                        alert(error.response?.data?.message || 'Failed to delete user');
                     }
                 },
-                // 课程管理
+                // Course Management
                 async loadCourses() {
                     this.coursesLoading = true;
                     try {
@@ -608,8 +608,8 @@
                         this.courses = response.data.list || [];
                         this.courseTotal = response.data.total || 0;
                     } catch (error) {
-                        console.error('加载课程列表失败:', error);
-                        alert(error.response?.data?.message || '加载课程列表失败');
+                        console.error('Failed to load course list:', error);
+                        alert(error.response?.data?.message || 'Failed to load course list');
                     } finally {
                         this.coursesLoading = false;
                     }
@@ -687,22 +687,22 @@
                             await axios.put(`/api/admin/courses/${this.editingCourse.id}`, formData, {
                                 headers: { Authorization: this.token, 'Content-Type': 'multipart/form-data' }
                             });
-                            alert('课程更新成功');
+                            alert('Course updated successfully');
                         } else {
                             await axios.post('/api/admin/courses', formData, {
                                 headers: { Authorization: this.token, 'Content-Type': 'multipart/form-data' }
                             });
-                            alert('课程添加成功');
+                            alert('Course added successfully');
                         }
                         this.closeCourseModal();
                         this.loadCourses();
                     } catch (error) {
-                        console.error('保存课程失败:', error);
-                        alert(error.response?.data?.message || '保存课程失败');
+                        console.error('Failed to save course:', error);
+                        alert(error.response?.data?.message || 'Failed to save course');
                     }
                 },
                 confirmDeleteCourse(course) {
-                    if (confirm(`确定要删除课程 "${course.title}" 吗？此操作不可恢复！`)) {
+                    if (confirm(`Are you sure you want to delete course "${course.title}"? This action cannot be undone!`)) {
                         this.deleteCourse(course.id);
                     }
                 },
@@ -711,14 +711,14 @@
                         await axios.delete(`/api/admin/courses/${courseId}`, {
                             headers: { Authorization: this.token }
                         });
-                        alert('课程删除成功');
+                        alert('Course deleted successfully');
                         this.loadCourses();
                     } catch (error) {
-                        console.error('删除课程失败:', error);
-                        alert(error.response?.data?.message || '删除课程失败');
+                        console.error('Failed to delete course:', error);
+                        alert(error.response?.data?.message || 'Failed to delete course');
                     }
                 },
-                // 数据统计
+                // Statistics
                 async loadStatistics() {
                     try {
                         const response = await axios.get('/api/admin/statistics', {
@@ -729,8 +729,8 @@
                             this.renderCharts();
                         });
                     } catch (error) {
-                        console.error('加载统计数据失败:', error);
-                        alert(error.response?.data?.message || '加载统计数据失败');
+                        console.error('Failed to load statistics:', error);
+                        alert(error.response?.data?.message || 'Failed to load statistics');
                     }
                 },
                 renderCharts() {
@@ -751,7 +751,7 @@
                         name: key
                     }));
                     const option = {
-                        title: { text: '课程分类分布', left: 'center' },
+                        title: { text: 'Course Category Distribution', left: 'center' },
                         tooltip: { trigger: 'item' },
                         series: [{
                             type: 'pie',
@@ -770,7 +770,7 @@
                     const categories = Object.keys(levelDist);
                     const values = Object.values(levelDist);
                     const option = {
-                        title: { text: '课程难度分布', left: 'center' },
+                        title: { text: 'Course Level Distribution', left: 'center' },
                         tooltip: { trigger: 'axis' },
                         xAxis: {
                             type: 'category',

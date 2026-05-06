@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧学习平台 - 用户注册</title>
+    <title>Smart Learning Platform - User Registration</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/register.css">
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 </head>
 <body class="register-page">
-<!-- 导航栏：注册页只保留返回首页 -->
+<!-- Navigation: Back to Home only -->
 <nav class="navbar">
     <div class="nav-container">
         <div class="nav-brand">
@@ -21,11 +21,11 @@
                     <circle cx="24" cy="8" r="3" fill="#ed8936"/>
                 </svg>
             </div>
-            <span class="brand-text">智慧学习平台</span>
+            <span class="brand-text">Smart Learning Platform</span>
         </div>
 
         <ul class="nav-menu" id="navMenu">
-            <li><a href="index.html" class="nav-link">返回首页</a></li>
+            <li><a href="index.html" class="nav-link">Back to Home</a></li>
         </ul>
 
         <div class="hamburger" id="hamburger">
@@ -38,22 +38,22 @@
     <div class="container">
         <div class="register-card register-card-narrow">
             <div class="card-header register-header-center">
-                <h1 class="form-title main-register-title">用户注册</h1>
-                <p class="form-subtitle">加入智慧学习平台，开启系统化的学习之旅</p>
+                <h1 class="form-title main-register-title">User Registration</h1>
+                <p class="form-subtitle">Join Smart Learning Platform and start your systematic learning journey</p>
             </div>
 
             <form class="register-form" id="registerForm" novalidate>
-                <!-- 基本信息区 -->
+                <!-- Basic Information Section -->
                 <div class="form-section">
-                    <h2 class="section-title section-title-primary">基本信息</h2>
+                    <h2 class="section-title section-title-primary">Basic Information</h2>
 
-                    <!-- 头像上传（可选） -->
+                    <!-- Avatar Upload (Optional) -->
                     <div class="form-group avatar-group">
-                        <label class="form-label">头像（可选）</label>
+                        <label class="form-label">Avatar (Optional)</label>
                         <div class="avatar-upload-container">
                             <div class="avatar-upload" id="avatarUpload">
                                 <div class="avatar-preview" id="avatarPreview">
-                                    <!-- 默认头像图标 -->
+                                    <!-- Default avatar icon -->
                                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                                         <circle cx="12" cy="12" r="10" stroke="#a0aec0" stroke-width="2"/>
                                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"
@@ -63,7 +63,7 @@
                                 </div>
                                 <input type="file" id="avatar" name="avatar" accept="image/*" class="avatar-input">
                                 <div class="avatar-overlay">
-                                    <span class="upload-text">点击上传</span>
+                                    <span class="upload-text">Click to Upload</span>
                                 </div>
                                 <div class="avatar-remove" id="avatarRemove" style="display: none;">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -72,15 +72,15 @@
                                     </svg>
                                 </div>
                             </div>
-                            <div class="avatar-hint">支持 JPG、PNG 格式，文件大小不超过 2MB。未上传时将使用默认头像。</div>
+                            <div class="avatar-hint">Supports JPG, PNG formats, file size up to 2MB. Default avatar will be used if not uploaded.</div>
                                 <div class="avatar-feedback" id="avatarFeedback" role="status" aria-live="polite"></div>
                         </div>
                     </div>
 
-                    <!-- 用户名 -->
+                    <!-- Username -->
                     <div class="form-group">
                         <div class="input-container">
-                            <label for="username" class="form-label">用户名 <span class="required">*</span></label>
+                            <label for="username" class="form-label">Username <span class="required">*</span></label>
                             <div class="input-wrapper">
                                 <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"
@@ -89,17 +89,17 @@
                                           stroke="#a0aec0" stroke-width="2"/>
                                 </svg>
                                 <input type="text" id="username" name="username" class="form-input"
-                                       placeholder="请输入用户名" autocomplete="username">
+                                       placeholder="Enter username" autocomplete="username">
                                 <div class="input-status" id="usernameStatus"></div>
                             </div>
-                            <div class="input-hint">4-20 个字符，支持字母、数字、下划线</div>
+                            <div class="input-hint">4-20 characters, supports letters, numbers, underscores</div>
                         </div>
                     </div>
 
-                    <!-- 手机号 -->
+                    <!-- Phone -->
                     <div class="form-group">
                         <div class="input-container">
-                            <label for="phone" class="form-label">手机号 <span class="required">*</span></label>
+                            <label for="phone" class="form-label">Phone <span class="required">*</span></label>
                             <div class="input-wrapper">
                                 <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                                     <rect x="4" y="3" width="16" height="18" rx="2" ry="2"
@@ -107,17 +107,17 @@
                                     <circle cx="12" cy="18" r="1" fill="#a0aec0"/>
                                 </svg>
                                 <input type="tel" id="phone" name="phone" class="form-input"
-                                       placeholder="请输入11位手机号码" autocomplete="tel">
+                                       placeholder="Enter 11-digit phone number" autocomplete="tel">
                                 <div class="input-status" id="phoneStatus"></div>
                             </div>
-                            <div class="input-hint">请输入有效的 11 位手机号码</div>
+                            <div class="input-hint">Please enter a valid 11-digit phone number</div>
                         </div>
                     </div>
 
-                    <!-- 邮箱 -->
+                    <!-- Email -->
                     <div class="form-group">
                         <div class="input-container">
-                            <label for="email" class="form-label">邮箱 <span class="required">*</span></label>
+                            <label for="email" class="form-label">Email <span class="required">*</span></label>
                             <div class="input-wrapper">
                                 <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                                     <rect x="3" y="5" width="18" height="14" rx="2" ry="2"
@@ -125,17 +125,17 @@
                                     <path d="M4 7l8 6 8-6" stroke="#a0aec0" stroke-width="2"/>
                                 </svg>
                                 <input type="email" id="email" name="email" class="form-input"
-                                       placeholder="请输入常用邮箱" autocomplete="email">
+                                       placeholder="Enter your email" autocomplete="email">
                                 <div class="input-status" id="emailStatus"></div>
                             </div>
-                            <div class="input-hint">将用于接收课程通知等重要信息</div>
+                            <div class="input-hint">Will be used to receive important information such as course notifications</div>
                         </div>
                     </div>
 
-                    <!-- 邮箱验证码 -->
+                    <!-- Email Verification Code -->
                     <div class="form-group">
                         <div class="input-container">
-                            <label for="emailCode" class="form-label">邮箱验证码 <span class="required">*</span></label>
+                            <label for="emailCode" class="form-label">Email Verification Code <span class="required">*</span></label>
                             <div class="input-wrapper" style="display: flex; gap: 0.75rem; align-items: stretch;">
                                 <div style="flex: 1; position: relative; display: flex; align-items: center;">
                                     <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" style="position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); z-index: 1;">
@@ -145,27 +145,27 @@
                                         <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#a0aec0" stroke-width="2"/>
                                     </svg>
                                     <input type="text" id="emailCode" name="emailCode" class="form-input"
-                                           placeholder="请输入邮箱验证码" maxlength="6" style="padding-left: 2.5rem;">
+                                           placeholder="Enter verification code" maxlength="6" style="padding-left: 2.5rem;">
                                     <div class="input-status" id="emailCodeStatus"></div>
                                 </div>
                                 <button type="button" id="sendCodeBtn" class="btn btn-secondary" 
                                         style="padding: 0.75rem 1.5rem; white-space: nowrap; min-width: 120px; align-self: stretch; height: auto;">
-                                    发送验证码
+                                    Send Code
                                 </button>
                             </div>
-                            <div class="input-hint">验证码将发送到您的邮箱，有效期为5分钟</div>
+                            <div class="input-hint">Verification code will be sent to your email, valid for 5 minutes</div>
                         </div>
                     </div>
 
-                    <!-- 密码 -->
+                    <!-- Password -->
                     <div class="form-group">
                         <div class="input-container">
-                            <label for="password" class="form-label">密码 <span class="required">*</span></label>
+                            <label for="password" class="form-label">Password <span class="required">*</span></label>
                             <div class="input-wrapper">
                                 <input type="password" id="password" name="password" class="form-input no-leading-icon"
-                                       placeholder="请输入密码" autocomplete="new-password">
+                                       placeholder="Enter password" autocomplete="new-password">
                                 <div class="input-status" id="passwordStatus"></div>
-                                <button type="button" id="passwordToggle" class="toggle-btn" aria-label="切换密码显示">
+                                <button type="button" id="passwordToggle" class="toggle-btn" aria-label="Toggle password visibility">
                                     <svg class="eye-icon eye-show" width="18" height="18" viewBox="0 0 24 24" fill="none">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
                                               stroke="currentColor" stroke-width="2"/>
@@ -177,32 +177,32 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="input-hint">4-8 位，需同时包含字母和数字</div>
+                            <div class="input-hint">4-8 characters, must contain both letters and numbers</div>
                             <div class="password-feedback" id="passwordFeedback">
                                 <div class="password-strength">
                                     <div class="strength-bar">
                                         <span id="passwordStrengthBar"></span>
                                     </div>
-                                    <span class="strength-text" id="passwordStrengthText">安全性：弱</span>
+                                    <span class="strength-text" id="passwordStrengthText">Security: Weak</span>
                                 </div>
                                 <ul class="password-rules">
-                                    <li data-rule="length">至少 6 位长度</li>
-                                    <li data-rule="letter">包含字母</li>
-                                    <li data-rule="number">包含数字</li>
+                                    <li data-rule="length">At least 6 characters</li>
+                                    <li data-rule="letter">Contains letters</li>
+                                    <li data-rule="number">Contains numbers</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 确认密码 -->
+                    <!-- Confirm Password -->
                     <div class="form-group">
                         <div class="input-container">
-                            <label for="confirmPassword" class="form-label">确认密码 <span class="required">*</span></label>
+                            <label for="confirmPassword" class="form-label">Confirm Password <span class="required">*</span></label>
                             <div class="input-wrapper">
                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-input no-leading-icon"
-                                       placeholder="请再次输入密码" autocomplete="new-password">
+                                       placeholder="Re-enter password" autocomplete="new-password">
                                 <div class="input-status" id="confirmPasswordStatus"></div>
-                                <button type="button" id="confirmPasswordToggle" class="toggle-btn" aria-label="切换密码显示">
+                                <button type="button" id="confirmPasswordToggle" class="toggle-btn" aria-label="Toggle password visibility">
                                     <svg class="eye-icon eye-show" width="18" height="18" viewBox="0 0 24 24" fill="none">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
                                               stroke="currentColor" stroke-width="2"/>
@@ -217,178 +217,178 @@
                         </div>
                     </div>
 
-                    <!-- 性别 -->
+                    <!-- Gender -->
                     <div class="form-group">
                         <div class="input-container">
-                            <label class="form-label">性别 <span class="required">*</span></label>
+                            <label class="form-label">Gender <span class="required">*</span></label>
                             <div class="radio-group">
                                 <label class="radio-item">
-                                    <input type="radio" name="gender" value="男">
-                                    <span>男</span>
+                                    <input type="radio" name="gender" value="Male">
+                                    <span>Male</span>
                                 </label>
                                 <label class="radio-item">
-                                    <input type="radio" name="gender" value="女">
-                                    <span>女</span>
+                                    <input type="radio" name="gender" value="Female">
+                                    <span>Female</span>
                                 </label>
                                 <label class="radio-item">
-                                    <input type="radio" name="gender" value="保密">
-                                    <span>保密</span>
+                                    <input type="radio" name="gender" value="Prefer not to say">
+                                    <span>Prefer not to say</span>
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 学习信息区 -->
+                <!-- Learning Information Section -->
                 <div class="form-section">
-                    <h2 class="section-title section-title-primary">学习信息</h2>
+                    <h2 class="section-title section-title-primary">Learning Information</h2>
 
-                    <!-- 学习偏好（多选） -->
+                    <!-- Learning Preferences (Multiple Choice) -->
                     <div class="form-group">
-                        <label class="form-label">学习偏好 <span class="required">*</span>（可多选）</label>
+                        <label class="form-label">Learning Preferences <span class="required">*</span> (Multiple choice)</label>
                         <div class="checkbox-group grid-3">
                             <label class="checkbox-item">
-                                <input type="checkbox" name="learningPreference" value="视觉学习">
-                                <span>视觉学习</span>
+                                <input type="checkbox" name="learningPreference" value="Visual Learning">
+                                <span>Visual Learning</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="learningPreference" value="听觉学习">
-                                <span>听觉学习</span>
+                                <input type="checkbox" name="learningPreference" value="Auditory Learning">
+                                <span>Auditory Learning</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="learningPreference" value="动手实践">
-                                <span>动手实践</span>
+                                <input type="checkbox" name="learningPreference" value="Hands-on Practice">
+                                <span>Hands-on Practice</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="learningPreference" value="阅读写作">
-                                <span>阅读写作</span>
+                                <input type="checkbox" name="learningPreference" value="Reading & Writing">
+                                <span>Reading & Writing</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="learningPreference" value="社交学习">
-                                <span>社交学习</span>
+                                <input type="checkbox" name="learningPreference" value="Social Learning">
+                                <span>Social Learning</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="learningPreference" value="独立学习">
-                                <span>独立学习</span>
+                                <input type="checkbox" name="learningPreference" value="Independent Learning">
+                                <span>Independent Learning</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- 课程兴趣（多选） -->
+                    <!-- Course Interests (Multiple Choice) -->
                     <div class="form-group">
-                        <label class="form-label">课程兴趣 <span class="required">*</span>（可多选）</label>
+                        <label class="form-label">Course Interests <span class="required">*</span> (Multiple choice)</label>
                         <div class="checkbox-group grid-3">
                             <label class="checkbox-item">
-                                <input type="checkbox" name="courseInterest" value="编程开发">
-                                <span>编程开发</span>
+                                <input type="checkbox" name="courseInterest" value="Programming Development">
+                                <span>Programming Development</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="courseInterest" value="前端学习">
-                                <span>前端学习</span>
+                                <input type="checkbox" name="courseInterest" value="Frontend Development">
+                                <span>Frontend Development</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="courseInterest" value="数据科学">
-                                <span>数据科学</span>
+                                <input type="checkbox" name="courseInterest" value="Data Science">
+                                <span>Data Science</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="courseInterest" value="人工智能">
-                                <span>人工智能</span>
+                                <input type="checkbox" name="courseInterest" value="Artificial Intelligence">
+                                <span>Artificial Intelligence</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="courseInterest" value="设计创意">
-                                <span>设计创意</span>
+                                <input type="checkbox" name="courseInterest" value="Design & Creativity">
+                                <span>Design & Creativity</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="courseInterest" value="商业管理">
-                                <span>商业管理</span>
+                                <input type="checkbox" name="courseInterest" value="Business Management">
+                                <span>Business Management</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="courseInterest" value="职业技能">
-                                <span>职业技能</span>
+                                <input type="checkbox" name="courseInterest" value="Professional Skills">
+                                <span>Professional Skills</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- 学习目标（单选） -->
+                    <!-- Learning Goals (Single Choice) -->
                     <div class="form-group">
-                        <label class="form-label">学习目标 <span class="required">*</span></label>
+                        <label class="form-label">Learning Goal <span class="required">*</span></label>
                         <div class="radio-group grid-4">
                             <label class="radio-item">
-                                <input type="radio" name="learningGoal" value="职业提升">
-                                <span>职业提升</span>
+                                <input type="radio" name="learningGoal" value="Career Advancement">
+                                <span>Career Advancement</span>
                             </label>
                             <label class="radio-item">
-                                <input type="radio" name="learningGoal" value="技能拓展">
-                                <span>技能拓展</span>
+                                <input type="radio" name="learningGoal" value="Skill Expansion">
+                                <span>Skill Expansion</span>
                             </label>
                             <label class="radio-item">
-                                <input type="radio" name="learningGoal" value="学术深造">
-                                <span>学术深造</span>
+                                <input type="radio" name="learningGoal" value="Academic Advancement">
+                                <span>Academic Advancement</span>
                             </label>
                             <label class="radio-item">
-                                <input type="radio" name="learningGoal" value="兴趣爱好">
-                                <span>兴趣爱好</span>
+                                <input type="radio" name="learningGoal" value="Hobby & Interest">
+                                <span>Hobby & Interest</span>
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <!-- 账户类型选择 -->
+                <!-- Account Type Selection -->
                 <div class="form-section">
-                    <h2 class="section-title section-title-primary">账户类型</h2>
+                    <h2 class="section-title section-title-primary">Account Type</h2>
                     
                     <div class="form-group">
-                        <label class="form-label">请选择账户类型 <span class="required">*</span></label>
+                        <label class="form-label">Select Account Type <span class="required">*</span></label>
                         <div class="radio-group">
                             <label class="radio-item">
                                 <input type="radio" name="userRole" value="USER" checked>
-                                <span>普通用户</span>
+                                <span>Regular User</span>
                             </label>
                             <label class="radio-item">
                                 <input type="radio" name="userRole" value="ADMIN">
-                                <span>管理员</span>
+                                <span>Administrator</span>
                             </label>
                         </div>
                         <p class="form-hint" style="margin-top: 0.5rem; color: #718096; font-size: 0.875rem;">
-                            选择管理员身份需要平台验证，默认注册为普通用户
+                            Selecting administrator role requires platform verification. Default registration is as regular user.
                         </p>
                         <div class="form-group" id="adminInviteContainer" style="margin-top: 0.75rem; display: none;">
                             <label for="adminInviteCode" class="form-label">
-                                管理员邀请码
-                                <button type="button" class="icon-help" id="adminInviteHelp" aria-label="管理员邀请码说明">?</button>
+                                Administrator Invite Code
+                                <button type="button" class="icon-help" id="adminInviteHelp" aria-label="Administrator Invite Code Help">?</button>
                             </label>
                             <input 
                                 type="text" 
                                 id="adminInviteCode" 
                                 class="form-input" 
-                                placeholder="请输入平台提供的管理员邀请码">
+                                placeholder="Enter the administrator invite code provided by the platform">
                             <p class="form-hint" style="margin-top: 0.35rem; color: #718096; font-size: 0.85rem;">
-                                仅限已获得平台授权的管理员使用，如需开通请联系平台管理员。
+                                Only for administrators authorized by the platform. Contact platform administrator if needed.
                             </p>
                             <div class="admin-invite-tip" id="adminInviteTip">
-                                管理员邀请码配置在后端 <code>src/main/resources/application.yml</code> 中的
-                                <code>app.admin.invite-code</code>。本地默认值为 <strong>admin-2025-secret</strong>。
+                                The administrator invite code is configured in the backend <code>src/main/resources/application.yml</code> under
+                                <code>app.admin.invite-code</code>. The default local value is <strong>admin-2025-secret</strong>.
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 协议 & 提交 -->
+                <!-- Agreement & Submit -->
                 <div class="form-section">
                     <div class="agreement">
                         <label class="checkbox-item">
                             <input type="checkbox" id="agreement">
-                            <span>我已阅读并同意 <a href="https://zhuanlan.zhihu.com/p/421832962" target="_blank" class="link">用户协议</a> 和 <a href="https://blog.csdn.net/weixin_55553121/article/details/120492101" target="_blank" class="link">隐私政策</a></span>
+                            <span>I have read and agree to the <a href="https://zhuanlan.zhihu.com/p/421832962" target="_blank" class="link">User Agreement</a> and <a href="https://blog.csdn.net/weixin_55553121/article/details/120492101" target="_blank" class="link">Privacy Policy</a></span>
                         </label>
                     </div>
 
                     <div class="form-actions form-actions-centered">
-                        <button type="submit" class="btn btn-primary" id="submitBtn">注册</button>
-                        <button type="reset" class="btn btn-secondary" id="resetBtn">重置</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Register</button>
+                        <button type="reset" class="btn btn-secondary" id="resetBtn">Reset</button>
                     </div>
 
                     <div class="form-footer">
-                        <p>已经有账号？<a href="login.html" class="login-link">立即登录</a></p>
+                        <p>Already have an account? <a href="login.html" class="login-link">Login Now</a></p>
                     </div>
                 </div>
             </form>
@@ -400,36 +400,36 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-section">
-                <h3 class="footer-title">智慧学习平台</h3>
-                <p class="footer-desc">致力于为全球学习者提供优质的在线教育服务，让知识触手可及。</p>
+                <h3 class="footer-title">Smart Learning Platform</h3>
+                <p class="footer-desc">Committed to providing quality online education services for learners worldwide, making knowledge accessible.</p>
             </div>
 
             <div class="footer-section">
-                <h4 class="footer-subtitle">联系我们</h4>
+                <h4 class="footer-subtitle">Contact Us</h4>
                 <div class="contact-info">
-                    <p>📞 客服热线：400-123-4567</p>
-                    <p>📧 邮箱：service@example.com</p>
-                    <p>🕒 服务时间：9:00-21:00</p>
+                    <p>📞 Hotline: 400-123-4567</p>
+                    <p>📧 Email: service@example.com</p>
+                    <p>🕒 Service Hours: 9:00-21:00</p>
                 </div>
             </div>
 
             <div class="footer-section">
-                <h4 class="footer-subtitle">重要链接</h4>
+                <h4 class="footer-subtitle">Important Links</h4>
                 <ul class="footer-links">
                     <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
-                           rel="noopener noreferrer">关于我们</a></li>
+                           rel="noopener noreferrer">About Us</a></li>
                     <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
-                           rel="noopener noreferrer">用户协议</a></li>
+                           rel="noopener noreferrer">Terms of Service</a></li>
                     <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
-                           rel="noopener noreferrer">隐私政策</a></li>
+                           rel="noopener noreferrer">Privacy Policy</a></li>
                     <li><a href="https://www.nchu.edu.cn/" class="footer-link" target="_blank"
-                           rel="noopener noreferrer">合作院校</a></li>
+                           rel="noopener noreferrer">Partner Institutions</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p class="copyright">© 2025 智慧学习平台. 保留所有权利.</p>
+            <p class="copyright">© 2025 Smart Learning Platform. All rights reserved.</p>
         </div>
     </div>
 </footer>
@@ -632,14 +632,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (confirmPasswordInput && confirmPasswordInput.value) {
             const same = confirmPasswordInput.value === passwordInput.value;
-            setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? '两次密码一致' : '两次密码不一致');
+            setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? 'Passwords match' : 'Passwords do not match');
         }
     });
 
     confirmPasswordInput && confirmPasswordInput.addEventListener('input', () => {
         if (!passwordInput) return;
         const same = confirmPasswordInput.value === passwordInput.value;
-        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? '两次密码一致' : '两次密码不一致');
+        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? 'Passwords match' : 'Passwords do not match');
     });
 
     const bindPasswordToggle = (input, toggleBtn) => {
@@ -762,7 +762,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 使用固定宽度的文本格式，避免按钮跳动
         // 确保按钮宽度固定，不会因为文本长度变化而跳动
         sendCodeBtn.style.width = '150px';
-        sendCodeBtn.textContent = `${remaining}秒后重试`;
+        sendCodeBtn.textContent = `Retry in ${remaining}s`;
         
         // 使用 setInterval 而不是递归的 setTimeout，避免跳动
         countdownTimer = setInterval(() => {
@@ -771,13 +771,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(countdownTimer);
                 countdownTimer = null;
                 sendCodeBtn.disabled = false;
-                const original = sendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                const original = sendCodeBtn.getAttribute('data-original-text') || 'Send Code';
                 sendCodeBtn.textContent = original;
                 sendCodeBtn.style.width = ''; // 恢复CSS中的宽度设置
                 isSendingCode = false; // 重置发送标志
             } else {
                 // 使用固定格式，避免文本长度变化导致跳动
-                sendCodeBtn.textContent = `${remaining}秒后重试`;
+                sendCodeBtn.textContent = `Retry in ${remaining}s`;
                 // 确保按钮始终保持禁用状态和固定宽度
                 sendCodeBtn.disabled = true;
                 sendCodeBtn.style.width = '150px';
@@ -785,62 +785,62 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
 
-    // 绑定发送验证码按钮事件（只绑定一次，避免重复发送）
-    let isSendingCode = false; // 防止重复发送的标志
+    // Bind send verification code button event (bind only once to avoid duplicate sending)
+    let isSendingCode = false; // Flag to prevent duplicate sending
     
-    // 检查按钮是否已经绑定了事件监听器
+    // Check if button already has event listener bound
     if (sendCodeBtn && !sendCodeBtn.hasAttribute('data-listener-bound')) {
         sendCodeBtn.setAttribute('data-listener-bound', 'true');
-        console.log('绑定发送验证码按钮事件'); // 调试信息
+        console.log('Send verification code button event bound'); // Debug info
         
         sendCodeBtn.addEventListener('click', async (e) => {
-            console.log('发送验证码按钮被点击'); // 调试信息
-            e.preventDefault(); // 防止表单提交
-            e.stopPropagation(); // 阻止事件冒泡
-            e.stopImmediatePropagation(); // 阻止同一元素上的其他事件监听器
+            console.log('Send verification code button clicked'); // Debug info
+            e.preventDefault(); // Prevent form submission
+            e.stopPropagation(); // Stop event bubbling
+            e.stopImmediatePropagation(); // Stop other event listeners on same element
             
-            // 检查按钮是否已禁用（倒计时期间）
+            // Check if button is disabled (during countdown)
             if (sendCodeBtn.disabled || isSendingCode) {
-                console.log('按钮已禁用或正在发送中，忽略点击');
+                console.log('Button is disabled or sending, ignoring click');
                 return;
             }
             
             if (!emailInput) {
-                console.error('邮箱输入框未找到');
-                alert('邮箱输入框未找到');
+                console.error('Email input not found');
+                alert('Email input not found');
                 return;
             }
             
-            // 检查 validators 是否已定义
+            // Check if validators is defined
             if (typeof validators === 'undefined') {
-                console.error('validators 未定义，请检查 script.js 是否已加载');
-                alert('页面初始化失败，请刷新页面重试');
+                console.error('validators not defined, please check if script.js is loaded');
+                alert('Page initialization failed, please refresh and try again');
                 return;
             }
             
             const email = emailInput.value.trim();
             
-            // 验证邮箱格式
+            // Validate email format
             if (!email) {
-                alert('请先输入邮箱地址');
+                alert('Please enter email address first');
                 emailInput.focus();
                 return;
             }
             
             const emailValid = validators.email(email);
             if (!emailValid.ok) {
-                alert('请先输入正确的邮箱地址');
+                alert('Please enter a valid email address first');
                 emailInput.focus();
                 return;
             }
 
-            // 设置发送标志，防止重复点击
+            // Set sending flag to prevent duplicate clicks
             isSendingCode = true;
             try {
                 sendCodeBtn.disabled = true;
-                sendCodeBtn.textContent = '发送中...';
+                sendCodeBtn.textContent = 'Sending...';
                 
-                // 使用 URLSearchParams 发送表单数据
+                // Send form data using URLSearchParams
                 const formData = new URLSearchParams();
                 formData.append('email', email);
                 
@@ -851,43 +851,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 if (response.status >= 200 && response.status < 300) {
-                    alert('验证码已发送到您的邮箱，请查收');
+                    alert('Verification code sent to your email, please check');
                     if (emailCodeInput && emailCodeStatus) {
                         setInputStatus(emailCodeInput, emailCodeStatus, null, '');
                     }
-                    // 开始60秒倒计时
+                    // Start 60 second countdown
                     startCountdown(60);
                 } else {
-                    alert(response.data?.message || '发送验证码失败，请稍后重试');
+                    alert(response.data?.message || 'Failed to send verification code, please try again later');
                     sendCodeBtn.disabled = false;
-                    const original = sendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                    const original = sendCodeBtn.getAttribute('data-original-text') || 'Send Code';
                     sendCodeBtn.textContent = original;
                     isSendingCode = false;
                 }
             } catch (err) {
-                console.error('发送验证码失败:', err);
-                const errorMessage = err.response?.data?.message || '发送验证码失败，请稍后重试';
+                console.error('Failed to send verification code:', err);
+                const errorMessage = err.response?.data?.message || 'Failed to send verification code, please try again later';
                 alert(errorMessage);
                 
-                // 如果返回429（Too Many Requests），显示倒计时
+                // If returns 429 (Too Many Requests), show countdown
                 if (err.response?.status === 429) {
                     const remainingTime = err.response?.data?.remainingTime || 60;
                     startCountdown(remainingTime);
                 } else {
                     sendCodeBtn.disabled = false;
-                    const original = sendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                    const original = sendCodeBtn.getAttribute('data-original-text') || 'Send Code';
                     sendCodeBtn.textContent = original;
                     isSendingCode = false;
                 }
             }
-        }, true); // 使用捕获阶段，确保优先执行
+        }, true); // Use capture phase to ensure priority execution
     } else if (sendCodeBtn) {
-        console.log('发送验证码按钮事件已绑定，跳过重复绑定');
+        console.log('Send verification code button event already bound, skip duplicate binding');
     } else {
-        console.error('发送验证码按钮未找到');
+        console.error('Send verification code button not found');
     }
 
-    // 验证码输入验证 + 实时后端校验
+    // Verification code input validation + real-time backend validation
     let emailCodeServerValid = false;
     if (emailCodeInput && emailCodeStatus) {
         emailCodeInput.addEventListener('input', async () => {
@@ -898,19 +898,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             if (!/^\d{6}$/.test(code)) {
-                setInputStatus(emailCodeInput, emailCodeStatus, false, '请输入6位数字验证码');
+                setInputStatus(emailCodeInput, emailCodeStatus, false, 'Please enter 6-digit numeric verification code');
                 return;
             }
 
-            // 先本地通过格式校验，再请求后端实时验证
+            // First pass local format validation, then request backend real-time validation
             const email = emailInput ? emailInput.value.trim() : '';
             if (!email) {
-                setInputStatus(emailCodeInput, emailCodeStatus, false, '请先输入邮箱并获取验证码');
+                setInputStatus(emailCodeInput, emailCodeStatus, false, 'Please enter email and get verification code first');
                 return;
             }
 
             try {
-                // 使用 URLSearchParams 发送表单数据
+                // Send form data using URLSearchParams
                 const formData = new URLSearchParams();
                 formData.append('email', email);
                 formData.append('emailCode', code);
@@ -922,20 +922,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 if (resp.status >= 200 && resp.status < 300) {
                     emailCodeServerValid = true;
-                    setInputStatus(emailCodeInput, emailCodeStatus, true, '验证码正确');
+                    setInputStatus(emailCodeInput, emailCodeStatus, true, 'Verification code correct');
                 }
             } catch (err) {
                 emailCodeServerValid = false;
-                const msg = err.response?.data?.message || '验证码错误或已过期，请重新输入';
+                const msg = err.response?.data?.message || 'Verification code incorrect or expired, please re-enter';
                 setInputStatus(emailCodeInput, emailCodeStatus, false, msg);
             }
         });
     }
 
-    // 重置按钮额外处理一下状态样式
+    // Reset button additional state style handling
     const resetBtn = document.getElementById('resetBtn');
     resetBtn && resetBtn.addEventListener('click', (e) => {
-        // 阻止默认的表单重置行为，手动处理所有重置
+        // Prevent default form reset behavior, manually handle all resets
         e.preventDefault();
         
         [
@@ -949,7 +949,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (input) {
                 input.value = '';
                 input.classList.remove('input-error', 'input-success');
-                // 重置密码输入框类型
+                // Reset password input type
                 if (input.type === 'text' && (input.id === 'password' || input.id === 'confirmPassword')) {
                     input.type = 'password';
                 }
@@ -961,13 +961,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         if (agreementCheckbox) agreementCheckbox.checked = false;
         
-        // 重置头像
+        // Reset avatar
         const avatarInput = document.getElementById('avatar');
         const avatarPreview = document.getElementById('avatarPreview');
         const avatarRemove = document.getElementById('avatarRemove');
         if (avatarInput) {
             avatarInput.value = '';
-            // 清除文件选择
+            // Clear file selection
             avatarInput.files = null;
         }
         if (avatarPreview) {
@@ -982,7 +982,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (avatarRemove) avatarRemove.style.display = 'none';
         
-        // 重置单选和多选
+        // Reset radio and checkbox
         document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
         document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
             if (checkbox.id !== 'agreement') {
@@ -990,10 +990,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // 重置验证码按钮状态
+        // Reset verification code button state
         if (sendCodeBtn) {
             sendCodeBtn.disabled = false;
-            sendCodeBtn.textContent = '发送验证码';
+            sendCodeBtn.textContent = 'Send Code';
         }
         if (countdownTimer) {
             clearTimeout(countdownTimer);
@@ -1001,43 +1001,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 提交
-    // 标记表单已处理，防止script.js中的重复处理
+    // Submit
+    // Mark form as handled to prevent duplicate processing in script.js
     form.setAttribute('data-submit-handled', 'true');
-    // 确保重置注册状态（防止之前的注册状态影响）
+    // Ensure to reset registration status (prevent previous registration status from affecting)
     window.registrationSuccess = false;
     form.removeAttribute('data-registered');
     
-    // 确保事件监听器正确绑定（使用捕获阶段，确保优先执行）
-    // 使用捕获阶段确保优先执行，防止 script.js 中的事件先执行
+    // Ensure event listeners are correctly bound (use capture phase to ensure priority execution)
+    // Use capture phase to ensure priority execution, prevent events in script.js from executing first
     form.addEventListener('submit', async e => {
-        console.log('表单提交事件触发'); // 调试信息
-        e.preventDefault(); // 先阻止默认提交
-        e.stopPropagation(); // 阻止事件冒泡，防止 script.js 中的处理
-        e.stopImmediatePropagation(); // 阻止同一元素上的其他事件监听器
+        console.log('Form submit event triggered'); // Debug info
+        e.preventDefault(); // First prevent default submission
+        e.stopPropagation(); // Stop event bubbling, prevent processing in script.js
+        e.stopImmediatePropagation(); // Stop other event listeners on same element
         
-        // 防止重复处理：如果已经在处理中或已成功，立即返回
-        // 注意：只检查 isSubmitting，不检查 window.registrationSuccess（因为可能在页面刷新后仍为true）
+        // Prevent duplicate processing: if already processing or succeeded, return immediately
+        // Note: Only check isSubmitting, not window.registrationSuccess (because it may still be true after page refresh)
         if (isSubmitting) {
-            console.log('正在提交中，阻止重复提交'); // 调试信息
+            console.log('Submitting, prevent duplicate submission'); // Debug info
             e.stopPropagation();
             e.stopImmediatePropagation();
             return;
         }
-        // 如果表单已被标记为已注册，也阻止提交
+        // If form is already marked as registered, also prevent submission
         if (form.hasAttribute('data-registered')) {
-            console.log('表单已注册，阻止提交'); // 调试信息
+            console.log('Form already registered, prevent submission'); // Debug info
             e.stopPropagation();
             e.stopImmediatePropagation();
             return;
         }
         
-        console.log('开始处理表单提交'); // 调试信息
+        console.log('Start processing form submission'); // Debug info
 
-        // 检查必要的函数是否已定义
+        // Check if necessary functions are defined
         if (typeof validators === 'undefined' || typeof setInputStatus === 'undefined') {
-            console.error('validators 或 setInputStatus 未定义，请检查 script.js 是否已加载');
-            alert('页面初始化失败，请刷新页面重试');
+            console.error('validators or setInputStatus not defined, please check if script.js is loaded');
+            alert('Page initialization failed, please refresh and try again');
             return;
         }
 
@@ -1047,7 +1047,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
 
-        // 逐项验证
+        // Validate each field
         const v1 = validators.username(username);
         const v2 = validators.phone(phone);
         const v3 = validators.email(email);
@@ -1058,32 +1058,32 @@ document.addEventListener('DOMContentLoaded', function() {
         setInputStatus(phoneInput, phoneStatus, v2.ok, v2.msg);
         setInputStatus(emailInput, emailStatus, v3.ok, v3.msg);
         setInputStatus(passwordInput, passwordStatus, v4.ok, v4.msg);
-        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? '两次密码一致' : '两次密码不一致');
+        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? 'Passwords match' : 'Passwords do not match');
 
         if (!agreementCheckbox.checked) {
-            alert('请先勾选同意用户协议和隐私政策');
+            alert('Please check the box to agree to the User Agreement and Privacy Policy');
             return;
         }
 
-        // 验证验证码（本地格式验证，实际验证在后端进行）
+        // Validate verification code (local format validation, actual validation on backend)
         const emailCode = emailCodeInput.value.trim();
         const emailCodeValid = emailCode && /^\d{6}$/.test(emailCode);
         if (emailCodeInput) {
             if (emailCodeValid) {
                 setInputStatus(emailCodeInput, emailCodeStatus, emailCodeServerValid ? true : null, 
-                    emailCodeServerValid ? '验证码正确' : '请输入6位数字验证码');
+                    emailCodeServerValid ? 'Verification code correct' : 'Please enter 6-digit numeric verification code');
             } else {
-                setInputStatus(emailCodeInput, emailCodeStatus, false, '请输入6位数字验证码');
+                setInputStatus(emailCodeInput, emailCodeStatus, false, 'Please enter 6-digit numeric verification code');
             }
         }
 
-        // 不强制要求异步验证完成，后端会再次验证
+        // Do not require async validation to complete, backend will validate again
         if (!v1.ok || !v2.ok || !v3.ok || !v4.ok || !same || !emailCodeValid) {
-            alert('请先修正表单中的红色错误项');
+            alert('Please fix the red error items in the form first');
             return;
         }
 
-        // 收集学习信息
+        // Collect learning information
         const learningPreference = Array.from(document.querySelectorAll('input[name="learningPreference"]:checked'))
             .map(i => i.value);
         const courseInterest = Array.from(document.querySelectorAll('input[name="courseInterest"]:checked'))
@@ -1092,55 +1092,55 @@ document.addEventListener('DOMContentLoaded', function() {
         const genderRadio = document.querySelector('input[name="gender"]:checked');
 
         if (!learningPreference.length || !courseInterest.length || !learningGoalRadio || !genderRadio) {
-            alert('请完整选择学习偏好、课程兴趣和学习目标、性别');
+            alert('Please fully select learning preferences, course interests, learning goals, and gender');
             return;
         }
 
-        // 提交注册（使用 FormData 支持文件上传）
-        // 注意：使用外层的 isSubmitting 变量，不要重新定义
+        // Submit registration (use FormData to support file upload)
+        // Note: Use outer isSubmitting variable, do not redefine
         async function submitRegistration() {
-            // 防止重复提交（使用外层的 isSubmitting 变量）
+            // Prevent duplicate submission (use outer isSubmitting variable)
             if (isSubmitting) {
-                console.log('注册请求正在处理中，请勿重复提交');
+                console.log('Registration request is being processed, please do not submit again');
                 return;
             }
             
             const submitBtn = document.getElementById('submitBtn');
             const emailCode = emailCodeInput.value.trim();
             
-            // 先进行所有验证（在设置提交状态之前）
+            // Perform all validations first (before setting submission state)
             if (!username || !phone || !email || !password || !genderRadio || !learningGoalRadio) {
-                alert('请确保所有必填项都已填写');
+                alert('Please ensure all required fields are filled');
                 return;
             }
             
             if (!emailCode) {
-                alert('请输入邮箱验证码');
+                alert('Please enter email verification code');
                 emailCodeInput.focus();
                 return;
             }
             if (!/^\d{6}$/.test(emailCode)) {
-                alert('验证码格式不正确，请输入6位数字');
+                alert('Verification code format is incorrect, please enter 6 digits');
                 emailCodeInput.focus();
                 return;
             }
             
             if (learningPreference.length === 0) {
-                alert('请至少选择一个学习偏好');
+                alert('Please select at least one learning preference');
                 return;
             }
             if (courseInterest.length === 0) {
-                alert('请至少选择一个课程兴趣');
+                alert('Please select at least one course interest');
                 return;
             }
             
-            // 验证头像文件（如果有）
+            // Validate avatar file (if any)
             const avatarInput = document.getElementById('avatar');
             if (avatarInput && avatarInput.files && avatarInput.files[0]) {
                 const file = avatarInput.files[0];
                 const maxSize = 2 * 1024 * 1024; // 2MB
                 if (file.size > maxSize) {
-                    alert('头像文件大小不能超过2MB，请选择更小的文件');
+                    alert('Avatar file size cannot exceed 2MB, please select a smaller file');
                     return;
                 }
                 const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
@@ -1149,16 +1149,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const isValidType = validTypes.includes(file.type) || 
                                   validExtensions.some(ext => fileName.endsWith(ext));
                 if (!isValidType) {
-                    alert('头像文件格式不支持，仅支持 JPG、JPEG、PNG、GIF 格式');
+                    alert('Avatar file format not supported, only JPG, JPEG, PNG, GIF formats are supported');
                     return;
                 }
             }
             
-            // 所有验证通过，设置提交状态
+            // All validations passed, set submission state
             isSubmitting = true;
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.textContent = '注册中...';
+                submitBtn.textContent = 'Registering...';
             }
             
             try {
@@ -1171,19 +1171,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('learningGoal', learningGoalRadio.value);
                 formData.append('emailCode', emailCode);
                 
-                // 添加用户角色
+                // Add user role
                 const userRoleRadio = document.querySelector('input[name="userRole"]:checked');
                 if (userRoleRadio) {
                     formData.append('userRole', userRoleRadio.value);
-                    // 如果选择管理员，附加管理员邀请码
+                    // If admin is selected, attach admin invite code
                     if (userRoleRadio.value === 'ADMIN' && adminInviteInput) {
                         const invite = adminInviteInput.value.trim();
                         if (!invite) {
-                            alert('请选择管理员身份时必须填写管理员邀请码');
+                            alert('Admin invite code is required when selecting administrator role');
                             isSubmitting = false;
                             if (submitBtn) {
                                 submitBtn.disabled = false;
-                                submitBtn.textContent = '注册';
+                                submitBtn.textContent = 'Register';
                             }
                             adminInviteInput.focus();
                             return;
@@ -1204,21 +1204,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     formData.append('avatar', avatarInput.files[0]);
                 }
                 
-                // 调试：打印FormData内容（仅开发时使用）
-                console.log('提交注册数据:');
+                // Debug: Print FormData content (for development use only)
+                console.log('Submit registration data:');
                 for (let pair of formData.entries()) {
                     console.log(pair[0] + ': ' + (pair[1] instanceof File ? pair[1].name : pair[1]));
                 }
                 
-                // 注意：使用 FormData 时，不要手动设置 Content-Type，让浏览器自动设置（包括 boundary）
+                // Note: When using FormData, do not manually set Content-Type, let the browser set it automatically (including boundary)
                 const resp = await axios.post(API_REGISTER, formData);
                 
-                // axios 正常响应（状态码 200-299）不会抛出异常，直接在这里处理
+                // axios normal response (status code 200-299) will not throw exception, handle directly here
                 if (resp.status >= 200 && resp.status < 300) {
-                    const message = resp.data?.message || '注册成功，请登录';
-                    // 标记已成功处理，防止其他监听器处理
+                    const message = resp.data?.message || 'Registration successful, please login';
+                    // Mark as successfully processed to prevent other listeners from processing
                     window.registrationSuccess = true;
-                    // 立即禁用表单和按钮，防止任何后续提交
+                    // Immediately disable form and buttons to prevent any subsequent submissions
                     if (form) {
                         form.setAttribute('data-registered', 'true');
                         const submitBtn = document.getElementById('submitBtn');
@@ -1228,57 +1228,57 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     alert(message);
-                    // 立即跳转，避免重复提示和后续处理
-                    window.location.replace('login.html'); // 使用replace而不是href，避免返回
-                    return; // 立即返回，防止后续代码执行
+                    // Immediately redirect to avoid duplicate prompts and subsequent processing
+                    window.location.replace('login.html'); // Use replace instead of href to avoid back
+                    return; // Return immediately to prevent subsequent code execution
                 }
                 
             } catch (err) {
-                // 如果已经成功处理过，不再处理错误
+                // If already successfully processed, do not handle error again
                 if (window.registrationSuccess) {
                     return;
                 }
-                // axios 只有在状态码不在 200-299 范围时才会抛出异常
-                console.error('注册错误详情:', err);
-                console.error('错误响应:', err.response);
-                console.error('错误响应数据:', err.response?.data);
+                // axios only throws exception when status code is not in 200-299 range
+                console.error('Registration error details:', err);
+                console.error('Error response:', err.response);
+                console.error('Error response data:', err.response?.data);
                 
-                // 处理错误响应
+                // Handle error response
                 if (err.response) {
                     const errorData = err.response.data || {};
-                    const errorMessage = errorData.message || '注册失败，请检查信息或稍后再试';
+                    const errorMessage = errorData.message || 'Registration failed, please check information or try again later';
                     
-                    // 提供更详细的错误提示
+                    // Provide more detailed error prompts
                     if (errorMessage.includes('已被注册') || errorMessage.includes('已存在')) {
-                        alert('注册失败：' + errorMessage + '\n\n请检查：\n1. 用户名是否已被使用\n2. 手机号是否已被注册\n3. 邮箱是否已被注册');
+                        alert('Registration failed: ' + errorMessage + '\n\nPlease check:\n1. Username is already in use\n2. Phone number is already registered\n3. Email is already registered');
                     } else if (errorMessage.includes('不能为空') || errorMessage.includes('至少选择')) {
-                        alert('注册失败：' + errorMessage + '\n\n请确保所有必填项都已正确填写');
+                        alert('Registration failed: ' + errorMessage + '\n\nPlease ensure all required fields are filled correctly');
                     } else {
-                        alert('注册失败：' + errorMessage);
+                        alert('Registration failed: ' + errorMessage);
                     }
                 } else if (err.request) {
-                    // 请求已发出但没有收到响应
-                    alert('注册请求发送失败，请检查网络连接后重试');
+                    // Request was sent but no response received
+                    alert('Registration request failed, please check network connection and try again');
                 } else {
-                    // 其他错误
-                    alert('注册失败：' + (err.message || '未知错误，请稍后重试'));
+                    // Other errors
+                    alert('Registration failed: ' + (err.message || 'Unknown error, please try again later'));
                 }
             } finally {
-                // 如果已成功处理并跳转，不重置状态
+                // If successfully processed and redirected, do not reset state
                 if (window.registrationSuccess) {
                     return;
                 }
-                // 重置提交状态
+                // Reset submission state
                 isSubmitting = false;
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = '注册';
+                    submitBtn.textContent = 'Register';
                 }
             }
         }
         
         submitRegistration();
-    }, true); // 使用捕获阶段，确保优先执行，防止 script.js 中的事件先执行
+    }, true); // Use capture phase to ensure priority execution, prevent events in script.js from executing first
 })();
 </script>
 
