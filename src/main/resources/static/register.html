@@ -367,7 +367,7 @@
                             </p>
                             <div class="admin-invite-tip" id="adminInviteTip">
                                 The administrator invite code is configured in the backend <code>src/main/resources/application.yml</code> under
-                                <code>app.admin.invite-code</code>. The default local value is <strong>admin-2025-secret</strong>.
+                                <code>app.admin.invite-code</code>. The default local value is <strong>TeamWorkClass-2026</strong>.
                             </div>
                         </div>
                     </div>
@@ -439,7 +439,7 @@
 <script>
 // 在script.js加载之前就标记表单已处理，防止重复绑定
 (function() {
-    // 重置注册成功标志（防止之前的注册状态影响新页面）
+    // 重置Register成功标志（防止之前的Register状态影响新页面）
     window.registrationSuccess = false;
     
     // 立即执行函数，在DOM加载前就设置标记
@@ -448,7 +448,7 @@
             const form = document.getElementById('registerForm');
             if (form) {
                 form.setAttribute('data-submit-handled', 'true');
-                // 确保移除之前的注册标记
+                // 确保移除之前的Register标记
                 form.removeAttribute('data-registered');
             }
         });
@@ -457,7 +457,7 @@
         const form = document.getElementById('registerForm');
         if (form) {
             form.setAttribute('data-submit-handled', 'true');
-            // 确保移除之前的注册标记
+            // 确保移除之前的Register标记
             form.removeAttribute('data-registered');
         }
     }
@@ -468,7 +468,7 @@
 
 <script>
 // 注意：API_BASE、API_REGISTER、setInputStatus 和 validators 已在 script.js 中定义
-// 这里只需要注册页特定的功能代码
+// 这里只需要Register页特定的功能代码
 
 // 在script.js执行之前就设置标志，防止重复绑定验证码发送事件
 // 注意：不要在这里设置 data-listener-bound，让 initRegisterPage 来绑定事件
@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 验证文件大小（限制 2MB）
             const maxSize = 2 * 1024 * 1024; // 2MB
             if (file.size > maxSize) {
-                resetAvatarState('头像文件大小不能超过 2MB，请重新选择。', 'error');
+                resetAvatarState('Avatar file cannot exceed 2MB. Please choose another file.', 'error');
                 return;
             }
             
@@ -546,15 +546,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const isValidType = validTypes.includes(file.type) || 
                               validExtensions.some(ext => fileName.endsWith(ext));
             if (!isValidType) {
-                resetAvatarState('头像文件格式不支持，仅支持 JPG、JPEG、PNG、GIF。', 'error');
+                resetAvatarState('Avatar format is not supported. Only JPG, JPEG, PNG, and GIF are allowed.', 'error');
                 return;
             }
             
             const reader = new FileReader();
             reader.onload = e => {
-                avatarPreview.innerHTML = `<img src="${e.target.result}" alt="头像预览">`;
+                avatarPreview.innerHTML = `<img src="${e.target.result}" alt="Avatar Preview">`;
                 if (avatarRemove) avatarRemove.style.display = 'flex';
-                updateAvatarMessage('头像上传成功，可以继续注册。', 'success');
+                updateAvatarMessage('Avatar uploaded successfully. You can continue registration.', 'success');
             };
             reader.readAsDataURL(file);
         });
@@ -562,11 +562,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     avatarRemove && avatarRemove.addEventListener('click', e => {
         e.stopPropagation();
-        resetAvatarState('已移除已上传的头像。', 'info');
+        resetAvatarState('Uploaded avatar removed.', 'info');
     });
 })();
 
-// ================== 注册表单处理 ==================
+// ================== Register表单处理 ==================
 // 确保在DOM加载完成后执行
 (function initRegisterPage() {
     // 如果DOM还未加载完成，等待加载完成
@@ -577,11 +577,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const form = document.getElementById('registerForm');
     if (!form) {
-        console.error('注册表单未找到，请检查HTML结构');
+        console.error('Registration form not found. Check the HTML structure.');
         return;
     }
     
-    console.log('注册表单初始化完成，事件监听器已绑定');
+    console.log('Registration form initialized and event listeners are bound.');
 
     const usernameInput = document.getElementById('username');
     const usernameStatus = document.getElementById('usernameStatus');
@@ -709,15 +709,15 @@ document.addEventListener('DOMContentLoaded', function() {
         score += hasNumber ? 1 : 0;
 
         const levelMap = [
-            { text: '安全性：弱', color: '#f56565', width: '33%' },
-            { text: '安全性：中', color: '#ed8936', width: '66%' },
-            { text: '安全性：强', color: '#48bb78', width: '100%' }
+            { text: 'Strength: Weak', color: '#f56565', width: '33%' },
+            { text: 'Strength: Medium', color: '#ed8936', width: '66%' },
+            { text: 'Strength: Strong', color: '#48bb78', width: '100%' }
         ];
 
         if (!value) {
             passwordStrengthBar.style.width = '0%';
             passwordStrengthBar.style.background = '#e2e8f0';
-            passwordStrengthText.textContent = '安全性：--';
+            passwordStrengthText.textContent = 'Strength: --';
         } else {
             const level = levelMap[Math.max(score - 1, 0)];
             passwordStrengthBar.style.width = level.width;
@@ -736,7 +736,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     updatePasswordUI('');
 
-    // 发送验证码功能
+    // Send Code功能
     const sendCodeBtn = document.getElementById('sendCodeBtn');
     const emailCodeInput = document.getElementById('emailCode');
     const emailCodeStatus = document.getElementById('emailCodeStatus');
@@ -758,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let remaining = seconds;
         sendCodeBtn.disabled = true;
-        sendCodeBtn.setAttribute('data-original-text', sendCodeBtn.textContent || '发送验证码');
+        sendCodeBtn.setAttribute('data-original-text', sendCodeBtn.textContent || 'Send Code');
         // 使用固定宽度的文本格式，避免按钮跳动
         // 确保按钮宽度固定，不会因为文本长度变化而跳动
         sendCodeBtn.style.width = '150px';
@@ -1246,15 +1246,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Handle error response
                 if (err.response) {
                     const errorData = err.response.data || {};
-                    const errorMessage = errorData.message || 'Registration failed, please check information or try again later';
+                    const errorMessage = errorData.message || '';
                     
                     // Provide more detailed error prompts
-                    if (errorMessage.includes('已被注册') || errorMessage.includes('已存在')) {
-                        alert('Registration failed: ' + errorMessage + '\n\nPlease check:\n1. Username is already in use\n2. Phone number is already registered\n3. Email is already registered');
-                    } else if (errorMessage.includes('不能为空') || errorMessage.includes('至少选择')) {
-                        alert('Registration failed: ' + errorMessage + '\n\nPlease ensure all required fields are filled correctly');
+                    if (errorMessage.includes('already') || errorMessage.includes('exists') || errorMessage.includes('已被注册') || errorMessage.includes('已存在')) {
+                        alert('Registration failed.\n\nPlease check:\n1. Username is already in use\n2. Phone number is already registered\n3. Email is already registered');
+                    } else if (errorMessage.includes('required') || errorMessage.includes('不能为空') || errorMessage.includes('至少选择')) {
+                        alert('Registration failed.\n\nPlease ensure all required fields are filled correctly');
                     } else {
-                        alert('Registration failed: ' + errorMessage);
+                        alert('Registration failed. Please check your information or try again later.');
                     }
                 } else if (err.request) {
                     // Request was sent but no response received

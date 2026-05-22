@@ -61,6 +61,21 @@ CREATE TABLE user_course (
                              KEY idx_course_id (course_id)
 );
 
+-- Daily learning check-in table
+DROP TABLE IF EXISTS study_check_in;
+CREATE TABLE study_check_in (
+                                id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                user_id BIGINT NOT NULL,
+                                check_in_date DATE NOT NULL,
+                                study_minutes INT DEFAULT 0,
+                                note VARCHAR(255),
+                                create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                UNIQUE KEY uk_user_check_in_date (user_id, check_in_date),
+                                KEY idx_user_id (user_id),
+                                KEY idx_check_in_date (check_in_date)
+);
+
 -- 插入示例课程数据（包含标签和详情）
 INSERT INTO course (title, description, detail_description, level, category, cover_url, teacher, teacher_intro, price, tags, course_outline, course_images, duration, student_count, rating) VALUES
 ('Java 基础入门', '从零开始学习 Java 编程语言，掌握面向对象编程基础', '本课程是Java编程的入门课程，适合零基础的学员。课程从Java语言的基础语法开始，逐步深入讲解面向对象编程的核心概念，包括类、对象、继承、多态、封装等。通过大量实际案例和编程练习，帮助学员建立扎实的Java编程基础。\n\n课程特色：\n1. 零基础友好，循序渐进\n2. 理论与实践相结合\n3. 丰富的编程练习和项目实战\n4. 专业的讲师团队指导\n\n学完本课程后，你将能够：\n- 掌握Java基础语法和数据类型\n- 理解面向对象编程思想\n- 能够编写简单的Java应用程序\n- 为后续深入学习Java框架打下坚实基础', '初级', '编程开发', '/image/course/java-basic.jpg', '张老师', '张老师拥有10年Java开发经验，曾在多家知名互联网公司担任高级工程师和技术专家。擅长Java核心技术、Spring框架、微服务架构等领域。教学风格深入浅出，注重实践，已培养数千名Java开发工程师。', 0, '编程开发,动手实践,视觉学习,职业提升', '[{"title":"第一章：Java开发环境搭建","lessons":[{"title":"Java简介与发展历史","duration":"30分钟"},{"title":"JDK安装与配置","duration":"45分钟"},{"title":"第一个Java程序","duration":"40分钟"},{"title":"IDE工具使用（IntelliJ IDEA）","duration":"50分钟"}]},{"title":"第二章：Java基础语法","lessons":[{"title":"变量与数据类型","duration":"50分钟"},{"title":"运算符与表达式","duration":"45分钟"},{"title":"流程控制语句","duration":"60分钟"},{"title":"数组的使用","duration":"50分钟"}]},{"title":"第三章：面向对象编程","lessons":[{"title":"类与对象的概念","duration":"50分钟"},{"title":"封装与访问控制","duration":"45分钟"},{"title":"继承与多态","duration":"60分钟"},{"title":"接口与抽象类","duration":"55分钟"}]},{"title":"第四章：Java核心API","lessons":[{"title":"String字符串处理","duration":"50分钟"},{"title":"集合框架（List、Set、Map）","duration":"80分钟"},{"title":"异常处理机制","duration":"50分钟"},{"title":"IO流操作","duration":"60分钟"}]},{"title":"第五章：项目实战","lessons":[{"title":"学生管理系统开发","duration":"120分钟"},{"title":"图书管理系统开发","duration":"150分钟"}]}]', '["/image/course/java-basic-1.jpg","/image/course/java-basic-2.jpg","/image/course/java-basic-3.jpg"]', '40小时', 1250, 4.8),

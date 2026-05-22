@@ -46,13 +46,28 @@
                 )
             </if>
             <if test="learningPreference != null and learningPreference != ''">
-                AND tags LIKE CONCAT('%', #{learningPreference}, '%')
+                AND (
+                    tags LIKE CONCAT('%', #{learningPreference}, '%')
+                    <if test="learningPreferenceAlt != null and learningPreferenceAlt != ''">
+                        OR tags LIKE CONCAT('%', #{learningPreferenceAlt}, '%')
+                    </if>
+                )
             </if>
             <if test="courseInterest != null and courseInterest != ''">
-                AND tags LIKE CONCAT('%', #{courseInterest}, '%')
+                AND (
+                    tags LIKE CONCAT('%', #{courseInterest}, '%')
+                    <if test="courseInterestAlt != null and courseInterestAlt != ''">
+                        OR tags LIKE CONCAT('%', #{courseInterestAlt}, '%')
+                    </if>
+                )
             </if>
             <if test="learningGoal != null and learningGoal != ''">
-                AND tags LIKE CONCAT('%', #{learningGoal}, '%')
+                AND (
+                    tags LIKE CONCAT('%', #{learningGoal}, '%')
+                    <if test="learningGoalAlt != null and learningGoalAlt != ''">
+                        OR tags LIKE CONCAT('%', #{learningGoalAlt}, '%')
+                    </if>
+                )
             </if>
         </where>
         ORDER BY id DESC
@@ -72,13 +87,28 @@
                 )
             </if>
             <if test="learningPreference != null and learningPreference != ''">
-                AND tags LIKE CONCAT('%', #{learningPreference}, '%')
+                AND (
+                    tags LIKE CONCAT('%', #{learningPreference}, '%')
+                    <if test="learningPreferenceAlt != null and learningPreferenceAlt != ''">
+                        OR tags LIKE CONCAT('%', #{learningPreferenceAlt}, '%')
+                    </if>
+                )
             </if>
             <if test="courseInterest != null and courseInterest != ''">
-                AND tags LIKE CONCAT('%', #{courseInterest}, '%')
+                AND (
+                    tags LIKE CONCAT('%', #{courseInterest}, '%')
+                    <if test="courseInterestAlt != null and courseInterestAlt != ''">
+                        OR tags LIKE CONCAT('%', #{courseInterestAlt}, '%')
+                    </if>
+                )
             </if>
             <if test="learningGoal != null and learningGoal != ''">
-                AND tags LIKE CONCAT('%', #{learningGoal}, '%')
+                AND (
+                    tags LIKE CONCAT('%', #{learningGoal}, '%')
+                    <if test="learningGoalAlt != null and learningGoalAlt != ''">
+                        OR tags LIKE CONCAT('%', #{learningGoalAlt}, '%')
+                    </if>
+                )
             </if>
         </where>
     </select>

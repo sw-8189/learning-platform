@@ -48,7 +48,7 @@ app:
 
   admin:
     # 管理员邀请码（可通过环境变量 ADMIN_INVITE_CODE 覆盖）
-    invite-code: ${ADMIN_INVITE_CODE:admin-2025-secret}
+    invite-code: ${ADMIN_INVITE_CODE:TeamWorkClass-2026}
   
   # 文件上传配置
   upload:

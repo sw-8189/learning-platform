@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // 检查文件大小（限制为2MB）
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('文件大小不能超过2MB');
+                    alert('File size cannot exceed 2MB');
                     return;
                 }
 
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // 如果 avatarUrl 看起来像 data:，不要提交（附加客户端防护）
                     if (typeof userData.avatarUrl === 'string' && userData.avatarUrl.startsWith('data:')) {
-                        alert('检测到头像为 base64 数据，请使用头像上传按钮上传文件后再保存。');
+                        alert('Avatar preview data cannot be saved directly. Please upload the avatar file before saving.');
                         return;
                     }
 
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         headers: { Authorization: this.token }
                     });
 
-                    this.updateMessage = '信息更新成功';
+                    this.updateMessage = 'Profile updated successfully';
                     this.updateError = '';
 
                     // 更新展示
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     setTimeout(() => { this.updateMessage = ''; }, 3000);
                 } catch (error) {
-                    this.updateError = error.response?.data?.message || '信息更新失败';
+                    this.updateError = error.response?.data?.message || 'Failed to update profile';
                     this.updateMessage = '';
                 }
             },
@@ -154,17 +154,17 @@ document.addEventListener('DOMContentLoaded', function() {
             async updatePassword() {
                 const { oldPassword, newPassword, confirmNewPassword } = this.passwordForm;
                 if (!oldPassword || !newPassword || !confirmNewPassword) {
-                    this.passwordError = '请完整填写所有密码字段';
+                    this.passwordError = 'Please complete all password fields';
                     return;
                 }
                 if (newPassword !== confirmNewPassword) {
-                    this.passwordError = '两次输入的新密码不一致';
+                    this.passwordError = 'The two new passwords do not match';
                     return;
                 }
                 // 密码规则：4-8 位，必须包含字母和数字
                 const pwdRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,8}$/;
                 if (!pwdRegex.test(newPassword)) {
-                    this.passwordError = '新密码需为4-8位，且同时包含字母和数字';
+                    this.passwordError = 'The new password must be 4-8 characters and include both letters and numbers';
                     return;
                 }
 
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, {
                         headers: { Authorization: this.token }
                     });
-                    this.passwordMessage = '密码修改成功';
+                    this.passwordMessage = 'Password updated successfully';
                     this.passwordError = '';
                     // 清空表单
                     this.passwordForm.oldPassword = '';
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.passwordForm.confirmNewPassword = '';
                     setTimeout(() => { this.passwordMessage = ''; }, 3000);
                 } catch (error) {
-                    this.passwordError = error.response?.data?.message || '密码修改失败';
+                    this.passwordError = error.response?.data?.message || 'Failed to update password';
                     this.passwordMessage = '';
                 }
             },
@@ -220,10 +220,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     const response = await axios.post(`/api/courses/${courseId}/join`, {}, {
                         headers: { Authorization: this.token }
                     });
-                    alert('课程加入成功');
+                    alert('Course joined successfully');
                     this.loadMyCourses(); // 重新加载我的课程
                 } catch (error) {
-                    alert(error.response?.data?.message || '加入课程失败');
+                    alert(error.response?.data?.message || 'Failed to join course');
                 }
             },
             searchCourses() {
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             logout() {
                 localStorage.removeItem('token');
-                alert('已退出登录');
+                alert('Logged out');
                 window.location.href = 'login.html';
             }
         }

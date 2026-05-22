@@ -4,7 +4,10 @@
 }
 
 .app-layout {
+    height: 100vh;
+    height: 100dvh;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     overflow: hidden;
     position: relative;
@@ -26,7 +29,9 @@
 /* 侧边栏基础样式 */
 .sidebar {
     width: 260px;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(235, 248, 255, 0.95) 100%);
     backdrop-filter: blur(20px);
     border-right: 1px solid rgba(99, 179, 237, 0.2);
@@ -2109,9 +2114,12 @@
     padding: 1.8rem 1.5rem 2rem;
     overflow-y: auto;
     overflow-x: hidden;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
     position: relative;
     overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* 卡片、信息 */
@@ -4995,4 +5003,59 @@ input[type="password"]:focus {
     border-color: #3182ce;
     background: #ebf8ff;
     color: #3182ce;
+}
+
+/* Final mobile scroll fixes for the app shell. Earlier responsive blocks switch the
+   shell to a top-nav layout; these rules keep body scrolling available there. */
+@media (max-width: 900px) {
+    .app-layout {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        flex-direction: column;
+        overflow: visible;
+    }
+
+    .app-layout::after {
+        display: none;
+    }
+
+    .sidebar,
+    .sidebar.collapsed {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        height: auto;
+        max-height: 52vh;
+        max-height: 52dvh;
+        align-self: stretch;
+        border-right: none;
+        border-bottom: 1px solid rgba(99, 179, 237, 0.22);
+    }
+
+    .sidebar.collapsed {
+        max-height: 88px;
+    }
+
+    .sidebar-content {
+        max-height: calc(52vh - 92px);
+        max-height: calc(52dvh - 92px);
+    }
+
+    .sidebar.collapsed .sidebar-content,
+    .sidebar.collapsed .sidebar-footer {
+        display: none;
+    }
+
+    .sidebar:not(.collapsed) ~ * {
+        pointer-events: auto;
+    }
+
+    .main-content {
+        height: auto;
+        min-height: calc(100vh - 88px);
+        min-height: calc(100dvh - 88px);
+        overflow: visible;
+        padding: 1rem;
+    }
 }

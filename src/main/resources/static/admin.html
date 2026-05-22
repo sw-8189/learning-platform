@@ -237,7 +237,7 @@
 </head>
 <body>
     <div id="app" class="admin-container">
-        <!-- 头部 -->
+        <!-- Header -->
         <div class="admin-header">
             <h1>Admin Dashboard</h1>
             <div>
@@ -246,14 +246,14 @@
             </div>
         </div>
 
-        <!-- 导航 -->
+        <!-- Navigation -->
         <div class="admin-nav">
             <button class="nav-btn" :class="{active: activeTab === 'users'}" @click="switchTab('users')">User Management</button>
             <button class="nav-btn" :class="{active: activeTab === 'courses'}" @click="switchTab('courses')">Course Management</button>
             <button class="nav-btn" :class="{active: activeTab === 'statistics'}" @click="switchTab('statistics')">Statistics</button>
         </div>
 
-        <!-- 内容区 -->
+        <!-- Content -->
         <div class="admin-content">
             <!-- User Management -->
             <div v-show="activeTab === 'users'">
@@ -305,7 +305,7 @@
                         <button @click="nextUserPage" :disabled="userPage === userTotalPages">Next</button>
                     </div>
                 </div>
-                <div class="loading" v-else>加载中...</div>
+                <div class="loading" v-else>Loading...</div>
             </div>
 
             <!-- Course Management -->
@@ -335,11 +335,11 @@
                         <tbody>
                             <tr v-for="course in courses" :key="course.id">
                                 <td>{{ course.id }}</td>
-                                <td>{{ course.title }}</td>
-                                <td>{{ course.category || '-' }}</td>
-                                <td>{{ course.level || '-' }}</td>
-                                <td>{{ course.teacher || '-' }}</td>
-                                <td>{{ course.price || 0 }}元</td>
+                                <td>{{ translateText(course.title, 'Course') }}</td>
+                                <td>{{ translateText(course.category, '-') }}</td>
+                                <td>{{ translateText(course.level, '-') }}</td>
+                                <td>{{ translateText(course.teacher, '-') }}</td>
+                                <td>{{ course.price || 0 }} CNY</td>
                                 <td>{{ course.studentCount || 0 }}</td>
                                 <td>
                                     <button class="btn btn-primary" @click="editCourse(course)">Edit</button>
@@ -358,7 +358,7 @@
                         <button @click="nextCoursePage" :disabled="coursePage === courseTotalPages">Next</button>
                     </div>
                 </div>
-                <div class="loading" v-else>加载中...</div>
+                <div class="loading" v-else>Loading...</div>
             </div>
 
             <!-- Statistics -->
@@ -408,23 +408,23 @@
                         <label>Category</label>
                         <select v-model="courseForm.category">
                             <option value="">Select</option>
-                            <option value="编程开发">Programming Development</option>
-                            <option value="前端开发">Frontend Development</option>
-                            <option value="后端开发">Backend Development</option>
-                            <option value="数据科学">Data Science</option>
-                            <option value="设计创意">Design & Creativity</option>
-                            <option value="商业管理">Business Management</option>
-                            <option value="职业技能">Professional Skills</option>
-                            <option value="人工智能">Artificial Intelligence</option>
+                            <option value="Programming Development">Programming Development</option>
+                            <option value="Frontend Development">Frontend Development</option>
+                            <option value="Backend Development">Backend Development</option>
+                            <option value="Data Science">Data Science</option>
+                            <option value="Design & Creativity">Design & Creativity</option>
+                            <option value="Business Management">Business Management</option>
+                            <option value="Professional Skills">Professional Skills</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Level</label>
                         <select v-model="courseForm.level">
                             <option value="">Select</option>
-                            <option value="初级">Beginner</option>
-                            <option value="中级">Intermediate</option>
-                            <option value="高级">Advanced</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -458,6 +458,28 @@
 
     <script>
         const token = localStorage.getItem('token');
+        const ADMIN_TEXT_TRANSLATIONS = {
+            '编程开发': 'Programming Development',
+            '前端开发': 'Frontend Development',
+            '后端开发': 'Backend Development',
+            '数据科学': 'Data Science',
+            '设计创意': 'Design & Creativity',
+            '商业管理': 'Business Management',
+            '职业技能': 'Professional Skills',
+            '人工智能': 'Artificial Intelligence',
+            '初级': 'Beginner',
+            '中级': 'Intermediate',
+            '高级': 'Advanced',
+            '张老师': 'Instructor Zhang',
+            '李老师': 'Instructor Li',
+            '王老师': 'Instructor Wang',
+            'Java 基础入门': 'Java Fundamentals',
+            '前端开发实战': 'Practical Frontend Development',
+            'Python 数据分析': 'Python Data Analysis'
+        };
+        function adminHasCjk(value) {
+            return /[\u4e00-\u9fff]/.test(String(value || ''));
+        }
         if (!token) {
             window.location.href = 'login.html';
         }
@@ -515,6 +537,20 @@
                 this.loadUsers();
             },
             methods: {
+                translateText(value, fallback = '') {
+                    if (value === null || value === undefined || value === '') return fallback;
+                    const text = String(value);
+                    if (!adminHasCjk(text)) return text;
+                    if (ADMIN_TEXT_TRANSLATIONS[text.trim()]) return ADMIN_TEXT_TRANSLATIONS[text.trim()];
+                    if (text.includes(',')) {
+                        return text.split(',').map(item => this.translateText(item.trim(), item.trim())).join(', ');
+                    }
+                    return fallback || 'English content is being updated.';
+                },
+                getCourseSummary(course) {
+                    const title = this.translateText(course?.title, 'this course');
+                    return `Learn ${title} through structured lessons and practice.`;
+                },
                 async checkAdminPermission() {
                     try {
                         const response = await axios.get('/api/users/me', {
@@ -649,15 +685,15 @@
                 editCourse(course) {
                     this.editingCourse = course;
                     this.courseForm = {
-                        title: course.title || '',
-                        description: course.description || '',
-                        detailDescription: course.detailDescription || '',
-                        category: course.category || '',
-                        level: course.level || '',
-                        teacher: course.teacher || '',
-                        teacherIntro: course.teacherIntro || '',
+                        title: this.translateText(course.title, ''),
+                        description: this.translateText(course.description, this.getCourseSummary(course)),
+                        detailDescription: this.translateText(course.detailDescription, ''),
+                        category: this.translateText(course.category, ''),
+                        level: this.translateText(course.level, ''),
+                        teacher: this.translateText(course.teacher, ''),
+                        teacherIntro: this.translateText(course.teacherIntro, ''),
                         price: course.price || 0,
-                        duration: course.duration || ''
+                        duration: this.translateText(course.duration, String(course.duration || '').replace('\u5c0f\u65f6', ' hours').replace('\u5206\u949f', ' min'))
                     };
                     this.coverFile = null;
                     this.showCourseModal = true;
@@ -748,7 +784,7 @@
                     const categoryDist = this.statistics.categoryDistribution || {};
                     const data = Object.keys(categoryDist).map(key => ({
                         value: categoryDist[key],
-                        name: key
+                        name: this.translateText(key, 'Uncategorized')
                     }));
                     const option = {
                         title: { text: 'Course Category Distribution', left: 'center' },
@@ -767,7 +803,7 @@
                     if (!chartDom) return;
                     const myChart = echarts.init(chartDom);
                     const levelDist = this.statistics.levelDistribution || {};
-                    const categories = Object.keys(levelDist);
+                    const categories = Object.keys(levelDist).map(key => this.translateText(key, 'Unknown'));
                     const values = Object.values(levelDist);
                     const option = {
                         title: { text: 'Course Level Distribution', left: 'center' },
@@ -789,7 +825,7 @@
                 formatDate(dateStr) {
                     if (!dateStr) return '-';
                     const date = new Date(dateStr);
-                    return date.toLocaleString('zh-CN');
+                    return date.toLocaleString('en-US');
                 },
                 goBack() {
                     window.location.href = 'main.html';

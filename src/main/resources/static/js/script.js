@@ -24,7 +24,7 @@ function setInputStatus(inputEl, statusEl, ok, message) {
     } else {
         inputEl.classList.add('input-error');
         if (statusEl) {
-            statusEl.textContent = message || '请输入有效的内容';
+            statusEl.textContent = message || 'Please enter valid content';
             statusEl.classList.add('status-error');
         }
     }
@@ -32,25 +32,25 @@ function setInputStatus(inputEl, statusEl, ok, message) {
 
 const validators = {
     username: value => {
-        if (!value) return { ok: false, msg: '用户名不能为空' };
-        if (!/^\w{4,20}$/.test(value)) return { ok: false, msg: '4-20位，字母数字下划线' };
-        return { ok: true, msg: '用户名可用' };
+        if (!value) return { ok: false, msg: 'Username is required' };
+        if (!/^\w{4,20}$/.test(value)) return { ok: false, msg: '4-20 characters: letters, numbers, underscores' };
+        return { ok: true, msg: 'Username is available' };
     },
     phone: value => {
-        if (!value) return { ok: false, msg: '手机号不能为空' };
-        if (!/^1[3-9]\d{9}$/.test(value)) return { ok: false, msg: '请输入 11 位手机号码' };
-        return { ok: true, msg: '手机号格式正确' };
+        if (!value) return { ok: false, msg: 'Phone is required' };
+        if (!/^1[3-9]\d{9}$/.test(value)) return { ok: false, msg: 'Please enter an 11-digit phone number' };
+        return { ok: true, msg: 'Phone format is valid' };
     },
     email: value => {
-        if (!value) return { ok: false, msg: '邮箱不能为空' };
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return { ok: false, msg: '邮箱格式不正确' };
-        return { ok: true, msg: '邮箱格式正确' };
+        if (!value) return { ok: false, msg: 'Email is required' };
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return { ok: false, msg: 'Invalid email format' };
+        return { ok: true, msg: 'Email format is valid' };
     },
     password: value => {
-        if (!value) return { ok: false, msg: '密码不能为空' };
-        if (value.length < 4 || value.length > 8) return { ok: false, msg: '长度 4-8 位' };
-        if (!/[a-zA-Z]/.test(value) || !/\d/.test(value)) return { ok: false, msg: '需包含字母和数字' };
-        return { ok: true, msg: '密码格式正确' };
+        if (!value) return { ok: false, msg: 'Password is required' };
+        if (value.length < 4 || value.length > 8) return { ok: false, msg: 'Use 4-8 characters' };
+        if (!/[a-zA-Z]/.test(value) || !/\d/.test(value)) return { ok: false, msg: 'Must contain letters and numbers' };
+        return { ok: true, msg: 'Password format is valid' };
     }
 };
 
@@ -64,7 +64,7 @@ const validators = {
     }
 })();
 
-// ================== 注册页 ==================
+// ================== Register页 ==================
 (function initRegisterPage() {
     const form = document.getElementById('registerForm');
     // 如果register.html中已经处理了表单提交，则跳过这里的处理
@@ -121,14 +121,14 @@ const validators = {
 
         if (confirmPasswordInput && confirmPasswordInput.value) {
             const same = confirmPasswordInput.value === passwordInput.value;
-            setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? '两次密码一致' : '两次密码不一致');
+            setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? 'Passwords match' : 'Passwords do not match');
         }
     });
 
     confirmPasswordInput && confirmPasswordInput.addEventListener('input', () => {
         if (!passwordInput) return;
         const same = confirmPasswordInput.value === passwordInput.value;
-        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? '两次密码一致' : '两次密码不一致');
+        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? 'Passwords match' : 'Passwords do not match');
     });
 
     // 显示/隐藏密码
@@ -165,7 +165,7 @@ const validators = {
             // 大小限制 2MB
             if (file.size > 2 * 1024 * 1024) {
                 if (avatarFeedback) {
-                    avatarFeedback.textContent = '头像文件大小不能超过 2MB';
+                    avatarFeedback.textContent = 'Avatar file cannot exceed 2MB';
                     avatarFeedback.classList.add('error');
                 }
                 avatarInput.value = '';
@@ -176,7 +176,7 @@ const validators = {
             const name = file.name.toLowerCase();
             if (!name.endsWith('.jpg') && !name.endsWith('.jpeg') && !name.endsWith('.png') && !name.endsWith('.gif')) {
                 if (avatarFeedback) {
-                    avatarFeedback.textContent = '仅支持 JPG、JPEG、PNG、GIF 格式的图片';
+                    avatarFeedback.textContent = 'Only JPG, JPEG, PNG, and GIF images are supported';
                     avatarFeedback.classList.add('error');
                 }
                 avatarInput.value = '';
@@ -185,10 +185,10 @@ const validators = {
 
             const reader = new FileReader();
             reader.onload = e => {
-                avatarPreview.innerHTML = `<img src="${e.target.result}" alt="头像预览">`;
+                avatarPreview.innerHTML = `<img src="${e.target.result}" alt="Avatar Preview">`;
                 if (avatarRemove) avatarRemove.style.display = 'flex';
                 if (avatarFeedback) {
-                    avatarFeedback.textContent = '头像选择成功';
+                    avatarFeedback.textContent = 'Avatar selected successfully';
                     avatarFeedback.classList.add('success');
                 }
             };
@@ -226,18 +226,18 @@ const validators = {
         const startCountdown = (seconds) => {
             let remaining = seconds;
             sendCodeBtn.disabled = true;
-            sendCodeBtn.setAttribute('data-original-text', sendCodeBtn.textContent || '发送验证码');
-            sendCodeBtn.textContent = `${remaining}秒后重试`;
+            sendCodeBtn.setAttribute('data-original-text', sendCodeBtn.textContent || 'Send Code');
+            sendCodeBtn.textContent = `${remaining}s to retry`;
             countdownTimer = setInterval(() => {
                 remaining -= 1;
                 if (remaining <= 0) {
                     clearInterval(countdownTimer);
                     countdownTimer = null;
                     sendCodeBtn.disabled = false;
-                    const original = sendCodeBtn.getAttribute('data-original-text') || '发送验证码';
+                    const original = sendCodeBtn.getAttribute('data-original-text') || 'Send Code';
                     sendCodeBtn.textContent = original;
                 } else {
-                    sendCodeBtn.textContent = `${remaining}秒后重试`;
+                    sendCodeBtn.textContent = `${remaining}s to retry`;
                 }
             }, 1000);
         };
@@ -251,10 +251,10 @@ const validators = {
             sending = true;
             try {
                 const resp = await axios.post('/api/auth/send-code', null, { params: { email } });
-                alert(resp.data?.message || '验证码发送成功');
+                alert(resp.data?.message || 'Verification code sent');
                 startCountdown(60);
             } catch (err) {
-                const message = err.response?.data?.message || '验证码发送失败，请稍后重试';
+                const message = err.response?.data?.message || 'Failed to send verification code. Please try again later.';
                 alert(message);
             } finally {
                 sending = false;
@@ -292,15 +292,15 @@ const validators = {
         setInputStatus(phoneInput, phoneStatus, v2.ok, v2.msg);
         setInputStatus(emailInput, emailStatus, v3.ok, v3.msg);
         setInputStatus(passwordInput, passwordStatus, v4.ok, v4.msg);
-        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? '两次密码一致' : '两次密码不一致');
+        setInputStatus(confirmPasswordInput, confirmPasswordStatus, same, same ? 'Passwords match' : 'Passwords do not match');
 
         if (!agreementCheckbox.checked) {
-            alert('请先勾选同意用户协议和隐私政策');
+            alert('Please agree to the User Agreement and Privacy Policy first.');
             return;
         }
 
         if (!v1.ok || !v2.ok || !v3.ok || !v4.ok || !same) {
-            alert('请先修正表单中的红色错误项');
+            alert('Please fix the highlighted form errors first.');
             return;
         }
 
@@ -312,7 +312,7 @@ const validators = {
         const genderRadio = document.querySelector('input[name="gender"]:checked');
 
         if (!learningPreference.length || !courseInterest.length || !learningGoalRadio || !genderRadio) {
-            alert('请完整选择学习偏好、课程兴趣和学习目标、性别');
+            alert('Please complete learning preferences, course interests, learning goal, and gender.');
             return;
         }
 
@@ -357,8 +357,8 @@ const validators = {
         if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.classList.add('btn-disabled');
-            submitBtn.setAttribute('data-original-text', submitBtn.textContent || '注册');
-            submitBtn.textContent = '注册中...';
+            submitBtn.setAttribute('data-original-text', submitBtn.textContent || 'Register');
+            submitBtn.textContent = 'Registering...';
         }
 
         try {
@@ -367,27 +367,27 @@ const validators = {
             });
             // 如果后端返回 2xx，认为成功
             if (resp.status >= 200 && resp.status < 300) {
-                alert(resp.data?.message || '注册成功，请登录');
+                alert(resp.data?.message || 'Registration successful. Please sign in.');
                 if (avatarInput) avatarInput.value = '';
                 window.location.href = 'login.html';
                 return;
             }
             // 非200但未抛出异常的情况
-            alert('注册失败，请稍后重试');
+            alert('Registration failed. Please try again later.');
         } catch (err) {
-            console.error('注册请求失败：', err);
+            console.error('Registration request failed:', err);
             const status = err.response?.status;
-            const msg = err.response?.data?.message || '注册失败，请检查信息或稍后再试';
+            const msg = err.response?.data?.message || 'Registration failed. Please check your information or try again later.';
             // 业务错误（例如 400/409）直接给出提示
             if (status && status >= 400 && status < 500) {
                 alert(msg);
             } else {
-                alert('注册失败，请检查网络连接或稍后再试');
+                alert('Registration failed. Please check your network connection or try again later.');
             }
         } finally {
             // 恢复按钮状态
             if (submitBtn) {
-                const original = submitBtn.getAttribute('data-original-text') || '注册';
+                const original = submitBtn.getAttribute('data-original-text') || 'Register';
                 submitBtn.textContent = original;
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('btn-disabled');
@@ -410,12 +410,12 @@ const validators = {
     usernameInput && usernameInput.addEventListener('input', () => {
         const value = usernameInput.value.trim();
         const ok = !!value;
-        setInputStatus(usernameInput, usernameStatus, ok, ok ? '格式看起来没问题' : '用户名/手机号不能为空');
+        setInputStatus(usernameInput, usernameStatus, ok, ok ? 'Looks good' : 'Username or phone is required');
     });
 
     passwordInput && passwordInput.addEventListener('input', () => {
         const ok = !!passwordInput.value;
-        setInputStatus(passwordInput, passwordStatus, ok, ok ? '' : '密码不能为空');
+        setInputStatus(passwordInput, passwordStatus, ok, ok ? '' : 'Password is required');
     });
 
     form.addEventListener('submit', async e => {
@@ -425,11 +425,11 @@ const validators = {
         const password = passwordInput.value;
 
         if (!loginId) {
-            setInputStatus(usernameInput, usernameStatus, false, '用户名/手机号不能为空');
+            setInputStatus(usernameInput, usernameStatus, false, 'Username or phone is required');
             return;
         }
         if (!password) {
-            setInputStatus(passwordInput, passwordStatus, false, '密码不能为空');
+            setInputStatus(passwordInput, passwordStatus, false, 'Password is required');
             return;
         }
 
@@ -446,14 +446,14 @@ const validators = {
                 if (data.token) {
                     localStorage.setItem('token', data.token);
                 }
-                alert('登录成功，正在进入学习空间');
+                alert('Login successful. Entering learning space...');
                 window.location.href = 'main.html';
             } else {
-                alert('登录失败，请检查账号和密码');
+                alert('Login failed. Please check your account and password.');
             }
         } catch (err) {
             console.error(err);
-            alert(err.response?.data?.message || '登录失败，请检查账号和密码');
+            alert(err.response?.data?.message || 'Login failed. Please check your account and password.');
         }
     });
 })();
@@ -463,7 +463,7 @@ const validators = {
     function setup() {
         const img = document.getElementById('loginHeroImage');
         if (!img) return;
-        const fallback = '/image/学习路径.png'; // 使用现有的本地图片作为回退
+        const fallback = '/image/learning-path.png'; // 使用现有的本地图片作为回退
         // 如果 src 是相对路径或可能缺失，确保以根路径开头
         if (img.getAttribute('src') && img.getAttribute('src').startsWith('image/')) {
             img.src = '/' + img.getAttribute('src');
@@ -473,12 +473,12 @@ const validators = {
             if (img.getAttribute('data-fallback-applied') === '1') return;
             img.setAttribute('data-fallback-applied', '1');
             img.src = fallback;
-            img.alt = '登录界面图片（已回退）';
+            img.alt = 'Login hero image fallback';
             img.classList.add('image-fallback');
         });
         // 如果图片加载成功，移除回退标记
         img.addEventListener('load', function onLoad() {
-            if (img.getAttribute('data-fallback-applied') === '1' && img.src.indexOf('学习路径.png') === -1) {
+            if (img.getAttribute('data-fallback-applied') === '1' && img.src.indexOf('learning-path.png') === -1) {
                 img.removeAttribute('data-fallback-applied');
                 img.classList.remove('image-fallback');
             }
@@ -496,7 +496,7 @@ const validators = {
 (function attachGlobalImageFallbacks() {
     function applyFallback(img) {
         if (!img) return;
-        const fallback = img.getAttribute('data-fallback') || '/image/学习路径.png';
+        const fallback = img.getAttribute('data-fallback') || '/image/learning-path.png';
         function onError() {
             if (img.getAttribute('data-fallback-applied') === '1') return;
             img.setAttribute('data-fallback-applied', '1');

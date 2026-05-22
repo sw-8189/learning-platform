@@ -40,7 +40,7 @@ public class AuthController {
      * 管理员注册邀请码/后台口令
      * 通过 application.yml 中 app.admin.invite-code 配置
      */
-    @Value("${app.admin.invite-code:}")
+    @Value("${app.admin.invite-code:TeamWorkClass-2026}")
     private String adminInviteCode;
 
     /** 非生产用的简单内存 token 存储 */

@@ -30,8 +30,7 @@ public class CourseController {
             @RequestParam(required = false) String courseInterest,
             @RequestParam(required = false) String learningGoal
     ) {
-        return ((com.nchu.learningplatform.service.impl.CourseServiceImpl) courseService)
-                .pageQuery(page, size, keyword, learningPreference, courseInterest, learningGoal);
+        return courseService.pageQuery(page, size, keyword, learningPreference, courseInterest, learningGoal);
     }
 
     @GetMapping("/{id}")
@@ -46,11 +45,11 @@ public class CourseController {
     ) {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
-            return ResponseEntity.status(401).body(Map.of("message", "未登录"));
+            return ResponseEntity.status(401).body(Map.of("message", "Please sign in first."));
         }
         try {
             courseService.joinCourse(userId, id);
-            return ResponseEntity.ok(Map.of("message", "已加入我的课程"));
+            return ResponseEntity.ok(Map.of("message", "Course added to My Courses."));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
         }
@@ -63,11 +62,11 @@ public class CourseController {
     ) {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
-            return ResponseEntity.status(401).body(Map.of("message", "未登录"));
+            return ResponseEntity.status(401).body(Map.of("message", "Please sign in first."));
         }
         try {
             courseService.quitCourse(userId, id);
-            return ResponseEntity.ok(Map.of("message", "已退选课程"));
+            return ResponseEntity.ok(Map.of("message", "Course removed from My Courses."));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
         }

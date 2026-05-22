@@ -14,13 +14,19 @@ public interface CourseMapper {
                            @Param("size") int size,
                            @Param("keyword") String keyword,
                            @Param("learningPreference") String learningPreference,
+                           @Param("learningPreferenceAlt") String learningPreferenceAlt,
                            @Param("courseInterest") String courseInterest,
-                           @Param("learningGoal") String learningGoal);
+                           @Param("courseInterestAlt") String courseInterestAlt,
+                           @Param("learningGoal") String learningGoal,
+                           @Param("learningGoalAlt") String learningGoalAlt);
 
     long count(@Param("keyword") String keyword,
                @Param("learningPreference") String learningPreference,
+               @Param("learningPreferenceAlt") String learningPreferenceAlt,
                @Param("courseInterest") String courseInterest,
-               @Param("learningGoal") String learningGoal);
+               @Param("courseInterestAlt") String courseInterestAlt,
+               @Param("learningGoal") String learningGoal,
+               @Param("learningGoalAlt") String learningGoalAlt);
 
     Course findById(@Param("id") Long id);
 

@@ -1,6 +1,6 @@
 /**
- * Service Worker清理脚本
- * 自动在 localhost 下注销 Service Worker（仅用于开发/调试）
+ * Service Worker cleanup script
+ * Automatically unregister Service Workers on localhost（仅用于开发/调试）
  */
 (function() {
     'use strict';

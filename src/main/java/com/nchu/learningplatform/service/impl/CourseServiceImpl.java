@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class CourseServiceImpl implements CourseService {
 
+    private static final Map<String, String> TAG_ALIASES = buildTagAliases();
+
     @Resource
     private CourseMapper courseMapper;
 
@@ -39,8 +41,30 @@ public class CourseServiceImpl implements CourseService {
         if (size == null || size < 1) size = 9;
         int offset = (page - 1) * size;
 
-        List<Course> list = courseMapper.pageQuery(offset, size, keyword, learningPreference, courseInterest, learningGoal);
-        long total = courseMapper.count(keyword, learningPreference, courseInterest, learningGoal);
+        String learningPreferenceAlt = getTagAlias(learningPreference);
+        String courseInterestAlt = getTagAlias(courseInterest);
+        String learningGoalAlt = getTagAlias(learningGoal);
+
+        List<Course> list = courseMapper.pageQuery(
+                offset,
+                size,
+                keyword,
+                normalizeFilter(learningPreference),
+                learningPreferenceAlt,
+                normalizeFilter(courseInterest),
+                courseInterestAlt,
+                normalizeFilter(learningGoal),
+                learningGoalAlt
+        );
+        long total = courseMapper.count(
+                keyword,
+                normalizeFilter(learningPreference),
+                learningPreferenceAlt,
+                normalizeFilter(courseInterest),
+                courseInterestAlt,
+                normalizeFilter(learningGoal),
+                learningGoalAlt
+        );
 
         return new PageResult<>(total, page, size, list);
     }
@@ -57,7 +81,7 @@ public class CourseServiceImpl implements CourseService {
         List<UserCourse> existing = userCourseMapper.findByUserId(userId);
         for (UserCourse uc : existing) {
             if (uc.getCourseId().equals(courseId)) {
-                throw new RuntimeException("您已经加入过该课程");
+                throw new RuntimeException("You have already joined this course.");
             }
         }
 
@@ -73,7 +97,7 @@ public class CourseServiceImpl implements CourseService {
     public void quitCourse(Long userId, Long courseId) {
         int deleted = userCourseMapper.deleteByUserIdAndCourseId(userId, courseId);
         if (deleted == 0) {
-            throw new RuntimeException("您未加入该课程");
+            throw new RuntimeException("You have not joined this course.");
         }
     }
 
@@ -96,7 +120,7 @@ public class CourseServiceImpl implements CourseService {
                 .collect(Collectors.toSet());
 
         // 获取所有课程
-        List<Course> allCourses = courseMapper.pageQuery(0, 1000, null, null, null, null);
+        List<Course> allCourses = courseMapper.pageQuery(0, 1000, null, null, null, null, null, null, null);
 
         // 根据用户标签推荐课程（学习偏好、课程兴趣、学习目标）
         List<Course> recommended = new ArrayList<>();
@@ -106,15 +130,9 @@ public class CourseServiceImpl implements CourseService {
 
         // 构建用户标签集合
         Set<String> userTags = new HashSet<>();
-        if (learningPreference != null && !learningPreference.isEmpty()) {
-            Collections.addAll(userTags, learningPreference.split(","));
-        }
-        if (courseInterest != null && !courseInterest.isEmpty()) {
-            Collections.addAll(userTags, courseInterest.split(","));
-        }
-        if (learningGoal != null && !learningGoal.isEmpty()) {
-            userTags.add(learningGoal);
-        }
+        addExpandedTags(userTags, learningPreference);
+        addExpandedTags(userTags, courseInterest);
+        addExpandedTags(userTags, learningGoal);
 
         // 根据标签匹配课程
         for (Course course : allCourses) {
@@ -179,5 +197,66 @@ public class CourseServiceImpl implements CourseService {
             }
         }
         return count;
+    }
+
+    private static Map<String, String> buildTagAliases() {
+        Map<String, String> aliases = new HashMap<>();
+        addAlias(aliases, "Male", "男");
+        addAlias(aliases, "Female", "女");
+        addAlias(aliases, "Visual Learning", "视觉学习");
+        addAlias(aliases, "Auditory Learning", "听觉学习");
+        addAlias(aliases, "Hands-on Practice", "动手实践");
+        addAlias(aliases, "Reading & Writing", "阅读写作");
+        addAlias(aliases, "Social Learning", "社交学习");
+        addAlias(aliases, "Independent Learning", "独立学习");
+        addAlias(aliases, "Programming Development", "编程开发");
+        addAlias(aliases, "Frontend Development", "前端开发");
+        addAlias(aliases, "Frontend Development", "前端学习");
+        addAlias(aliases, "Backend Development", "后端开发");
+        addAlias(aliases, "Data Science", "数据科学");
+        addAlias(aliases, "Artificial Intelligence", "人工智能");
+        addAlias(aliases, "Design & Creativity", "设计创意");
+        addAlias(aliases, "Business Management", "商业管理");
+        addAlias(aliases, "Professional Skills", "职业技能");
+        addAlias(aliases, "Career Advancement", "职业提升");
+        addAlias(aliases, "Skill Expansion", "技能拓展");
+        addAlias(aliases, "Academic Advancement", "学术深造");
+        addAlias(aliases, "Hobby & Interest", "兴趣爱好");
+        return Collections.unmodifiableMap(aliases);
+    }
+
+    private static void addAlias(Map<String, String> aliases, String english, String legacyChinese) {
+        aliases.put(english, legacyChinese);
+        aliases.put(legacyChinese, english);
+    }
+
+    private String normalizeFilter(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private String getTagAlias(String value) {
+        String normalized = normalizeFilter(value);
+        return normalized == null ? null : TAG_ALIASES.get(normalized);
+    }
+
+    private void addExpandedTags(Set<String> tags, String rawValues) {
+        if (rawValues == null || rawValues.isBlank()) {
+            return;
+        }
+        for (String value : rawValues.split(",")) {
+            String normalized = normalizeFilter(value);
+            if (normalized == null) {
+                continue;
+            }
+            tags.add(normalized);
+            String alias = getTagAlias(normalized);
+            if (alias != null && !alias.isBlank()) {
+                tags.add(alias);
+            }
+        }
     }
 }

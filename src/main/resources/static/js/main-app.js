@@ -1,4 +1,104 @@
-// 更新后的脚本（仅展示 Vue 部分，替换原脚本）
+const TEXT_TRANSLATIONS = {
+    '男': 'Male',
+    '女': 'Female',
+    '视觉学习': 'Visual Learning',
+    '听觉学习': 'Auditory Learning',
+    '动手实践': 'Hands-on Practice',
+    '阅读写作': 'Reading & Writing',
+    '社交学习': 'Social Learning',
+    '独立学习': 'Independent Learning',
+    '编程开发': 'Programming Development',
+    '前端开发': 'Frontend Development',
+    '前端学习': 'Frontend Development',
+    '后端开发': 'Backend Development',
+    '数据科学': 'Data Science',
+    '人工智能': 'Artificial Intelligence',
+    '设计创意': 'Design & Creativity',
+    '商业管理': 'Business Management',
+    '职业技能': 'Professional Skills',
+    '职业提升': 'Career Advancement',
+    '技能拓展': 'Skill Expansion',
+    '学术深造': 'Academic Advancement',
+    '兴趣爱好': 'Hobby & Interest',
+    '入门': 'Beginner',
+    '初级': 'Beginner',
+    '中级': 'Intermediate',
+    '进阶': 'Advanced',
+    '高级': 'Advanced',
+    '张老师': 'Instructor Zhang',
+    '李老师': 'Instructor Li',
+    '王老师': 'Instructor Wang',
+    '赵老师': 'Instructor Zhao',
+    '陈老师': 'Instructor Chen',
+    '刘老师': 'Instructor Liu',
+    '孙老师': 'Instructor Sun',
+    '周老师': 'Instructor Zhou',
+    '吴老师': 'Instructor Wu',
+    '郑老师': 'Instructor Zheng',
+    '钱老师': 'Instructor Qian',
+    'Java 基础入门': 'Java Fundamentals',
+    '前端开发实战': 'Practical Frontend Development',
+    'Python 数据分析': 'Python Data Analysis',
+    'Spring Boot 企业级开发': 'Enterprise Spring Boot Development',
+    'Vue.js 全栈开发': 'Vue.js Full-Stack Development',
+    '机器学习实战': 'Practical Machine Learning',
+    'UI/UX 设计基础': 'UI/UX Design Fundamentals',
+    '产品经理实战': 'Practical Product Management',
+    'React 前端框架': 'React Frontend Framework',
+    'Node.js 后端开发': 'Node.js Backend Development',
+    'MySQL 数据库设计': 'MySQL Database Design',
+    '深度学习入门': 'Deep Learning Fundamentals',
+    'Photoshop 设计技巧': 'Photoshop Design Skills',
+    '项目管理实战': 'Practical Project Management',
+    'Excel 数据分析': 'Excel Data Analysis',
+    'Python 爬虫开发': 'Python Web Scraping',
+    'TypeScript 进阶': 'Advanced TypeScript',
+    'Docker 容器技术': 'Docker Container Technology',
+    '商业数据分析': 'Business Data Analysis',
+    'Illustrator 矢量设计': 'Illustrator Vector Design',
+    'Git 版本控制': 'Git Version Control',
+    '算法与数据结构': 'Algorithms and Data Structures',
+    '自然语言处理': 'Natural Language Processing',
+    'Web 安全防护': 'Web Security Defense',
+    '产品设计思维': 'Product Design Thinking',
+    'Angular 框架开发': 'Angular Framework Development',
+    'Redis 缓存技术': 'Redis Caching Technology',
+    'MongoDB 数据库': 'MongoDB Database',
+    '计算机视觉': 'Computer Vision',
+    'Figma 设计工具': 'Figma Design Tools',
+    '市场营销策略': 'Marketing Strategy',
+    'Linux 系统管理': 'Linux System Administration',
+    'C++ 编程进阶': 'Advanced C++ Programming',
+    '微服务架构': 'Microservices Architecture',
+    '数据挖掘技术': 'Data Mining Technology',
+    '强化学习': 'Reinforcement Learning',
+    'Sketch 设计工具': 'Sketch Design Tools',
+    '财务管理基础': 'Financial Management Fundamentals',
+    'Kubernetes 容器编排': 'Kubernetes Container Orchestration',
+    'Swift iOS 开发': 'Swift iOS Development',
+    'Kotlin Android 开发': 'Kotlin Android Development',
+    'Flutter 跨平台开发': 'Flutter Cross-Platform Development',
+    'Rust 系统编程': 'Rust Systems Programming',
+    'Scala 函数式编程': 'Scala Functional Programming',
+    'Java学习路线': 'Java Learning Path',
+    '前端开发怎么系统入门？': 'How to Start Frontend Development Systematically?',
+    '我的Python数据分析自学心得': 'My Self-Study Notes on Python Data Analysis',
+    'Java期末大作业分享': 'Java Final Project Resource Sharing'
+};
+
+function hasCjkText(value) {
+    return /[\u4e00-\u9fff]/.test(String(value || ''));
+}
+
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 new Vue({
     el: '#app',
     data() {
@@ -38,15 +138,15 @@ new Vue({
             // 学习社区相关
             communityActiveTab: 'recommended', // recommended, discussion, question, experience, my-posts, my-likes, my-favorites
             communityTabs: [
-                {label: '推荐动态', value: 'recommended'},
-                {label: '技术讨论', value: 'discussion'},
-                {label: '学习问答', value: 'question'},
-                {label: '经验分享', value: 'experience'},
-                {label: '我的发布', value: 'my-posts'},
-                {label: '我点赞的', value: 'my-likes'},
-                {label: '我的收藏', value: 'my-favorites'}
+                {label: 'Recommended', value: 'recommended'},
+                {label: 'Discussions', value: 'discussion'},
+                {label: 'Q&A', value: 'question'},
+                {label: 'Experiences', value: 'experience'},
+                {label: 'My Posts', value: 'my-posts'},
+                {label: 'Liked', value: 'my-likes'},
+                {label: 'Favorites', value: 'my-favorites'}
             ],
-            courseCategories: ['编程开发', '前端开发', '后端开发', '数据科学', '设计创意', '商业管理', '职业技能', '人工智能'],
+            courseCategories: ['Programming Development', 'Frontend Development', 'Backend Development', 'Data Science', 'Design & Creativity', 'Business Management', 'Professional Skills', 'Artificial Intelligence'],
             selectedCategory: '',
             communityKeyword: '',
             communityPosts: [],
@@ -91,6 +191,15 @@ new Vue({
             learningStatsLoading: false,
             categoryChart: null,
             levelChart: null,
+            checkInSummary: null,
+            checkInLoading: false,
+            checkInError: '',
+            checkInNotice: '',
+            checkInSubmitting: false,
+            checkInMinutes: 30,
+            checkInNote: '',
+            checkInWeekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            todayDate: '',
             // 管理后台相关
             adminUsers: [],
             adminUserPage: 1,
@@ -161,20 +270,23 @@ new Vue({
         parsedLearningPreference() {
             const v = this.user.learningPreference;
             if (!v || v === '') return '-';
-            if (Array.isArray(v)) return v.join('、');
-            return String(v).split(',').join('、');
+            const values = Array.isArray(v) ? v : String(v).split(',');
+            return values.map(item => this.translateText(item.trim())).join(', ');
         },
         parsedCourseInterest() {
             const v = this.user.courseInterest;
             if (!v || v === '') return '-';
-            if (Array.isArray(v)) return v.join('、');
-            return String(v).split(',').join('、');
+            const values = Array.isArray(v) ? v : String(v).split(',');
+            return values.map(item => this.translateText(item.trim())).join(', ');
         },
         totalPages() {
             return Math.ceil(this.courseTotal / this.size);
         },
         adminCourseTotalPages() {
             return Math.ceil(this.adminCourseTotal / this.adminCourseSize) || 1;
+        },
+        checkInHeatmap() {
+            return (this.checkInSummary && this.checkInSummary.heatmap) || [];
         }
     },
 
@@ -183,7 +295,22 @@ new Vue({
         toggleSidebar() {
             this.sidebarCollapsed = !this.sidebarCollapsed;
         },
-        // 个人信息模块展开/折叠
+        scrollMainContentToTop() {
+            this.$nextTick(() => {
+                const main = this.$refs.mainContent || document.querySelector('.main-content');
+                const mainCanScroll = main && main.scrollHeight > main.clientHeight + 1 &&
+                    window.getComputedStyle(main).overflowY !== 'visible';
+
+                if (mainCanScroll && typeof main.scrollTo === 'function') {
+                    main.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                } else if (mainCanScroll) {
+                    main.scrollTop = 0;
+                }
+
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            });
+        },
+        //人信息模块展开/折叠
         toggleProfileModule() {
             if (!this.sidebarCollapsed) {
                 this.profileExpanded = !this.profileExpanded;
@@ -191,7 +318,7 @@ new Vue({
                 if (this.profileExpanded) {
                     this.activeTab = 'profile';
                     // 如果没有选中子项，默认选中"我的信息"
-                    if (!this.activeSubTab || (this.activeSubTab !== 'profile-info' && this.activeSubTab !== 'profile-course')) {
+                    if (!this.activeSubTab || !['profile-info', 'profile-course', 'profile-checkin', 'profile-messages'].includes(this.activeSubTab)) {
                         this.activeSubTab = 'profile-info';
                     }
                 }
@@ -259,7 +386,8 @@ new Vue({
         },
         switchTab(tab) {
             this.activeTab = tab;
-            // 切换标签时关闭图片模态框和课程详情
+            this.scrollMainContentToTop();
+            // 切换标签时Close image modal和课程详情
             this.viewingImage = null;
             if (tab !== 'course-detail') {
                 this.courseDetail = null;
@@ -268,7 +396,7 @@ new Vue({
             if (tab === 'profile') {
                 this.profileExpanded = true;
                 // 如果没有选中子项，默认选中"我的信息"
-                if (!this.activeSubTab || (this.activeSubTab !== 'profile-info' && this.activeSubTab !== 'profile-course')) {
+                if (!this.activeSubTab || !['profile-info', 'profile-course', 'profile-checkin', 'profile-messages'].includes(this.activeSubTab)) {
                     this.activeSubTab = 'profile-info';
                 }
             }
@@ -328,8 +456,9 @@ new Vue({
         },
         switchSubTab(subTab) {
             this.activeSubTab = subTab;
+            this.scrollMainContentToTop();
             // 如果切换到个人中心子项，确保激活个人中心标签并展开模块
-            if (subTab === 'profile-info' || subTab === 'profile-course' || subTab === 'profile-messages') {
+            if (subTab === 'profile-info' || subTab === 'profile-course' || subTab === 'profile-checkin' || subTab === 'profile-messages') {
                 this.activeTab = 'profile';
                 this.profileExpanded = true;
             }
@@ -377,14 +506,16 @@ new Vue({
                 // 保证 editUser 的学习偏好与课程兴趣以数组形式绑定到复选框（若为字符串则切分）
                 this.editUser = {
                     ...this.user,
-                    learningPreference: this.user.learningPreference ? String(this.user.learningPreference).split(',') : [],
-                    courseInterest: this.user.courseInterest ? String(this.user.courseInterest).split(',') : []
+                    gender: this.normalizeSelectionValue(this.user.gender),
+                    learningPreference: this.normalizeSelectionList(this.user.learningPreference),
+                    courseInterest: this.normalizeSelectionList(this.user.courseInterest),
+                    learningGoal: this.normalizeSelectionValue(this.user.learningGoal)
                 };
                 
                 // 加载完成后再次确保viewingImage为null
                 this.viewingImage = null;
             } catch (error) {
-                console.error('加载用户信息失败:', error);
+                console.error('Failed to load user info:', error);
                 // 即使出错也要确保viewingImage为null
                 this.viewingImage = null;
             }
@@ -397,7 +528,7 @@ new Vue({
                 });
                 this.userCourses = response.data || [];
             } catch (error) {
-                console.error('获取课程失败:', error);
+                console.error('Failed to load courses:', error);
                 this.userCourses = [];
             }
         },
@@ -419,7 +550,7 @@ new Vue({
                 this.courseTotal = response.data.total || 0;
                 return Promise.resolve();
             } catch (error) {
-                console.error('查询课程失败:', error);
+                console.error('Failed to query courses:', error);
                 this.courses = [];
                 this.courseTotal = 0;
                 return Promise.reject(error);
@@ -438,7 +569,57 @@ new Vue({
         // 解析标签
         parseTags(tagsString) {
             if (!tagsString) return [];
-            return tagsString.split(',').filter(tag => tag.trim());
+            return tagsString.split(',').filter(tag => tag.trim()).map(tag => this.translateText(tag.trim()));
+        },
+        translateText(value, fallback = '') {
+            if (value === null || value === undefined || value === '') {
+                return fallback;
+            }
+            const text = String(value);
+            const trimmed = text.trim();
+            if (!hasCjkText(trimmed)) {
+                return text;
+            }
+            if (TEXT_TRANSLATIONS[trimmed]) {
+                return TEXT_TRANSLATIONS[trimmed];
+            }
+            if (trimmed.includes(',')) {
+                return trimmed
+                    .split(',')
+                    .map(part => this.translateText(part.trim(), part.trim()))
+                    .join(', ');
+            }
+            return fallback || 'English content is being updated.';
+        },
+        getCourseSummary(course) {
+            const title = this.translateText(course?.title, 'this course');
+            return `Learn ${title} through structured lessons, practical exercises, and project-based practice.`;
+        },
+        normalizeSelectionValue(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            const text = String(value).trim();
+            return TEXT_TRANSLATIONS[text] || text;
+        },
+        normalizeSelectionList(value) {
+            if (!value) return [];
+            const values = Array.isArray(value) ? value : String(value).split(',');
+            return values
+                .map(item => this.normalizeSelectionValue(item))
+                .filter(Boolean);
+        },
+        getPostTypeLabel(type) {
+            const typeMap = {
+                discussion: 'Discussion',
+                question: 'Q&A',
+                experience: 'Experience'
+            };
+            return typeMap[type] || 'Post';
+        },
+        formatDuration(value) {
+            const raw = String(value || '');
+            return this.translateText(raw, raw.replace('\u5c0f\u65f6', ' hours').replace('\u5206\u949f', ' min'));
         },
         // 加载学习统计数据
         async loadLearningStatistics() {
@@ -460,11 +641,90 @@ new Vue({
                     this.renderCharts();
                 });
             } catch (error) {
-                console.error('加载学习统计数据失败:', error);
+                console.error('Failed to load learning statistics:', error);
                 this.learningStats = null;
             } finally {
                 this.learningStatsLoading = false;
             }
+        },
+        async loadCheckInSummary() {
+            if (!this.token) {
+                this.checkInError = 'Please sign in to use daily check-in.';
+                return;
+            }
+
+            this.checkInLoading = true;
+            this.checkInError = '';
+            this.checkInNotice = '';
+            try {
+                const response = await axios.get('/api/check-ins/summary', {
+                    headers: { Authorization: this.token }
+                });
+                this.checkInSummary = response.data || null;
+            } catch (error) {
+                console.error('Failed to load check-in data:', error);
+                this.checkInSummary = null;
+                this.checkInError = error.response?.data?.message || 'Failed to load check-in data. Please try again.';
+            } finally {
+                this.checkInLoading = false;
+            }
+        },
+        async submitStudyCheckIn() {
+            if (this.checkInSummary && this.checkInSummary.checkedToday) {
+                return;
+            }
+            if (!this.token) {
+                this.checkInError = 'Please sign in to use daily check-in.';
+                return;
+            }
+
+            const minutes = Number(this.checkInMinutes || 0);
+            if (!Number.isFinite(minutes) || minutes < 0 || minutes > 1440) {
+                this.checkInError = 'Study minutes must be between 0 and 1440.';
+                return;
+            }
+
+            this.checkInSubmitting = true;
+            this.checkInError = '';
+            this.checkInNotice = '';
+            try {
+                const response = await axios.post('/api/check-ins/today', {
+                    studyMinutes: Math.round(minutes),
+                    note: this.checkInNote || ''
+                }, {
+                    headers: { Authorization: this.token }
+                });
+                this.checkInSummary = response.data || null;
+                this.checkInNote = '';
+                this.checkInNotice = 'Check-in completed!';
+            } catch (error) {
+                console.error('Check-in failed:', error);
+                this.checkInError = error.response?.data?.message || error.message || 'Check-in failed. Please try again.';
+            } finally {
+                this.checkInSubmitting = false;
+            }
+        },
+        getHeatmapLevel(day) {
+            if (!day || !day.checked) return '';
+            const minutes = day.studyMinutes || 0;
+            if (minutes >= 90) return 'level-3';
+            if (minutes >= 30) return 'level-2';
+            return 'level-1';
+        },
+        getHeatmapDayTitle(day) {
+            if (!day) return '';
+            if (!day.checked) {
+                return `${day.date}: no check-in`;
+            }
+            const minutes = day.studyMinutes || 0;
+            return `${day.date}: checked in${minutes ? `, ${minutes} min` : ''}`;
+        },
+        getTodayDateString() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         },
         // 渲染图表
         renderCharts() {
@@ -472,17 +732,17 @@ new Vue({
             
             // 确保ECharts已加载
             if (typeof echarts === 'undefined') {
-                console.warn('ECharts未加载，请检查CDN');
+                console.warn('ECharts is not loaded. Check the CDN.');
                 return;
             }
             
-            // 渲染课程分类分布图
+            // 渲染Course Category Distribution图
             this.renderCategoryChart();
             
-            // 渲染课程难度分布图
+            // 渲染Course Difficulty Distribution图
             this.renderLevelChart();
         },
-        // 渲染课程分类分布图
+        // 渲染Course Category Distribution图
         renderCategoryChart() {
             const chartDom = document.getElementById('categoryChart');
             if (!chartDom) return;
@@ -493,6 +753,10 @@ new Vue({
             
             this.categoryChart = echarts.init(chartDom);
             const categoryData = this.learningStats.categoryDistribution || {};
+            const translatedCategoryData = Object.entries(categoryData).map(([name, value]) => ({
+                name: this.translateText(name || 'Uncategorized', 'Uncategorized'),
+                value
+            }));
             
             const option = {
                 backgroundColor: '#f7fafc',
@@ -523,17 +787,14 @@ new Vue({
                     },
                     label: {
                         show: true,
-                        formatter: '{b}\n{c} 门'
+                        formatter: '{b}\n{c} courses'
                     },
-                    data: Object.entries(categoryData).map(([name, value]) => ({
-                        name: name || '未分类',
-                        value: value
-                    }))
+                    data: translatedCategoryData
                 }]
             };
             
             if (option.series[0].data.length === 0) {
-                option.series[0].data = [{ name: '暂无数据', value: 0 }];
+                option.series[0].data = [{ name: 'No Data', value: 0 }];
             }
             
             this.categoryChart.setOption(option);
@@ -545,7 +806,7 @@ new Vue({
                 }
             });
         },
-        // 渲染课程难度分布图
+        // 渲染Course Difficulty Distribution图
         renderLevelChart() {
             const chartDom = document.getElementById('levelChart');
             if (!chartDom) return;
@@ -556,6 +817,7 @@ new Vue({
             
             this.levelChart = echarts.init(chartDom);
             const levelData = this.learningStats.levelDistribution || {};
+            const levelNames = Object.keys(levelData).map(name => this.translateText(name, 'Unknown'));
             
             const option = {
                 backgroundColor: '#f7fafc',
@@ -567,7 +829,7 @@ new Vue({
                 },
                 xAxis: {
                     type: 'category',
-                    data: Object.keys(levelData).length > 0 ? Object.keys(levelData) : ['暂无数据'],
+                    data: levelNames.length > 0 ? levelNames : ['No Data'],
                     axisLine: { lineStyle: { color: '#cbd5e0' } },
                     axisLabel: { color: '#4a5568' }
                 },
@@ -617,13 +879,13 @@ new Vue({
         // 查看课程详情
         async viewCourseDetail(courseId, source = 'course-center') {
             if (!courseId) {
-                console.error('课程ID不能为空');
-                alert('课程ID无效');
+                console.error('Course ID cannot be empty');
+                alert('Invalid course ID');
                 return;
             }
             this.courseDetailLoading = true;
             this.courseDetail = null;
-            this.viewingImage = null; // 确保关闭图片模态框
+            this.viewingImage = null; // 确保Close image modal
             this.courseDetailSource = source; // 记录来源
             this.activeTab = 'course-detail';
             
@@ -634,11 +896,11 @@ new Vue({
                 if (response.data) {
                 this.courseDetail = response.data;
                 } else {
-                    throw new Error('课程数据为空');
+                    throw new Error('Course data is empty');
                 }
             } catch (error) {
-                console.error('加载课程详情失败:', error);
-                alert('加载课程详情失败: ' + (error.response?.data?.message || error.message || '请稍后重试'));
+                console.error('Failed to load course details:', error);
+                alert('Failed to load course details: ' + (error.response?.data?.message || error.message || 'Please try again later'));
                 // 加载失败时返回上一页
                 this.backToCourseCenter();
             } finally {
@@ -659,7 +921,7 @@ new Vue({
             this.activeTab = 'course-center';
             }
             this.courseDetail = null;
-            this.viewingImage = null;  // 确保关闭图片模态框
+            this.viewingImage = null;  // 确保Close image modal
             this.courseDetailSource = 'course-center'; // 重置来源
         },
         // ========== 学习社区相关方法 ==========
@@ -692,7 +954,7 @@ new Vue({
                 // 我的点赞 / 我的收藏 单独接口
                 if (this.communityActiveTab === 'my-likes') {
                     if (!this.token) {
-                        alert('请先登录');
+                        alert('Please sign in first');
                         this.communityPosts = [];
                         this.communityTotal = 0;
                         return;
@@ -706,7 +968,7 @@ new Vue({
                     });
                 } else if (this.communityActiveTab === 'my-favorites') {
                     if (!this.token) {
-                        alert('请先登录');
+                        alert('Please sign in first');
                         this.communityPosts = [];
                         this.communityTotal = 0;
                         return;
@@ -746,7 +1008,7 @@ new Vue({
                 this.communityPosts = response.data.records || [];
                 this.communityTotal = response.data.total || 0;
             } catch (error) {
-                console.error('加载帖子失败:', error);
+                console.error('Failed to load posts:', error);
                 this.communityPosts = [];
                 this.communityTotal = 0;
             } finally {
@@ -775,7 +1037,7 @@ new Vue({
 
             const maxSize = 10 * 1024 * 1024;
             if (file.size > maxSize) {
-                this.postAttachmentError = '附件文件大小不能超过 10MB，请重新选择。';
+                this.postAttachmentError = 'Attachment size cannot exceed 10MB. Please choose another file.';
                 this.postAttachmentFile = null;
                 this.postAttachmentName = '';
                 const input = this.$refs.postAttachmentInput;
@@ -799,7 +1061,7 @@ new Vue({
         },
         async submitPost() {
             if (!this.newPost.title || !this.newPost.content) {
-                alert('请填写标题和内容');
+                alert('Please enter a title and content');
                 return;
             }
             
@@ -825,7 +1087,7 @@ new Vue({
                 await axios.post('/api/community/posts', payload, {
                     headers: { Authorization: this.token }
                 });
-                alert('发布成功！');
+                alert('Post published successfully!');
                 this.showCreatePostModal = false;
                 this.newPost = {
                     title: '',
@@ -847,8 +1109,8 @@ new Vue({
                 }
                 this.loadCommunityPosts(1);
             } catch (error) {
-                console.error('发布失败:', error);
-                alert('发布失败: ' + (error.response?.data?.message || error.message));
+                console.error('Publish failed:', error);
+                alert('Publish failed: ' + (error.response?.data?.message || error.message));
             }
         },
         async viewPostDetail(postId) {
@@ -862,8 +1124,8 @@ new Vue({
                 this.postDetail = response.data;
                 await this.loadPostComments(postId);
             } catch (error) {
-                console.error('加载帖子详情失败:', error);
-                alert('加载失败，请稍后重试');
+                console.error('Failed to load post details:', error);
+                alert('Failed to load. Please try again later.');
             } finally {
                 this.postDetailLoading = false;
             }
@@ -876,7 +1138,7 @@ new Vue({
         },
         async toggleLikePost(postId, isLiked) {
             if (!this.token) {
-                alert('请先登录');
+                alert('Please sign in first');
                 return;
             }
             
@@ -913,12 +1175,12 @@ new Vue({
                     this.loadCommunityPosts(this.communityPage);
                 }
             } catch (error) {
-                console.error('操作失败:', error);
+                console.error('Operation failed:', error);
             }
         },
         async toggleFavoritePost(postId, isFavorited) {
             if (!this.token) {
-                alert('请先登录');
+                alert('Please sign in first');
                 return;
             }
             
@@ -951,7 +1213,7 @@ new Vue({
                     this.loadCommunityPosts(this.communityPage);
                 }
             } catch (error) {
-                console.error('操作失败:', error);
+                console.error('Operation failed:', error);
             }
         },
         async loadPostComments(postId) {
@@ -962,7 +1224,7 @@ new Vue({
                 });
                 this.postComments = response.data || [];
             } catch (error) {
-                console.error('加载评论失败:', error);
+                console.error('Failed to load comments:', error);
                 this.postComments = [];
             } finally {
                 this.postCommentsLoading = false;
@@ -970,7 +1232,7 @@ new Vue({
         },
         async submitComment() {
             if (!this.newCommentContent.trim()) {
-                alert('请输入评论内容');
+                alert('Please enter a comment');
                 return;
             }
             
@@ -986,8 +1248,8 @@ new Vue({
                 await this.loadPostComments(this.postDetail.id);
                 this.postDetail.commentCount = (this.postDetail.commentCount || 0) + 1;
             } catch (error) {
-                console.error('发表评论失败:', error);
-                alert('发表失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to post comment:', error);
+                alert('Submit failed: ' + (error.response?.data?.message || error.message));
             }
         },
         replyToComment(comment) {
@@ -1000,7 +1262,7 @@ new Vue({
         },
         async submitReply(parentId) {
             if (!this.replyContent.trim()) {
-                alert('请输入回复内容');
+                alert('Please enter a reply');
                 return;
             }
             
@@ -1015,13 +1277,13 @@ new Vue({
                 this.cancelReply();
                 await this.loadPostComments(this.postDetail.id);
             } catch (error) {
-                console.error('发表回复失败:', error);
-                alert('发表失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to post reply:', error);
+                alert('Submit failed: ' + (error.response?.data?.message || error.message));
             }
         },
         async toggleLikeComment(commentId, isLiked) {
             if (!this.token) {
-                alert('请先登录');
+                alert('Please sign in first');
                 return;
             }
             
@@ -1051,7 +1313,7 @@ new Vue({
                 };
                 updateComment(this.postComments);
             } catch (error) {
-                console.error('操作失败:', error);
+                console.error('Operation failed:', error);
             }
         },
         async setBestAnswer(commentId) {
@@ -1062,10 +1324,10 @@ new Vue({
                 });
                 await this.loadPostComments(this.postDetail.id);
                 this.postDetail.isResolved = true;
-                alert('已设置为最佳答案');
+                alert('Marked as best answer');
             } catch (error) {
-                console.error('设置失败:', error);
-                alert('设置失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to update:', error);
+                alert('Failed to update: ' + (error.response?.data?.message || error.message));
             }
         },
         async loadNotifications() {
@@ -1078,7 +1340,7 @@ new Vue({
                 });
                 this.notifications = response.data || [];
             } catch (error) {
-                console.error('加载通知失败:', error);
+                console.error('Failed to load notifications:', error);
             } finally {
                 this.notificationsLoading = false;
             }
@@ -1092,7 +1354,7 @@ new Vue({
                 });
                 this.unreadNotificationCount = response.data.count || 0;
             } catch (error) {
-                console.error('加载未读通知数失败:', error);
+                console.error('Failed to load unread notification count:', error);
             }
         },
         async markAllNotificationsRead() {
@@ -1103,7 +1365,7 @@ new Vue({
                 this.unreadNotificationCount = 0;
                 this.notifications.forEach(n => n.isRead = true);
             } catch (error) {
-                console.error('标记失败:', error);
+                console.error('Failed to mark as read:', error);
             }
         },
         handleNotificationClick(notification) {
@@ -1128,19 +1390,19 @@ new Vue({
         },
         getNotificationTypeLabel(type) {
             const typeMap = {
-                'like': '点赞',
-                'comment': '评论',
-                'reply': '回复',
-                'follow': '关注',
-                'best_answer': '最佳答案',
-                'announcement': '系统公告',
-                'default': '通知'
+                'like': 'Like',
+                'comment': 'Comment',
+                'reply': 'Reply',
+                'follow': 'Follow',
+                'best_answer': 'Best Answer',
+                'announcement': 'Announcement',
+                'default': 'Notification'
             };
-            return typeMap[type] || '通知';
+            return typeMap[type] || 'Notification';
         },
         truncateContent(content, length) {
             if (!content) return '';
-            const text = content.replace(/<[^>]*>/g, '');
+            const text = this.translateText(content.replace(/<[^>]*>/g, ''), 'This post was created before the English update.');
             return text.length > length ? text.substring(0, length) + '...' : text;
         },
         formatTime(timeStr) {
@@ -1152,21 +1414,33 @@ new Vue({
             const hours = Math.floor(diff / 3600000);
             const days = Math.floor(diff / 86400000);
             
-            if (minutes < 1) return '刚刚';
-            if (minutes < 60) return minutes + '分钟前';
-            if (hours < 24) return hours + '小时前';
-            if (days < 7) return days + '天前';
-            return time.toLocaleDateString('zh-CN');
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return minutes + ' min ago';
+            if (hours < 24) return hours + ' hr ago';
+            if (days < 7) return days + ' days ago';
+            return time.toLocaleDateString('en-US');
         },
         // 解析课程大纲
         parseCourseOutline(outlineString) {
             if (!outlineString) return [];
             try {
-                return JSON.parse(outlineString);
+                const outline = JSON.parse(outlineString);
+                if (!Array.isArray(outline)) return [];
+                return outline.map((chapter, index) => ({
+                    ...chapter,
+                    title: this.translateText(chapter.title, `Chapter ${index + 1}`),
+                    lessons: Array.isArray(chapter.lessons)
+                        ? chapter.lessons.map((lesson, lessonIndex) => ({
+                            ...lesson,
+                            title: this.translateText(lesson.title, `Lesson ${lessonIndex + 1}`),
+                            duration: this.formatDuration(lesson.duration)
+                        }))
+                        : []
+                }));
             } catch (e) {
                 // 如果不是JSON格式，尝试解析为简单格式
                 return outlineString.split('\n').filter(line => line.trim()).map(line => ({
-                    title: line.trim(),
+                    title: this.translateText(line.trim(), 'Course module'),
                     lessons: []
                 }));
             }
@@ -1205,36 +1479,37 @@ new Vue({
         // 格式化描述文本（支持换行）
         formatDescription(text) {
             if (!text) return '';
-            return text.replace(/\n/g, '<br>');
+            const fallback = 'This content was created before the English language update.';
+            return escapeHtml(this.translateText(text, fallback)).replace(/\n/g, '<br>');
         },
         // 获取星级显示
         getStars(rating) {
-            if (!rating) return '☆☆☆☆☆';
+            if (!rating) return '-----';
             const fullStars = Math.floor(rating);
             const hasHalfStar = rating % 1 >= 0.5;
-            let stars = '★'.repeat(fullStars);
-            if (hasHalfStar) stars += '☆';
-            stars += '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
+            let stars = '*'.repeat(fullStars);
+            if (hasHalfStar) stars += '+';
+            stars += '-'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
             return stars;
         },
         // 查看图片
         viewImage(imageUrl) {
             // 严格验证：必须是有效的非空字符串
             if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
-                console.warn('无效的图片URL:', imageUrl);
+                console.warn('Invalid image URL:', imageUrl);
                 return;
             }
             // 验证URL格式（必须以http://或https://开头，或者是相对路径）
             const trimmedUrl = imageUrl.trim();
             if (trimmedUrl === '' || trimmedUrl === 'null' || trimmedUrl === 'undefined') {
-                console.warn('图片URL为空或无效:', imageUrl);
+                console.warn('Image URL is empty or invalid:', imageUrl);
                 return;
             }
             this.viewingImage = trimmedUrl;
         },
-        // 关闭图片模态框
+        // Close image modal
         closeImageModal() {
-            console.log('关闭图片模态框');
+            console.log('Close image modal');
             this.viewingImage = null;
             // 强制更新，确保DOM立即响应
             this.$nextTick(() => {
@@ -1247,7 +1522,7 @@ new Vue({
         },
         // 处理图片加载错误
         handleImageError(event) {
-            console.error('图片加载失败:', this.viewingImage);
+            console.error('Image failed to load:', this.viewingImage);
             // 如果图片加载失败，立即关闭模态框（不显示alert，直接关闭）
             this.viewingImage = null;
             this.$forceUpdate();
@@ -1261,7 +1536,7 @@ new Vue({
         },
         // 处理图片加载成功（用于调试）
         handleImageLoad(event) {
-            console.log('图片加载成功:', this.viewingImage);
+            console.log('Image loaded:', this.viewingImage);
         },
         // 获取分页数字数组
         getPageNumbers() {
@@ -1308,7 +1583,7 @@ new Vue({
             if (this.jumpPage >= 1 && this.jumpPage <= this.totalPages) {
                 this.changePage(this.jumpPage);
             } else {
-                alert(`请输入1到${this.totalPages}之间的页码`);
+                alert(`Please enter a page from 1 to ${this.totalPages}`);
                 this.jumpPage = this.page;
             }
         },
@@ -1326,7 +1601,7 @@ new Vue({
                 this.courseTotal = response.data.total || 0;
                 return Promise.resolve();
             } catch (error) {
-                console.error('获取推荐课程失败:', error);
+                console.error('Failed to load recommended courses:', error);
                 this.courses = [];
                 this.courseTotal = 0;
                 return Promise.reject(error);
@@ -1342,7 +1617,7 @@ new Vue({
                 await axios.post(`/api/courses/${courseId}/join`, {}, {
                     headers: { Authorization: this.token }
                 });
-                alert('已成功加入课程！');
+                alert('Joined the course successfully!');
                 // 刷新我的课程列表以更新按钮状态
                 await this.getUserCourses();
                 // 如果当前在推荐课程标签，刷新推荐课程列表
@@ -1353,20 +1628,20 @@ new Vue({
                     await this.queryCourses();
                 }
             } catch (error) {
-                console.error('加入课程失败:', error);
-                alert('加入课程失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to join course:', error);
+                alert('Failed to join course: ' + (error.response?.data?.message || error.message));
             }
         },
         // 退选课程
         async quitCourse(courseId) {
-            if (!confirm('确定要退选该课程吗？')) {
+            if (!confirm('Are you sure you want to unenroll from this course?')) {
                 return;
             }
             try {
                 await axios.delete(`/api/courses/${courseId}/quit`, {
                     headers: { Authorization: this.token }
                 });
-                alert('已成功退选课程！');
+                alert('Unenrolled successfully!');
                 // 刷新我的课程列表
                 await this.getUserCourses();
                 // 刷新课程中心列表
@@ -1376,8 +1651,8 @@ new Vue({
                     await this.queryCourses();
                 }
             } catch (error) {
-                console.error('退选课程失败:', error);
-                alert('退选课程失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to unenroll:', error);
+                alert('Failed to unenroll: ' + (error.response?.data?.message || error.message));
             }
         },
         // 切换密码显示/隐藏
@@ -1411,7 +1686,7 @@ new Vue({
 
             // 检查文件大小（限制 2MB）
             if (file.size > 2 * 1024 * 1024) {
-                alert('文件大小不能超过2MB');
+                alert('File size cannot exceed 2MB');
                 return;
             }
 
@@ -1481,37 +1756,37 @@ new Vue({
                     this.editUser.avatarUrl = avatarPath;
                 }
 
-                alert('信息更新成功！');
+                alert('Profile updated successfully!');
                 // 重新加载用户信息以确保所有数据都是最新的
                 await this.loadUserInfo();
                 // 清空临时文件
                 this.avatarFile = null;
             } catch (error) {
-                console.error('信息更新失败:', error);
-                alert('信息更新失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to update profile:', error);
+                alert('Failed to update profile: ' + (error.response?.data?.message || error.message));
             }
         },
 
         async updatePassword() {
             if (!this.passwordForm.oldPassword || !this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
-                alert('请填写完整的密码信息');
+                alert('Please complete all password fields');
                 return;
             }
 
             if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
-                alert('两次输入的新密码不一致');
+                alert('The new passwords do not match');
                 return;
             }
 
             // 与注册时保持一致的密码验证逻辑：4-8位，需同时包含字母和数字
             const newPwd = this.passwordForm.newPassword;
             if (newPwd.length < 4 || newPwd.length > 8) {
-                alert('新密码长度应为4-8位');
+                alert('New password must be 4-8 characters');
                 return;
             }
 
             if (!/[a-zA-Z]/.test(newPwd) || !/\d/.test(newPwd)) {
-                alert('新密码需同时包含字母和数字');
+                alert('New password must contain letters and numbers');
                 return;
             }
 
@@ -1523,15 +1798,15 @@ new Vue({
                     headers: { Authorization: this.token }
                 });
 
-                alert('密码修改成功！');
+                alert('Password changed successfully!');
                 this.passwordForm = {
                     oldPassword: '',
                     newPassword: '',
                     confirmPassword: ''
                 };
             } catch (error) {
-                console.error('密码修改失败:', error);
-                alert('密码修改失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to change password:', error);
+                alert('Failed to change password: ' + (error.response?.data?.message || error.message));
             }
         },
 
@@ -1556,13 +1831,13 @@ new Vue({
                     headers: { Authorization: this.token },
                     params: params
                 });
-                console.log('用户列表响应:', response.data);
+                console.log('User list response:', response.data);
                 this.adminUsers = response.data.records || [];
                 this.adminUserTotal = response.data.total || 0;
-                console.log(`加载了 ${this.adminUsers.length} 个用户，总计 ${this.adminUserTotal} 个`);
+                console.log(`Loaded ${this.adminUsers.length} users, total ${this.adminUserTotal}`);
             } catch (error) {
-                console.error('加载用户列表失败:', error);
-                alert('加载用户列表失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to load users:', error);
+                alert('Failed to load users: ' + (error.response?.data?.message || error.message));
             } finally {
                 this.adminUsersLoading = false;
             }
@@ -1583,8 +1858,8 @@ new Vue({
                 this.adminCourseTotal = response.data.total || 0;
                 this.adminCourseJumpPage = this.adminCoursePage;
             } catch (error) {
-                console.error('加载课程列表失败:', error);
-                alert('加载课程列表失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to load courses:', error);
+                alert('Failed to load courses: ' + (error.response?.data?.message || error.message));
             } finally {
                 this.adminCoursesLoading = false;
             }
@@ -1606,8 +1881,8 @@ new Vue({
                     this.renderAdminCharts();
                 }, 100);
             } catch (error) {
-                console.error('加载统计数据失败:', error);
-                this.adminStatisticsError = error.response?.data?.message || error.message || '统计数据加载失败';
+                console.error('Failed to load statistics:', error);
+                this.adminStatisticsError = error.response?.data?.message || error.message || 'Failed to load statistics';
                 this.adminStatistics = null;
             } finally {
                 this.adminStatisticsLoading = false;
@@ -1637,7 +1912,7 @@ new Vue({
         },
         renderAdminCharts() {
             if (!this.adminStatistics) {
-                console.warn('adminStatistics为空，无法渲染图表');
+                console.warn('Admin statistics are empty; charts cannot be rendered');
                 return;
             }
             
@@ -1649,11 +1924,12 @@ new Vue({
                 }
                 this.adminCategoryChart = echarts.init(categoryChartDom);
                 const categoryData = this.adminStatistics.categoryDistribution || {};
-                const categoryEntries = Object.entries(categoryData);
+                const categoryEntries = Object.entries(categoryData)
+                    .map(([name, value]) => [this.translateText(name, 'Uncategorized'), value]);
                 if (categoryEntries.length > 0) {
                     const option = {
                         backgroundColor: 'transparent',
-                        title: { text: '课程分类分布', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
+                        title: { text: 'Course Category Distribution', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
                         tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
                         legend: {
                             orient: 'vertical',
@@ -1693,7 +1969,7 @@ new Vue({
                     };
                     this.adminCategoryChart.setOption(option);
                 } else {
-                    console.warn('分类数据为空');
+                    console.warn('Category data is empty');
                 }
             }
             
@@ -1705,11 +1981,12 @@ new Vue({
                 }
                 this.adminLevelChart = echarts.init(levelChartDom);
                 const levelData = this.adminStatistics.levelDistribution || {};
-                const levelKeys = Object.keys(levelData);
+                const levelEntries = Object.entries(levelData).map(([name, value]) => [this.translateText(name, 'Unknown'), value]);
+                const levelKeys = levelEntries.map(([name]) => name);
                 if (levelKeys.length > 0) {
                     const option = {
                         backgroundColor: 'transparent',
-                        title: { text: '课程难度分布', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
+                        title: { text: 'Course Difficulty Distribution', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
                         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
                         grid: { left: '10%', right: '10%', bottom: '15%', top: '20%' },
                         xAxis: { 
@@ -1726,7 +2003,7 @@ new Vue({
                         },
                         series: [{
                             type: 'bar',
-                            data: Object.values(levelData),
+                            data: levelEntries.map(([, value]) => value),
                             itemStyle: {
                                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                                     { offset: 0, color: 'rgba(99, 179, 237, 0.9)' },
@@ -1759,11 +2036,11 @@ new Vue({
                     };
                     this.adminLevelChart.setOption(option);
                 } else {
-                    console.warn('难度数据为空');
+                    console.warn('Difficulty data is empty');
                 }
             }
             
-            // 学习偏好分布
+            // Learning Preference Distribution
             const prefChartDom = document.getElementById('adminPreferenceChart');
             if (prefChartDom) {
                 if (this.adminPreferenceChart) {
@@ -1771,11 +2048,12 @@ new Vue({
                 }
                 this.adminPreferenceChart = echarts.init(prefChartDom);
                 const prefData = this.adminStatistics.preferenceDistribution || {};
-                const prefEntries = Object.entries(prefData);
+                const prefEntries = Object.entries(prefData)
+                    .map(([name, value]) => [this.translateText(name, 'Unknown'), value]);
                 if (prefEntries.length > 0) {
                     const prefOption = {
                         backgroundColor: 'transparent',
-                        title: { text: '学习偏好分布', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
+                        title: { text: 'Learning Preference Distribution', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
                         tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
                         legend: { 
                             bottom: 0,
@@ -1797,11 +2075,11 @@ new Vue({
                     };
                     this.adminPreferenceChart.setOption(prefOption);
                 } else {
-                    console.warn('学习偏好数据为空');
+                    console.warn('Learning preference data is empty');
                 }
             }
             
-            // 课程兴趣分布
+            // Course Interest Distribution
             const interestChartDom = document.getElementById('adminInterestChart');
             if (interestChartDom) {
                 if (this.adminInterestChart) {
@@ -1809,11 +2087,13 @@ new Vue({
                 }
                 this.adminInterestChart = echarts.init(interestChartDom);
                 const interestData = this.adminStatistics.interestDistribution || {};
-                const interestKeys = Object.keys(interestData);
+                const interestEntries = Object.entries(interestData)
+                    .map(([name, value]) => [this.translateText(name, 'Unknown'), value]);
+                const interestKeys = interestEntries.map(([name]) => name);
                 if (interestKeys.length > 0) {
                     const interestOption = {
                         backgroundColor: 'transparent',
-                        title: { text: '课程兴趣分布', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
+                        title: { text: 'Course Interest Distribution', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
                         tooltip: { trigger: 'axis' },
                         grid: { left: '8%', right: '4%', bottom: '15%', top: '18%' },
                         xAxis: {
@@ -1842,7 +2122,7 @@ new Vue({
                                     { offset: 1, color: '#3182ce' }
                                 ])
                             },
-                            data: Object.values(interestData),
+                            data: interestEntries.map(([, value]) => value),
                             lineStyle: { width: 3, color: '#3182ce' },
                             symbolSize: 8,
                             symbol: 'circle',
@@ -1851,7 +2131,7 @@ new Vue({
                     };
                     this.adminInterestChart.setOption(interestOption);
                 } else {
-                    console.warn('课程兴趣数据为空');
+                    console.warn('Course interest data is empty');
                 }
             }
             
@@ -1866,7 +2146,7 @@ new Vue({
                 if (popularCourses.length > 0) {
                     const popularOption = {
                         backgroundColor: 'transparent',
-                        title: { text: '热门课程 TOP5（按选课人数）', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
+                        title: { text: 'Top 5 Popular Courses by Enrollment', left: 'center', textStyle: { color: '#1a202c', fontSize: 16, fontWeight: 600 } },
                         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
                         grid: { left: '15%', right: '10%', bottom: '10%', top: '20%' },
                         xAxis: { 
@@ -1877,7 +2157,7 @@ new Vue({
                         },
                         yAxis: {
                             type: 'category',
-                            data: popularCourses.map(c => c.title || '未知课程'),
+                            data: popularCourses.map(c => this.translateText(c.title, 'Unknown Course')),
                             axisLabel: { 
                                 interval: 0,
                                 color: '#4a5568'
@@ -1926,14 +2206,16 @@ new Vue({
                     };
                     this.adminPopularCourseChart.setOption(popularOption);
                 } else {
-                    console.warn('热门课程数据为空');
+                    console.warn('Popular course data is empty');
                 }
             }
         },
         parseArray(value) {
             if (!value) return [];
-            if (Array.isArray(value)) return value.filter(Boolean);
-            return String(value).split(',').map(v => v.trim()).filter(Boolean);
+            const values = Array.isArray(value) ? value : String(value).split(',');
+            return values
+                .map(v => this.translateText(v.trim(), 'Tag'))
+                .filter(Boolean);
         },
         ensureAdminModuleVisible() {
             this.$nextTick(() => {
@@ -1968,18 +2250,18 @@ new Vue({
                     }
                 }
                 this.adminCourseForm = {
-                    title: course.title || '',
-                    description: course.description || '',
-                    detailDescription: course.detailDescription || '',
-                    category: course.category || '',
-                    level: course.level || '',
-                    teacher: course.teacher || '',
-                    teacherIntro: course.teacherIntro || '',
+                    title: this.translateText(course.title, ''),
+                    description: this.translateText(course.description, this.getCourseSummary(course)),
+                    detailDescription: this.translateText(course.detailDescription, ''),
+                    category: this.translateText(course.category, ''),
+                    level: this.translateText(course.level, ''),
+                    teacher: this.translateText(course.teacher, ''),
+                    teacherIntro: this.translateText(course.teacherIntro, ''),
                     price: course.price != null ? course.price : 0,
-                    duration: course.duration || '',
+                    duration: this.formatDuration(course.duration),
                     coverUrl: course.coverUrl || '',
-                    tags: course.tags || '',
-                    selectedTags: course.tags ? course.tags.split(',').map(t => t.trim()).filter(t => t) : [],
+                    tags: course.tags ? this.parseTags(course.tags).join(',') : '',
+                    selectedTags: course.tags ? this.parseTags(course.tags) : [],
                     courseImages: courseImages
                 };
             } else {
@@ -2014,7 +2296,7 @@ new Vue({
             if (!file) return;
             const maxSize = 2 * 1024 * 1024; // 2MB，与头像保持一致
             if (file.size > maxSize) {
-                alert('封面图片不能超过2MB，请压缩后重新上传');
+                alert('Cover image cannot exceed 2MB. Please compress it and upload again.');
                 e.target.value = '';
                 this.adminCourseCoverFile = null;
                 this.adminCourseForm.coverUrl = '';
@@ -2026,7 +2308,7 @@ new Vue({
             const isValidType = validTypes.includes(file.type) ||
                 validExtensions.some(ext => file.endsWith(ext));
             if (!isValidType) {
-                alert('封面仅支持 JPG、JPEG、PNG、GIF 格式图片');
+                alert('Cover only supports JPG, JPEG, PNG, and GIF images.');
                 e.target.value = '';
                 this.adminCourseCoverFile = null;
                 this.adminCourseForm.coverUrl = '';
@@ -2052,7 +2334,7 @@ new Vue({
             files.forEach((file) => {
                 const maxSize = 2 * 1024 * 1024; // 2MB，避免超过服务器限制
                 if (file.size > maxSize) {
-                    alert(`图片 ${file.name} 大小不能超过2MB，请压缩后重新上传`);
+                    alert(`Image ${file.name} cannot exceed 2MB. Please compress it and upload again.`);
                     return;
                 }
                 const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
@@ -2061,7 +2343,7 @@ new Vue({
                 const isValidType = validTypes.includes(file.type) ||
                     validExtensions.some(ext => fileName.endsWith(ext));
                 if (!isValidType) {
-                    alert(`图片 ${file.name} 格式不支持，仅支持 JPG、JPEG、PNG、GIF 格式`);
+                    alert(`Image ${file.name} format is not supported. Only JPG, JPEG, PNG, and GIF are allowed.`);
                     return;
                 }
                 const reader = new FileReader();
@@ -2084,7 +2366,7 @@ new Vue({
             e.target.value = '';
         },
         removeCourseImage(index) {
-            if (confirm('确定要删除这张图片吗？')) {
+            if (confirm('Are you sure you want to delete this image?')) {
                 // 如果是新上传的图片，也要从文件数组中移除
                 const image = this.adminCourseForm.courseImages[index];
                 if (image && image.isNew && image.fileIndex !== undefined) {
@@ -2110,7 +2392,7 @@ new Vue({
                 if (!file) return;
                 const maxSize = 2 * 1024 * 1024; // 2MB
                 if (file.size > maxSize) {
-                    alert('图片大小不能超过2MB，请压缩后重新上传');
+                    alert('Image cannot exceed 2MB. Please compress it and upload again.');
                     return;
                 }
                 const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
@@ -2119,7 +2401,7 @@ new Vue({
                 const isValidType = validTypes.includes(file.type) ||
                     validExtensions.some(ext => fileName.endsWith(ext));
                 if (!isValidType) {
-                    alert('图片格式不支持，仅支持 JPG、JPEG、PNG、GIF 格式');
+                    alert('Image format is not supported. Only JPG, JPEG, PNG, and GIF are allowed.');
                     return;
                 }
                 const reader = new FileReader();
@@ -2151,7 +2433,7 @@ new Vue({
         },
         async saveAdminCourse() {
             if (!this.adminCourseForm.title || !this.adminCourseForm.title.trim()) {
-                alert('请输入课程名称');
+                alert('Please enter a course name');
                 return;
             }
             try {
@@ -2197,15 +2479,15 @@ new Vue({
                                     // 持久化时仅保存URL字符串，便于前台解析
                                     finalCourseImages.push(imageUrl);
                                 } else {
-                                    console.warn(`第${i + 1}张图片上传后未返回URL`);
+                                    console.warn(`Image ${i + 1} upload did not return a URL`);
                                 }
                             } catch (error) {
-                                console.error('上传课程图片失败:', error);
-                                alert(`上传第${i + 1}张图片失败: ${error.response?.data?.message || error.message}`);
+                                console.error('Failed to upload course image:', error);
+                                alert(`Failed to upload image ${i + 1} ${error.response?.data?.message || error.message}`);
                                 // 继续处理其他图片，但不添加到最终列表
                             }
                         } else {
-                            console.warn(`第${i + 1}张图片的文件索引超出范围`);
+                            console.warn(`Image ${i + 1} file index is out of range`);
                         }
                     } else {
                         // 保留的旧图片（可能是字符串或对象）
@@ -2230,18 +2512,18 @@ new Vue({
 
                 if (this.editingAdminCourse) {
                     await axios.put(`/api/admin/courses/${this.editingAdminCourse.id}`, form, { headers });
-                    alert('课程信息已保存');
+                    alert('Course saved');
                 } else {
                     await axios.post('/api/admin/courses', form, { headers });
-                    alert('课程创建成功');
+                    alert('Course created');
                 }
                 this.closeAdminCourseModal();
                 const reloadPage = this.editingAdminCourse ? this.adminCoursePage : 1;
                 this.adminCoursePage = reloadPage;
                 this.loadAdminCourses(reloadPage);
             } catch (error) {
-                console.error('保存课程失败:', error);
-                alert('保存课程失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to save course:', error);
+                alert('Failed to save course: ' + (error.response?.data?.message || error.message));
             }
         },
         getAdminCoursePageNumbers() {
@@ -2304,7 +2586,7 @@ new Vue({
             if (this.adminCourseJumpPage >= 1 && this.adminCourseJumpPage <= this.adminCourseTotalPages) {
                 this.changeAdminCoursePage(this.adminCourseJumpPage);
             } else {
-                alert(`请输入1到${this.adminCourseTotalPages}之间的页码`);
+                alert(`Please enter a page from 1 to ${this.adminCourseTotalPages}`);
                 this.adminCourseJumpPage = this.adminCoursePage;
             }
         },
@@ -2316,11 +2598,11 @@ new Vue({
         },
         async sendAnnouncement() {
             if (!this.announcementForm.title || !this.announcementForm.title.trim()) {
-                alert('请输入公告标题');
+                alert('Please enter an announcement title');
                 return;
             }
             if (!this.announcementForm.content || !this.announcementForm.content.trim()) {
-                alert('请输入公告内容');
+                alert('Please enter announcement content');
                 return;
             }
             this.announcementSending = true;
@@ -2331,18 +2613,18 @@ new Vue({
                 }, {
                     headers: { Authorization: this.token }
                 });
-                alert('公告发送成功');
+                alert('Announcement sent');
                 this.announcementForm = { title: '', content: '' };
                 this.closeAnnouncementModal();
             } catch (error) {
-                console.error('发送公告失败:', error);
-                alert('公告发送失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to send announcement:', error);
+                alert('Failed to send announcement: ' + (error.response?.data?.message || error.message));
             } finally {
                 this.announcementSending = false;
             }
         },
         confirmDeleteUser(user) {
-            if (!confirm(`确定要删除用户 "${user.username}" 吗？此操作不可恢复！`)) return;
+            if (!confirm(`Are you sure you want to delete user "${user.username}" ? This action cannot be undone!`)) return;
             this.deleteUser(user.id);
         },
         async deleteUser(userId) {
@@ -2350,15 +2632,15 @@ new Vue({
                 await axios.delete(`/api/admin/users/${userId}`, {
                     headers: { Authorization: this.token }
                 });
-                alert('用户删除成功！');
+                alert('User deleted successfully!');
                 this.loadAdminUsers();
             } catch (error) {
-                console.error('删除用户失败:', error);
-                alert('删除用户失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to delete user:', error);
+                alert('Failed to delete user: ' + (error.response?.data?.message || error.message));
             }
         },
         confirmFreezeUser(user) {
-            if (!confirm(`确定要冻结用户 "${user.username}" 吗？冻结后该用户将无法登录。`)) return;
+            if (!confirm(`Are you sure you want to freeze user "${user.username}" ? The user will not be able to sign in after freezing.`)) return;
             this.freezeUser(user.id);
         },
         async freezeUser(userId) {
@@ -2366,15 +2648,15 @@ new Vue({
                 await axios.put(`/api/admin/users/${userId}/freeze`, {}, {
                     headers: { Authorization: this.token }
                 });
-                alert('用户已冻结！');
+                alert('User frozen!');
                 this.loadAdminUsers();
             } catch (error) {
-                console.error('冻结用户失败:', error);
-                alert('冻结用户失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to freeze user:', error);
+                alert('Failed to freeze user: ' + (error.response?.data?.message || error.message));
             }
         },
         confirmUnfreezeUser(user) {
-            if (!confirm(`确定要恢复用户 "${user.username}" 吗？恢复后该用户可以正常登录。`)) return;
+            if (!confirm(`Are you sure you want to restore user "${user.username}" ? The user will be able to sign in after restoration.`)) return;
             this.unfreezeUser(user.id);
         },
         async unfreezeUser(userId) {
@@ -2382,15 +2664,15 @@ new Vue({
                 await axios.put(`/api/admin/users/${userId}/unfreeze`, {}, {
                     headers: { Authorization: this.token }
                 });
-                alert('用户已恢复！');
+                alert('User restored!');
                 this.loadAdminUsers();
             } catch (error) {
-                console.error('恢复用户失败:', error);
-                alert('恢复用户失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to restore user:', error);
+                alert('Failed to restore user: ' + (error.response?.data?.message || error.message));
             }
         },
         confirmDeleteCourse(course) {
-            if (!confirm(`确定要删除课程 "${course.title}" 吗？此操作不可恢复！`)) return;
+            if (!confirm(`Are you sure you want to delete course "${course.title}" ? This action cannot be undone!`)) return;
             this.deleteCourse(course.id);
         },
         async deleteCourse(courseId) {
@@ -2398,15 +2680,15 @@ new Vue({
                 const response = await axios.delete(`/api/admin/courses/${courseId}`, {
                     headers: { Authorization: this.token }
                 });
-                alert(response.data?.message || '课程删除成功！已通知相关用户');
+                alert(response.data?.message || 'Course deleted successfully. Related users have been notified.');
                 this.loadAdminCourses();
                 // 如果当前用户在查看"我的课程"，刷新用户课程列表
                 if (this.activeTab === 'profile' && this.activeSubTab === 'profile-course') {
                     this.getUserCourses();
                 }
             } catch (error) {
-                console.error('删除课程失败:', error);
-                alert('删除课程失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to delete course:', error);
+                alert('Failed to delete course: ' + (error.response?.data?.message || error.message));
             }
         },
         formatDate(dateString) {
@@ -2416,9 +2698,9 @@ new Vue({
         },
         // 私信相关方法
         openMessageDialog(userId, username, avatarUrl) {
-            // 不能给自己发消息
+            // You cannot message yourself
             if (userId === this.user.id) {
-                alert('不能给自己发消息');
+                alert('You cannot message yourself');
                 return;
             }
             this.currentChatUser = {
@@ -2461,7 +2743,7 @@ new Vue({
                         });
                         msg.isRead = true;
                     } catch (e) {
-                        console.error('标记消息已读失败:', e);
+                        console.error('Failed to mark message as read:', e);
                     }
                 }
                 // 刷新未读消息数
@@ -2471,8 +2753,8 @@ new Vue({
                     this.scrollToBottom();
                 });
             } catch (error) {
-                console.error('加载消息失败:', error);
-                alert('加载消息失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to load messages:', error);
+                alert('Failed to load messages: ' + (error.response?.data?.message || error.message));
             } finally {
                 this.messageLoading = false;
             }
@@ -2513,8 +2795,8 @@ new Vue({
                     this.scrollToBottom();
                 });
             } catch (error) {
-                console.error('发送消息失败:', error);
-                alert('发送消息失败: ' + (error.response?.data?.message || error.message));
+                console.error('Failed to send message:', error);
+                alert('Failed to send message: ' + (error.response?.data?.message || error.message));
             } finally {
                 this.sendingMessage = false;
             }
@@ -2559,7 +2841,7 @@ new Vue({
                     this.messageSearchResults = users.filter(u => u.id !== this.user.id);
                 }
             } catch (error) {
-                console.error('搜索用户失败:', error);
+                console.error('Failed to search users:', error);
                 this.messageSearchResults = [];
             }
         },
@@ -2585,7 +2867,7 @@ new Vue({
                     }
                 }
             } catch (error) {
-                console.error('加载会话列表失败:', error);
+                console.error('Failed to load conversations:', error);
                 this.conversations = [];
             } finally {
                 this.conversationsLoading = false;
@@ -2599,7 +2881,7 @@ new Vue({
                 });
                 this.unreadMessageCount = response.data.count || 0;
             } catch (error) {
-                console.error('加载未读消息数失败:', error);
+                console.error('Failed to load unread message count:', error);
             }
         },
         openConversation(conv) {
@@ -2633,7 +2915,7 @@ new Vue({
                         this.loadUnreadMessageCount();
                         this.loadUnreadNotificationCount();
                     }
-                }, 30000); // 每30秒刷新一次
+                }, 30000); // Refresh every 30 seconds
             }
         }
     },
@@ -2646,6 +2928,7 @@ new Vue({
         this.showNotificationPanel = false;
         this.activeTab = 'profile'; // 确保默认显示个人中心
         this.activeSubTab = 'profile-info'; // 确保默认显示我的信息
+        this.todayDate = this.getTodayDateString();
         
         // 强制设置为null（防止任何意外情况）
         if (this.viewingImage !== null && this.viewingImage !== undefined) {
@@ -2661,6 +2944,7 @@ new Vue({
         this.loadUserInfo();
         // 加载用户课程列表（用于判断是否已加入）
         this.getUserCourses();
+        this.loadCheckInSummary();
         // 启动消息轮询
         this.startMessagePolling();
         
@@ -2678,9 +2962,6 @@ new Vue({
             if (this.showNotificationPanel) {
                 this.showNotificationPanel = false;
             }
-            // 强制确保显示个人信息界面（防止被其他代码覆盖）
-            this.activeTab = 'profile';
-            this.activeSubTab = 'profile-info';
             this.$forceUpdate();
         }, 100);
         
@@ -2688,16 +2969,6 @@ new Vue({
             if (this.viewingImage) {
                 console.warn('created: 第二次检查，viewingImage不为null，强制设置为null:', this.viewingImage);
                 this.viewingImage = null;
-                this.$forceUpdate();
-            }
-            // 再次确保显示个人信息界面
-            if (this.activeTab !== 'profile' || this.activeSubTab !== 'profile-info') {
-                console.warn('created: 第二次检查，activeTab或activeSubTab不正确，强制设置为个人信息界面', {
-                    activeTab: this.activeTab,
-                    activeSubTab: this.activeSubTab
-                });
-                this.activeTab = 'profile';
-                this.activeSubTab = 'profile-info';
                 this.$forceUpdate();
             }
         }, 500);
@@ -2708,15 +2979,10 @@ new Vue({
         this.courseDetail = null;
         this.showCreatePostModal = false;
         this.showNotificationPanel = false;
-        this.activeTab = 'profile'; // 确保默认显示个人中心
-        this.activeSubTab = 'profile-info'; // 确保默认显示我的信息
         this.$forceUpdate();
         
         // 使用Vue的$nextTick确保在DOM更新后执行
         this.$nextTick(() => {
-            // 再次确保显示个人信息界面
-            this.activeTab = 'profile';
-            this.activeSubTab = 'profile-info';
             this.viewingImage = null;
             this.courseDetail = null;
             this.showCreatePostModal = false;
@@ -2737,20 +3003,13 @@ new Vue({
                     this.viewingImage = null;
                     this.$forceUpdate();
                 }
-                // 再次确保显示个人信息界面（防止被其他代码覆盖）
-                if (this.activeTab !== 'profile' || this.activeSubTab !== 'profile-info') {
-                    console.warn('mounted延迟检查: activeTab或activeSubTab不正确，强制设置为个人信息界面');
-                    this.activeTab = 'profile';
-                    this.activeSubTab = 'profile-info';
-                    this.$forceUpdate();
-                }
             }, 500);
         });
         
-        // 添加全局ESC键监听，确保可以关闭图片模态框
+        // 添加全局ESC键监听，确保可以Close image modal
         const handleEscape = (e) => {
             if (e.key === 'Escape' && this.viewingImage) {
-                console.log('ESC键按下，关闭图片模态框');
+                console.log('ESC键按下，Close image modal');
                 this.closeImageModal();
             }
         };
@@ -2762,7 +3021,7 @@ new Vue({
             if (imageModal) {
                 imageModal.addEventListener('click', (e) => {
                     if (e.target === imageModal) {
-                        console.log('点击背景，关闭图片模态框');
+                        console.log('点击背景，Close image modal');
                         this.closeImageModal();
                     }
                 });
@@ -2785,6 +3044,10 @@ new Vue({
                         this.renderCharts();
                     });
                 }
+            }
+            if (newVal === 'profile-checkin') {
+                this.todayDate = this.getTodayDateString();
+                this.loadCheckInSummary();
             }
             if (oldVal === 'profile-course' && newVal !== 'profile-course') {
                 this.disposeCharts();
@@ -2827,12 +3090,10 @@ new Vue({
         this.courseDetail = null;
         this.showCreatePostModal = false;
         this.showNotificationPanel = false;
-        this.activeTab = 'profile';
-        this.activeSubTab = 'profile-info';
     }
 });
 
-// 全局保护：页面加载时强制关闭图片模态框
+// 全局保护：页面加载时强制Close image modal
 (function() {
     function forceCloseImageModal() {
         // 通过DOM直接移除模态框（如果存在）
