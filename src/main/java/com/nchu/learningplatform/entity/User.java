@@ -2,6 +2,8 @@ package com.nchu.learningplatform.entity;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class User {
     private Long id;
@@ -16,4 +18,5 @@ public class User {
     private String courseInterest;
     private String learningGoal;
     private String status; // 用户状态：ACTIVE(正常), FROZEN(冻结)
+    private LocalDateTime createTime;
 }

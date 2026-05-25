@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 public class LoginRequest {
 
-    @NotBlank(message = "用户名或手机号不能为空")
+    @NotBlank(message = "Username or phone number is required")
     private String usernameOrPhone;
 
-    @NotBlank(message = "密码不能为空")
+    @NotBlank(message = "Password is required")
     private String password;
 }

@@ -140,6 +140,37 @@
         .btn-secondary:hover {
             background: #4a5568;
         }
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #dd6b20;
+        }
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #38a169;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-active {
+            background: #f0fff4;
+            color: #276749;
+            border: 1px solid #c6f6d5;
+        }
+        .status-frozen {
+            background: #fff5f5;
+            color: #9b2c2c;
+            border: 1px solid #fed7d7;
+        }
         .search-box {
             display: flex;
             gap: 10px;
@@ -271,7 +302,7 @@
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>Role</th>
-                                <th>Gender</th>
+                                <th>Status</th>
                                 <th>Registration Time</th>
                                 <th>Actions</th>
                             </tr>
@@ -287,9 +318,17 @@
                                         {{ user.role === 'ADMIN' ? 'Admin' : 'Regular User' }}
                                     </span>
                                 </td>
-                                <td>{{ user.gender || '-' }}</td>
+                                <td>
+                                    <span :class="['status-badge', user.status === 'FROZEN' ? 'status-frozen' : 'status-active']">
+                                        {{ user.status === 'FROZEN' ? 'Frozen' : 'Active' }}
+                                    </span>
+                                </td>
                                 <td>{{ formatDate(user.createTime) }}</td>
                                 <td>
+                                    <button v-if="user.role !== 'ADMIN' && user.status !== 'FROZEN'"
+                                            class="btn btn-warning" @click="freezeUser(user)">Freeze</button>
+                                    <button v-if="user.status === 'FROZEN'"
+                                            class="btn btn-success" @click="unfreezeUser(user)">Unfreeze</button>
                                     <button class="btn btn-danger" @click="confirmDeleteUser(user)">Delete</button>
                                 </td>
                             </tr>
@@ -384,6 +423,8 @@
                 </div>
                 <div class="chart-container" id="categoryChart"></div>
                 <div class="chart-container" id="levelChart"></div>
+                <div class="chart-container" id="registrationTrendChart"></div>
+                <div class="chart-container" id="popularCoursesChart"></div>
             </div>
         </div>
 
@@ -521,7 +562,9 @@
                     // Statistics
                     statistics: null,
                     categoryChart: null,
-                    levelChart: null
+                    levelChart: null,
+                    registrationTrendChart: null,
+                    popularCoursesChart: null
                 }
             },
             computed: {
@@ -629,6 +672,31 @@
                         alert(error.response?.data?.message || 'Failed to delete user');
                     }
                 },
+                async freezeUser(user) {
+                    if (!confirm(`Are you sure you want to freeze user "${user.username}"?`)) return;
+                    try {
+                        await axios.put(`/api/admin/users/${user.id}/freeze`, {}, {
+                            headers: { Authorization: this.token }
+                        });
+                        alert('User has been frozen');
+                        this.loadUsers();
+                    } catch (error) {
+                        console.error('Failed to freeze user:', error);
+                        alert(error.response?.data?.message || 'Failed to freeze user');
+                    }
+                },
+                async unfreezeUser(user) {
+                    try {
+                        await axios.put(`/api/admin/users/${user.id}/unfreeze`, {}, {
+                            headers: { Authorization: this.token }
+                        });
+                        alert('User has been unfrozen');
+                        this.loadUsers();
+                    } catch (error) {
+                        console.error('Failed to unfreeze user:', error);
+                        alert(error.response?.data?.message || 'Failed to unfreeze user');
+                    }
+                },
                 // Course Management
                 async loadCourses() {
                     this.coursesLoading = true;
@@ -693,7 +761,7 @@
                         teacher: this.translateText(course.teacher, ''),
                         teacherIntro: this.translateText(course.teacherIntro, ''),
                         price: course.price || 0,
-                        duration: this.translateText(course.duration, String(course.duration || '').replace('\u5c0f\u65f6', ' hours').replace('\u5206\u949f', ' min'))
+                        duration: course.duration || ''
                     };
                     this.coverFile = null;
                     this.showCourseModal = true;
@@ -776,6 +844,12 @@
                     if (this.statistics && this.statistics.levelDistribution) {
                         this.renderLevelChart();
                     }
+                    if (this.statistics && this.statistics.registrationTrend) {
+                        this.renderRegistrationTrendChart();
+                    }
+                    if (this.statistics && this.statistics.popularCourses) {
+                        this.renderPopularCoursesChart();
+                    }
                 },
                 renderCategoryChart() {
                     const chartDom = document.getElementById('categoryChart');
@@ -822,6 +896,51 @@
                     myChart.setOption(option);
                     this.levelChart = myChart;
                 },
+                renderRegistrationTrendChart() {
+                    const chartDom = document.getElementById('registrationTrendChart');
+                    if (!chartDom) return;
+                    const myChart = echarts.init(chartDom);
+                    const trend = this.statistics.registrationTrend || [];
+                    const months = trend.map(item => item.month || item.MONTH);
+                    const counts = trend.map(item => item.count || item.COUNT);
+                    const option = {
+                        title: { text: 'User Registration Trend', left: 'center' },
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { type: 'category', data: months, axisLabel: { rotate: 45 } },
+                        yAxis: { type: 'value', minInterval: 1 },
+                        series: [{
+                            data: counts,
+                            type: 'line',
+                            smooth: true,
+                            itemStyle: { color: '#48bb78' },
+                            areaStyle: { color: 'rgba(72, 187, 120, 0.15)' }
+                        }]
+                    };
+                    myChart.setOption(option);
+                    this.registrationTrendChart = myChart;
+                },
+                renderPopularCoursesChart() {
+                    const chartDom = document.getElementById('popularCoursesChart');
+                    if (!chartDom) return;
+                    const myChart = echarts.init(chartDom);
+                    const courses = this.statistics.popularCourses || [];
+                    const titles = courses.map(c => c.title).reverse();
+                    const counts = courses.map(c => c.enrollmentCount).reverse();
+                    const option = {
+                        title: { text: 'Popular Courses (Top 5)', left: 'center' },
+                        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                        xAxis: { type: 'value', minInterval: 1 },
+                        yAxis: { type: 'category', data: titles },
+                        series: [{
+                            type: 'bar',
+                            data: counts,
+                            itemStyle: { color: '#ed8936' },
+                            barMaxWidth: 30
+                        }]
+                    };
+                    myChart.setOption(option);
+                    this.popularCoursesChart = myChart;
+                },
                 formatDate(dateStr) {
                     if (!dateStr) return '-';
                     const date = new Date(dateStr);
@@ -830,7 +949,14 @@
                 goBack() {
                     window.location.href = 'main.html';
                 },
-                logout() {
+                async logout() {
+                    try {
+                        if (this.token) {
+                            await axios.post('/api/auth/logout', {}, {
+                                headers: { Authorization: this.token }
+                            });
+                        }
+                    } catch (e) { /* ignore */ }
                     localStorage.removeItem('token');
                     window.location.href = 'login.html';
                 }

@@ -177,7 +177,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="input-hint">4-8 characters, must contain both letters and numbers</div>
+                            <div class="input-hint">At least 6 characters, must contain both letters and numbers</div>
                             <div class="password-feedback" id="passwordFeedback">
                                 <div class="password-strength">
                                     <div class="strength-bar">
@@ -1249,9 +1249,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const errorMessage = errorData.message || '';
                     
                     // Provide more detailed error prompts
-                    if (errorMessage.includes('already') || errorMessage.includes('exists') || errorMessage.includes('已被注册') || errorMessage.includes('已存在')) {
+                    if (errorMessage.includes('already') || errorMessage.includes('exists')) {
                         alert('Registration failed.\n\nPlease check:\n1. Username is already in use\n2. Phone number is already registered\n3. Email is already registered');
-                    } else if (errorMessage.includes('required') || errorMessage.includes('不能为空') || errorMessage.includes('至少选择')) {
+                    } else if (errorMessage.includes('required')) {
                         alert('Registration failed.\n\nPlease ensure all required fields are filled correctly');
                     } else {
                         alert('Registration failed. Please check your information or try again later.');

@@ -1381,22 +1381,14 @@ textarea {
     flex-shrink: 0;
 }
 
-.checkin-content {
-    display: grid;
-    grid-template-columns: minmax(240px, 0.8fr) minmax(260px, 1fr);
-    gap: 1rem;
-    min-width: 0;
-}
-
 .checkin-metrics {
     display: grid;
     grid-template-columns: repeat(3, minmax(120px, 1fr));
-    grid-column: 1 / -1;
     gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .checkin-metric,
-.checkin-form,
 .checkin-heatmap-card {
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(226, 232, 240, 0.9);
@@ -1415,19 +1407,6 @@ textarea {
     color: #1a202c;
     font-size: 2rem;
     line-height: 1.1;
-}
-
-.checkin-form {
-    padding: 1rem;
-    min-width: 0;
-}
-
-.checkin-form .form-label {
-    margin-top: 0.75rem;
-}
-
-.checkin-form .form-label:first-child {
-    margin-top: 0;
 }
 
 .checkin-error,
@@ -1459,7 +1438,7 @@ textarea {
 }
 
 .checkin-heatmap-card {
-    padding: 1rem;
+    padding: 1.25rem;
     overflow: hidden;
     min-width: 0;
 }
@@ -1475,25 +1454,25 @@ textarea {
 
 .heatmap-weekdays {
     display: grid;
-    grid-template-rows: repeat(7, 14px);
+    grid-template-rows: repeat(7, 16px);
     gap: 4px;
     color: #718096;
-    font-size: 0.68rem;
-    line-height: 14px;
+    font-size: 0.72rem;
+    line-height: 16px;
     flex: 0 0 auto;
 }
 
 .checkin-heatmap {
     display: grid;
     grid-auto-flow: column;
-    grid-template-rows: repeat(7, 14px);
-    grid-auto-columns: 14px;
+    grid-template-rows: repeat(7, 16px);
+    grid-auto-columns: 16px;
     gap: 4px;
 }
 
 .heatmap-day {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 4px;
     background: #edf2f7;
     border: 1px solid rgba(203, 213, 224, 0.8);
@@ -1537,7 +1516,6 @@ textarea {
         flex-direction: column;
     }
 
-    .checkin-content,
     .checkin-metrics {
         grid-template-columns: 1fr;
     }

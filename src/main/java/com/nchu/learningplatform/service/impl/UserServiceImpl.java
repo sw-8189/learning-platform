@@ -27,39 +27,39 @@ public class UserServiceImpl implements UserService {
     public void register(RegisterRequest request) {
         // 参数验证
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
-            throw new RuntimeException("用户名不能为空");
+            throw new RuntimeException("Username is required");
         }
         if (request.getPhone() == null || request.getPhone().trim().isEmpty()) {
-            throw new RuntimeException("手机号不能为空");
+            throw new RuntimeException("Phone number is required");
         }
         if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            throw new RuntimeException("邮箱不能为空");
+            throw new RuntimeException("Email is required");
         }
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
-            throw new RuntimeException("密码不能为空");
+            throw new RuntimeException("Password is required");
         }
         if (request.getGender() == null || request.getGender().trim().isEmpty()) {
-            throw new RuntimeException("性别不能为空");
+            throw new RuntimeException("Gender is required");
         }
         if (request.getLearningGoal() == null || request.getLearningGoal().trim().isEmpty()) {
-            throw new RuntimeException("学习目标不能为空");
+            throw new RuntimeException("Learning goal is required");
         }
         if (request.getLearningPreference() == null || request.getLearningPreference().isEmpty()) {
-            throw new RuntimeException("请至少选择一个学习偏好");
+            throw new RuntimeException("Please select at least one learning preference");
         }
         if (request.getCourseInterest() == null || request.getCourseInterest().isEmpty()) {
-            throw new RuntimeException("请至少选择一个课程兴趣");
+            throw new RuntimeException("Please select at least one course interest");
         }
 
-        // 唯一性校验
+        // Unique check
         if (userMapper.findByUsername(request.getUsername()) != null) {
-            throw new RuntimeException("用户名已存在");
+            throw new RuntimeException("Username already exists");
         }
         if (userMapper.findByPhone(request.getPhone()) != null) {
-            throw new RuntimeException("手机号已被注册");
+            throw new RuntimeException("Phone number is already registered");
         }
         if (userMapper.findByEmail(request.getEmail()) != null) {
-            throw new RuntimeException("邮箱已被注册");
+            throw new RuntimeException("Email is already registered");
         }
 
         User user = new User();
@@ -96,15 +96,15 @@ public class UserServiceImpl implements UserService {
             if (exceptionMessage != null) {
                 String lowerMessage = exceptionMessage.toLowerCase();
                 if (lowerMessage.contains("username") || lowerMessage.contains("'user.username'")) {
-                    throw new RuntimeException("用户名已存在");
+                    throw new RuntimeException("Username already exists");
                 } else if (lowerMessage.contains("phone") || lowerMessage.contains("'user.phone'")) {
-                    throw new RuntimeException("手机号已被注册");
+                    throw new RuntimeException("Phone number is already registered");
                 } else if (lowerMessage.contains("email") || lowerMessage.contains("'user.email'")) {
-                    throw new RuntimeException("邮箱已被注册");
+                    throw new RuntimeException("Email is already registered");
                 }
             }
             // 如果无法确定具体字段，抛出通用错误
-            throw new RuntimeException("注册信息冲突，请检查用户名、手机号或邮箱是否已被使用");
+            throw new RuntimeException("Registration conflict. Please check if username, phone, or email is already in use");
         } catch (Exception e) {
             // 检查是否是SQL唯一性约束冲突
             Throwable cause = e.getCause();
@@ -130,11 +130,11 @@ public class UserServiceImpl implements UserService {
     public User login(LoginRequest request) {
         User user = userMapper.findByUsernameOrPhone(request.getUsernameOrPhone());
         if (user == null || !user.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("用户名或密码错误");
+            throw new RuntimeException("Invalid username or password");
         }
         // 检查用户状态
         if ("FROZEN".equals(user.getStatus())) {
-            throw new RuntimeException("账号已被冻结，请联系管理员");
+            throw new RuntimeException("Account has been frozen. Please contact administrator");
         }
         return user;
     }
@@ -156,12 +156,22 @@ public class UserServiceImpl implements UserService {
     public void updatePassword(Long userId, String oldPassword, String newPassword) {
         User user = userMapper.findById(userId);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new RuntimeException("User not found");
         }
         if (!user.getPassword().equals(oldPassword)) {
-            throw new RuntimeException("原密码错误");
+            throw new RuntimeException("Incorrect current password");
         }
         userMapper.updatePassword(userId, newPassword);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        User user = userMapper.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("Email is not registered");
+        }
+        userMapper.updatePassword(user.getId(), newPassword);
     }
 
     @Override

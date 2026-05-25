@@ -54,7 +54,7 @@ public class UserController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         User user = userService.getById(userId);
         return ResponseEntity.ok(user);
@@ -70,7 +70,7 @@ public class UserController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         user.setId(userId);
@@ -79,7 +79,7 @@ public class UserController {
         String avatarUrl = user.getAvatarUrl();
         if (avatarUrl != null) {
             if (avatarUrl.startsWith("data:")) {
-                return ResponseEntity.badRequest().body(Map.of("message", "头像不应为 base64 数据，请使用文件上传接口上传图片"));
+                return ResponseEntity.badRequest().body(Map.of("message", "Avatar should not be base64 data. Please use the file upload endpoint"));
             }
             // 与数据库定义保持一致（schema 中为 VARCHAR(2000)），如果项目中列较短，限制更小
             if (avatarUrl.length() > 2000) {
@@ -89,10 +89,10 @@ public class UserController {
 
         try {
             userService.updateUserInfo(user);
-            return ResponseEntity.ok(Map.of("message", "信息更新成功"));
+            return ResponseEntity.ok(Map.of("message", "Profile updated successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "信息更新失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to update profile: " + e.getMessage()));
         }
     }
 
@@ -106,7 +106,7 @@ public class UserController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         String oldPassword = payload.get("oldPassword");
@@ -114,12 +114,12 @@ public class UserController {
 
         if (oldPassword == null || newPassword == null) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "参数不完整"));
+                    .body(Map.of("message", "Incomplete parameters"));
         }
 
         try {
             userService.updatePassword(userId, oldPassword, newPassword);
-            return ResponseEntity.ok(Map.of("message", "密码修改成功"));
+            return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", e.getMessage()));
@@ -134,7 +134,7 @@ public class UserController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
@@ -153,7 +153,7 @@ public class UserController {
             return ResponseEntity.ok(courses);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取课程失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch courses: " + e.getMessage()));
         }
 
 
@@ -173,10 +173,10 @@ public class UserController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (avatar == null || avatar.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "未上传文件"));
+            return ResponseEntity.badRequest().body(Map.of("message", "No file uploaded"));
         }
 
         try {
@@ -198,7 +198,7 @@ public class UserController {
             // 保存文件
             java.io.File targetFile = target.toFile();
             if (targetFile == null) {
-                throw new RuntimeException("无法创建目标文件");
+                throw new RuntimeException("Unable to create target file");
             }
             avatar.transferTo(targetFile);
 
@@ -215,7 +215,7 @@ public class UserController {
             return ResponseEntity.ok(Map.of("avatarUrl", avatarUrl));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "上传失败: " + e.getMessage()));
+                    .body(Map.of("message", "Upload failed: " + e.getMessage()));
         }
     }
 
@@ -228,12 +228,12 @@ public class UserController {
             @RequestParam(required = false) String keyword) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
@@ -245,7 +245,7 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "搜索用户失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to search users: " + e.getMessage()));
         }
     }
 

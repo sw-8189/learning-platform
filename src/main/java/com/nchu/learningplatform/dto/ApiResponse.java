@@ -20,7 +20,7 @@ public class ApiResponse<T> {
      * 成功响应
      */
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, "操作成功", data, 200);
+        return new ApiResponse<>(true, "Operation successful", data, 200);
     }
 
     public static <T> ApiResponse<T> success(String message, T data) {
@@ -28,7 +28,7 @@ public class ApiResponse<T> {
     }
 
     public static ApiResponse<Void> success() {
-        return new ApiResponse<>(true, "操作成功", null, 200);
+        return new ApiResponse<>(true, "Operation successful", null, 200);
     }
 
     /**

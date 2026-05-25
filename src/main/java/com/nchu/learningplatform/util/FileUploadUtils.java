@@ -56,19 +56,19 @@ public class FileUploadUtils {
     public static String uploadFile(MultipartFile file, String uploadDir, String subDir) throws Exception {
         // 验证文件
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("文件不能为空");
+            throw new IllegalArgumentException("File is empty");
         }
         
         // 验证文件大小
         long maxSize = "avatar".equals(subDir) ? MAX_AVATAR_SIZE : MAX_COURSE_COVER_SIZE;
         if (file.getSize() > maxSize) {
-            throw new IllegalArgumentException("文件大小不能超过 " + (maxSize / 1024 / 1024) + "MB");
+            throw new IllegalArgumentException("File size cannot exceed " + (maxSize / 1024 / 1024) + "MB");
         }
         
         // 验证文件类型
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || !isValidImageType(originalFilename)) {
-            throw new IllegalArgumentException("不支持的文件类型，仅支持 JPG、JPEG、PNG、GIF 格式");
+            throw new IllegalArgumentException("Unsupported file type. Only JPG, JPEG, PNG, GIF are supported");
         }
         
         // 解析上传目录
@@ -96,7 +96,7 @@ public class FileUploadUtils {
         Path target = dir.resolve(filename);
         File targetFile = target.toFile();
         if (targetFile == null) {
-            throw new RuntimeException("无法创建目标文件");
+            throw new RuntimeException("Unable to create target file");
         }
         
         file.transferTo(targetFile);
@@ -104,7 +104,7 @@ public class FileUploadUtils {
         // 返回访问路径
         // 格式：/uploads/subDir/filename.ext
         String accessPath = "/uploads/" + (subDir != null ? subDir + "/" : "") + filename;
-        logger.info("文件上传成功: {} -> {}", originalFilename, accessPath);
+        logger.info("File uploaded successfully: {} -> {}", originalFilename, accessPath);
         
         return accessPath;
     }

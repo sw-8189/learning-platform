@@ -47,15 +47,15 @@ public class PasswordUtils {
      */
     public static String getPasswordStrengthHint(String password) {
         if (password == null || password.isEmpty()) {
-            return "请输入密码";
+            return "Please enter a password";
         }
         if (password.length() < 6) {
-            return "密码长度至少6位";
+            return "Password must be at least 6 characters";
         }
         if (!isPasswordStrong(password)) {
-            return "密码应包含字母和数字";
+            return "Password must contain letters and numbers";
         }
-        return "密码强度良好";
+        return "Password strength is good";
     }
     
     /**

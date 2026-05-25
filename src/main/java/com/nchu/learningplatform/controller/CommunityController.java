@@ -31,7 +31,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         try {
@@ -39,7 +39,7 @@ public class CommunityController {
             return ResponseEntity.ok(createdPost);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "发布失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to publish: " + e.getMessage()));
         }
     }
 
@@ -50,7 +50,7 @@ public class CommunityController {
         Post post = communityService.getPostById(id, userId);
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "帖子不存在"));
+                    .body(Map.of("message", "Post not found"));
         }
         return ResponseEntity.ok(post);
     }
@@ -86,7 +86,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         try {
@@ -108,10 +108,10 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (file == null || file.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "上传文件不能为空"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Upload file cannot be empty"));
         }
         try {
             // 将附件保存到 uploads/community 目录
@@ -130,20 +130,20 @@ public class CommunityController {
             java.io.File targetFile = target.toFile();
             if (targetFile == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("message", "无法创建目标文件"));
+                        .body(Map.of("message", "Unable to create target file"));
             }
             file.transferTo(targetFile);
 
             String url = "/uploads/community/" + newName;
             return ResponseEntity.ok(Map.of(
-                    "message", "附件上传成功",
+                    "message", "Attachment uploaded successfully",
                     "url", url,
                     "fileName", originalName != null ? originalName : newName
             ));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "附件上传失败: " + e.getMessage()));
+                    .body(Map.of("message", "Attachment upload failed: " + e.getMessage()));
         }
     }
 
@@ -153,12 +153,12 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         try {
             communityService.deletePost(id, userId);
-            return ResponseEntity.ok(Map.of("message", "删除成功"));
+            return ResponseEntity.ok(Map.of("message", "Deleted successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", e.getMessage()));
@@ -173,11 +173,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.likePost(id, userId);
-        return ResponseEntity.ok(Map.of("message", "点赞成功"));
+        return ResponseEntity.ok(Map.of("message", "Liked successfully"));
     }
 
     @DeleteMapping("/posts/{id}/like")
@@ -186,11 +186,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.unlikePost(id, userId);
-        return ResponseEntity.ok(Map.of("message", "取消点赞成功"));
+        return ResponseEntity.ok(Map.of("message", "Unliked successfully"));
     }
 
     // ========== 收藏相关 ==========
@@ -201,11 +201,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.favoritePost(id, userId);
-        return ResponseEntity.ok(Map.of("message", "收藏成功"));
+        return ResponseEntity.ok(Map.of("message", "Bookmarked successfully"));
     }
 
     @DeleteMapping("/posts/{id}/favorite")
@@ -214,11 +214,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.unfavoritePost(id, userId);
-        return ResponseEntity.ok(Map.of("message", "取消收藏成功"));
+        return ResponseEntity.ok(Map.of("message", "Bookmark removed successfully"));
     }
     
     @GetMapping("/posts/favorites")
@@ -229,7 +229,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         PageResult<Post> result = communityService.getFavoritePosts(userId, page, size);
         return ResponseEntity.ok(result);
@@ -243,7 +243,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         PageResult<Post> result = communityService.getLikedPosts(userId, page, size);
         return ResponseEntity.ok(result);
@@ -257,7 +257,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         try {
@@ -265,7 +265,7 @@ public class CommunityController {
             return ResponseEntity.ok(createdComment);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "评论失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to comment: " + e.getMessage()));
         }
     }
 
@@ -284,7 +284,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         try {
@@ -302,12 +302,12 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         try {
             communityService.deleteComment(id, userId);
-            return ResponseEntity.ok(Map.of("message", "删除成功"));
+            return ResponseEntity.ok(Map.of("message", "Deleted successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", e.getMessage()));
@@ -320,11 +320,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.likeComment(id, userId);
-        return ResponseEntity.ok(Map.of("message", "点赞成功"));
+        return ResponseEntity.ok(Map.of("message", "Liked successfully"));
     }
 
     @DeleteMapping("/comments/{id}/like")
@@ -333,11 +333,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.unlikeComment(id, userId);
-        return ResponseEntity.ok(Map.of("message", "取消点赞成功"));
+        return ResponseEntity.ok(Map.of("message", "Unliked successfully"));
     }
 
     @PostMapping("/comments/{id}/best-answer")
@@ -347,12 +347,12 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         try {
             communityService.setBestAnswer(id, postId, userId);
-            return ResponseEntity.ok(Map.of("message", "设置成功"));
+            return ResponseEntity.ok(Map.of("message", "Set successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", e.getMessage()));
@@ -367,11 +367,11 @@ public class CommunityController {
         Long followerId = authController.getUserIdByToken(token);
         if (followerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.followUser(followerId, userId);
-        return ResponseEntity.ok(Map.of("message", "关注成功"));
+        return ResponseEntity.ok(Map.of("message", "Followed successfully"));
     }
 
     @DeleteMapping("/users/{userId}/follow")
@@ -380,11 +380,11 @@ public class CommunityController {
         Long followerId = authController.getUserIdByToken(token);
         if (followerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.unfollowUser(followerId, userId);
-        return ResponseEntity.ok(Map.of("message", "取消关注成功"));
+        return ResponseEntity.ok(Map.of("message", "Unfollowed successfully"));
     }
 
     // ========== 通知相关 ==========
@@ -396,7 +396,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         List<Notification> notifications = communityService.getNotifications(userId, limit);
@@ -408,7 +408,7 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         int count = communityService.getUnreadNotificationCount(userId);
@@ -421,11 +421,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.markNotificationAsRead(id, userId);
-        return ResponseEntity.ok(Map.of("message", "已标记为已读"));
+        return ResponseEntity.ok(Map.of("message", "Marked as read"));
     }
 
     @PutMapping("/notifications/read-all")
@@ -433,11 +433,11 @@ public class CommunityController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         
         communityService.markAllNotificationsAsRead(userId);
-        return ResponseEntity.ok(Map.of("message", "全部标记为已读"));
+        return ResponseEntity.ok(Map.of("message", "All marked as read"));
     }
 }
 

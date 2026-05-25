@@ -29,8 +29,8 @@
 
         <!-- Main Function Area (Scrollable) -->
         <div class="sidebar-content" ref="sidebarContent">
-            <!-- Module 1: Personal Info (Parent + Submodules) -->
-            <div class="sidebar-module">
+            <!-- Module 1: Personal Info (Parent + Submodules) - Hidden for Admin -->
+            <div class="sidebar-module" v-if="user.role !== 'ADMIN'">
                 <div class="module-title" v-show="!sidebarCollapsed">Personal Info</div>
                 <div class="sidebar-parent" 
                      :class="{expanded: profileExpanded, active: activeTab === 'profile'}"
@@ -87,10 +87,10 @@
             </div>
 
             <!-- 分隔线 -->
-            <div class="sidebar-divider" v-show="!sidebarCollapsed"></div>
+            <div class="sidebar-divider" v-show="!sidebarCollapsed && user.role !== 'ADMIN'"></div>
 
-            <!-- Module 2: Core Functions (First-level Menu Items) -->
-            <div class="sidebar-module core-module">
+            <!-- Module 2: Core Functions (First-level Menu Items) - Hidden for Admin -->
+            <div class="sidebar-module core-module" v-if="user.role !== 'ADMIN'">
                 <div class="sidebar-item core-item" 
                      :class="{active: activeTab === 'course-center', loading: courseLoading}"
                      @click="switchTab('course-center')"
@@ -533,21 +533,21 @@
         <!-- Daily Check-in -->
         <section v-show="activeTab === 'profile' && activeSubTab === 'profile-checkin'" class="tab-panel active glass-panel">
             <h2 class="panel-title">Daily Check-in</h2>
-            <p class="panel-subtitle">Record each study day and keep your learning streak visible.</p>
+            <p class="panel-subtitle">Mark each study day and keep your learning streak visible.</p>
 
             <div class="checkin-dashboard">
                 <div class="checkin-hero">
                     <div>
                         <span class="checkin-eyebrow">Today's Learning</span>
-                        <h3>{{ checkInSummary && checkInSummary.checkedToday ? 'Checked in for today' : 'Ready after your study session' }}</h3>
+                        <h3>{{ checkInSummary && checkInSummary.checkedToday ? 'Checked in for today' : 'Ready to check in?' }}</h3>
                         <p>{{ checkInSummary ? checkInSummary.reminder : 'Loading your check-in status...' }}</p>
                     </div>
-                    <button 
-                        type="button" 
-                        class="primary-btn checkin-action-btn" 
-                        @click="submitStudyCheckIn" 
+                    <button
+                        type="button"
+                        class="primary-btn checkin-action-btn"
+                        @click="submitStudyCheckIn"
                         :disabled="checkInLoading || checkInSubmitting || (checkInSummary && checkInSummary.checkedToday)">
-                        {{ checkInSubmitting ? 'Checking in...' : (checkInSummary && checkInSummary.checkedToday ? 'Completed Today' : 'Check In Today') }}
+                        {{ checkInSubmitting ? 'Checking in...' : (checkInSummary && checkInSummary.checkedToday ? 'Completed' : 'Check In') }}
                     </button>
                 </div>
 
@@ -565,72 +565,47 @@
                         <p>{{ checkInNotice }}</p>
                     </div>
 
-                    <div class="checkin-content">
-                        <div class="checkin-metrics">
-                            <div class="checkin-metric">
-                                <span class="metric-label">Streak</span>
-                                <strong>{{ checkInSummary ? checkInSummary.streakDays : 0 }}</strong>
-                                <span class="metric-tip">consecutive days</span>
+                    <div class="checkin-metrics">
+                        <div class="checkin-metric">
+                            <span class="metric-label">Streak</span>
+                            <strong>{{ checkInSummary ? checkInSummary.streakDays : 0 }}</strong>
+                            <span class="metric-tip">consecutive days</span>
+                        </div>
+                        <div class="checkin-metric">
+                            <span class="metric-label">This Week</span>
+                            <strong>{{ checkInSummary ? checkInSummary.thisWeekDays : 0 }}/{{ checkInSummary ? checkInSummary.weekGoal : 5 }}</strong>
+                            <span class="metric-tip">active learning days</span>
+                        </div>
+                        <div class="checkin-metric">
+                            <span class="metric-label">Today</span>
+                            <strong>{{ checkInSummary && checkInSummary.checkedToday ? 'Done' : 'Open' }}</strong>
+                            <span class="metric-tip">check-in status</span>
+                        </div>
+                    </div>
+
+                    <div class="checkin-heatmap-card">
+                        <div class="chart-card-header">
+                            <h4>Learning Calendar</h4>
+                            <span>Last 14 weeks</span>
+                        </div>
+                        <div class="heatmap-shell">
+                            <div class="heatmap-weekdays">
+                                <span v-for="day in checkInWeekDays" :key="day">{{ day }}</span>
                             </div>
-                            <div class="checkin-metric">
-                                <span class="metric-label">This Week</span>
-                                <strong>{{ checkInSummary ? checkInSummary.thisWeekDays : 0 }}/{{ checkInSummary ? checkInSummary.weekGoal : 5 }}</strong>
-                                <span class="metric-tip">active learning days</span>
-                            </div>
-                            <div class="checkin-metric">
-                                <span class="metric-label">Today</span>
-                                <strong>{{ checkInSummary && checkInSummary.checkedToday ? 'Done' : 'Open' }}</strong>
-                                <span class="metric-tip">check-in status</span>
+                            <div class="checkin-heatmap">
+                                <span
+                                    v-for="day in checkInHeatmap"
+                                    :key="day.date"
+                                    :class="['heatmap-day', getHeatmapLevel(day), { today: day.date === todayDate }]"
+                                    :title="getHeatmapDayTitle(day)">
+                                </span>
                             </div>
                         </div>
-
-                        <div class="checkin-form">
-                            <label class="form-label" for="checkInMinutes">Study Minutes</label>
-                            <input 
-                                id="checkInMinutes" 
-                                type="number" 
-                                min="0" 
-                                max="1440" 
-                                v-model.number="checkInMinutes" 
-                                class="form-input"
-                                :disabled="checkInSummary && checkInSummary.checkedToday">
-                            <label class="form-label" for="checkInNote">Study Note</label>
-                            <textarea 
-                                id="checkInNote" 
-                                v-model="checkInNote" 
-                                rows="3" 
-                                maxlength="255" 
-                                class="form-textarea" 
-                                placeholder="What did you learn today?"
-                                :disabled="checkInSummary && checkInSummary.checkedToday"></textarea>
-                        </div>
-
-                        <div class="checkin-heatmap-card">
-                            <div class="chart-card-header">
-                                <h4>Learning Calendar</h4>
-                                <span>Last 14 weeks</span>
-                            </div>
-                            <div class="heatmap-shell">
-                                <div class="heatmap-weekdays">
-                                    <span v-for="day in checkInWeekDays" :key="day">{{ day }}</span>
-                                </div>
-                                <div class="checkin-heatmap">
-                                    <span 
-                                        v-for="day in checkInHeatmap" 
-                                        :key="day.date"
-                                        :class="['heatmap-day', getHeatmapLevel(day), { today: day.date === todayDate }]"
-                                        :title="getHeatmapDayTitle(day)">
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="heatmap-legend">
-                                <span>Less</span>
-                                <span class="heatmap-day"></span>
-                                <span class="heatmap-day level-1"></span>
-                                <span class="heatmap-day level-2"></span>
-                                <span class="heatmap-day level-3"></span>
-                                <span>More</span>
-                            </div>
+                        <div class="heatmap-legend">
+                            <span>Absent</span>
+                            <span class="heatmap-day"></span>
+                            <span class="heatmap-day level-1"></span>
+                            <span>Present</span>
                         </div>
                     </div>
                 </div>

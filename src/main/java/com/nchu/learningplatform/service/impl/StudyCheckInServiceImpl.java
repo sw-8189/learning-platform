@@ -50,6 +50,11 @@ public class StudyCheckInServiceImpl implements StudyCheckInService {
         summary.put("reminder", buildReminder(checkedToday, checkedYesterday, streakDays));
         summary.put("heatmap", buildHeatmap(startDate, today, checkInByDate));
         summary.put("weekDays", List.of("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
+
+        StudyCheckIn todayCheckIn = checkInByDate.get(today);
+        summary.put("todayStudyMinutes", todayCheckIn != null ? todayCheckIn.getStudyMinutes() : 0);
+        summary.put("todayNote", todayCheckIn != null ? todayCheckIn.getNote() : "");
+
         return summary;
     }
 
@@ -64,6 +69,10 @@ public class StudyCheckInServiceImpl implements StudyCheckInService {
             checkIn.setStudyMinutes(normalizeStudyMinutes(studyMinutes));
             checkIn.setNote(normalizeNote(note));
             studyCheckInMapper.insert(checkIn);
+        } else {
+            existing.setStudyMinutes(normalizeStudyMinutes(studyMinutes));
+            existing.setNote(normalizeNote(note));
+            studyCheckInMapper.update(existing);
         }
         return getSummary(userId);
     }

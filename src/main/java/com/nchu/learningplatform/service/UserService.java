@@ -17,6 +17,8 @@ public interface UserService {
 
     void updatePassword(Long userId, String oldPassword, String newPassword);
 
+    void resetPassword(String email, String newPassword);
+
     /**
      * 检查邮箱是否已存在
      * @param email 邮箱

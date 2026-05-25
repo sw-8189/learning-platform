@@ -21,6 +21,14 @@
         VALUES (#{userId}, #{checkInDate}, #{studyMinutes}, #{note})
     </insert>
 
+    <update id="update" parameterType="com.nchu.learningplatform.entity.StudyCheckIn">
+        UPDATE study_check_in
+        SET study_minutes = #{studyMinutes},
+            note = #{note},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
     <select id="findByUserIdAndDate" resultMap="StudyCheckInResultMap">
         SELECT
             id,

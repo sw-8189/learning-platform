@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -45,4 +46,7 @@ public interface UserMapper {
 
     // 重置AUTO_INCREMENT，使其等于指定值
     void resetAutoIncrement(@Param("nextId") Long nextId);
+
+    // 按月统计注册用户数
+    List<Map<String, Object>> countUsersByMonth();
 }

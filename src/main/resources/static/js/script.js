@@ -48,7 +48,7 @@ const validators = {
     },
     password: value => {
         if (!value) return { ok: false, msg: 'Password is required' };
-        if (value.length < 4 || value.length > 8) return { ok: false, msg: 'Use 4-8 characters' };
+        if (value.length < 6) return { ok: false, msg: 'Use at least 6 characters' };
         if (!/[a-zA-Z]/.test(value) || !/\d/.test(value)) return { ok: false, msg: 'Must contain letters and numbers' };
         return { ok: true, msg: 'Password format is valid' };
     }

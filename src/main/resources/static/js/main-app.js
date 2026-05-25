@@ -196,8 +196,6 @@ new Vue({
             checkInError: '',
             checkInNotice: '',
             checkInSubmitting: false,
-            checkInMinutes: 30,
-            checkInNote: '',
             checkInWeekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             todayDate: '',
             // 管理后台相关
@@ -503,6 +501,15 @@ new Vue({
                     headers: { Authorization: this.token }
                 });
                 this.user = response.data;
+
+                // Admin: switch to admin dashboard, skip user-only data loading
+                if (this.user.role === 'ADMIN') {
+                    this.activeTab = 'admin';
+                    this.activeSubTab = 'admin-users';
+                    this.adminExpanded = true;
+                    return;
+                }
+
                 // 保证 editUser 的学习偏好与课程兴趣以数组形式绑定到复选框（若为字符串则切分）
                 this.editUser = {
                     ...this.user,
@@ -670,17 +677,11 @@ new Vue({
             }
         },
         async submitStudyCheckIn() {
-            if (this.checkInSummary && this.checkInSummary.checkedToday) {
-                return;
-            }
             if (!this.token) {
                 this.checkInError = 'Please sign in to use daily check-in.';
                 return;
             }
-
-            const minutes = Number(this.checkInMinutes || 0);
-            if (!Number.isFinite(minutes) || minutes < 0 || minutes > 1440) {
-                this.checkInError = 'Study minutes must be between 0 and 1440.';
+            if (this.checkInSummary && this.checkInSummary.checkedToday) {
                 return;
             }
 
@@ -688,14 +689,10 @@ new Vue({
             this.checkInError = '';
             this.checkInNotice = '';
             try {
-                const response = await axios.post('/api/check-ins/today', {
-                    studyMinutes: Math.round(minutes),
-                    note: this.checkInNote || ''
-                }, {
+                const response = await axios.post('/api/check-ins/today', {}, {
                     headers: { Authorization: this.token }
                 });
                 this.checkInSummary = response.data || null;
-                this.checkInNote = '';
                 this.checkInNotice = 'Check-in completed!';
             } catch (error) {
                 console.error('Check-in failed:', error);
@@ -706,18 +703,11 @@ new Vue({
         },
         getHeatmapLevel(day) {
             if (!day || !day.checked) return '';
-            const minutes = day.studyMinutes || 0;
-            if (minutes >= 90) return 'level-3';
-            if (minutes >= 30) return 'level-2';
             return 'level-1';
         },
         getHeatmapDayTitle(day) {
             if (!day) return '';
-            if (!day.checked) {
-                return `${day.date}: no check-in`;
-            }
-            const minutes = day.studyMinutes || 0;
-            return `${day.date}: checked in${minutes ? `, ${minutes} min` : ''}`;
+            return day.checked ? `${day.date}: checked in` : `${day.date}: no check-in`;
         },
         getTodayDateString() {
             const today = new Date();
@@ -1778,10 +1768,10 @@ new Vue({
                 return;
             }
 
-            // 与注册时保持一致的密码验证逻辑：4-8位，需同时包含字母和数字
+            // 与注册时保持一致的密码验证逻辑：至少6位，需同时包含字母和数字
             const newPwd = this.passwordForm.newPassword;
-            if (newPwd.length < 4 || newPwd.length > 8) {
-                alert('New password must be 4-8 characters');
+            if (newPwd.length < 6) {
+                alert('New password must be at least 6 characters');
                 return;
             }
 
@@ -1810,7 +1800,16 @@ new Vue({
             }
         },
 
-        logout() {
+        async logout() {
+            try {
+                if (this.token) {
+                    await axios.post('/api/auth/logout', {}, {
+                        headers: { Authorization: this.token }
+                    });
+                }
+            } catch (e) {
+                // Ignore logout errors
+            }
             localStorage.removeItem('token');
             window.location.href = 'login.html';
         },
@@ -2926,8 +2925,8 @@ new Vue({
         this.courseDetail = null;
         this.showCreatePostModal = false;
         this.showNotificationPanel = false;
-        this.activeTab = 'profile'; // 确保默认显示个人中心
-        this.activeSubTab = 'profile-info'; // 确保默认显示我的信息
+        this.activeTab = 'profile';
+        this.activeSubTab = 'profile-info';
         this.todayDate = this.getTodayDateString();
         
         // 强制设置为null（防止任何意外情况）

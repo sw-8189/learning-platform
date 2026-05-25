@@ -161,10 +161,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.passwordError = 'The two new passwords do not match';
                     return;
                 }
-                // 密码规则：4-8 位，必须包含字母和数字
-                const pwdRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,8}$/;
+                // 密码规则：至少6位，必须包含字母和数字
+                const pwdRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
                 if (!pwdRegex.test(newPassword)) {
-                    this.passwordError = 'The new password must be 4-8 characters and include both letters and numbers';
+                    this.passwordError = 'The new password must be at least 6 characters and include both letters and numbers';
                     return;
                 }
 
@@ -242,7 +242,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.loadCourses();
                 }
             },
-            logout() {
+            async logout() {
+                try {
+                    if (this.token) {
+                        await axios.post('/api/auth/logout', {}, {
+                            headers: { Authorization: this.token }
+                        });
+                    }
+                } catch (e) { /* ignore */ }
                 localStorage.removeItem('token');
                 alert('Logged out');
                 window.location.href = 'login.html';

@@ -33,7 +33,7 @@ public class StatisticsController {
         Long userId = authController.getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
@@ -42,7 +42,7 @@ public class StatisticsController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取学习统计失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch learning statistics: " + e.getMessage()));
         }
     }
 }

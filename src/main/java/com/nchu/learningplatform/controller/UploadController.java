@@ -28,20 +28,20 @@ public class UploadController {
         Map<String, Object> res = new HashMap<>();
         if (file == null || file.isEmpty()) {
             res.put("valid", false);
-            res.put("message", "文件为空");
+            res.put("message", "File is empty");
             return ResponseEntity.ok(res);
         }
 
         if (file.getSize() > MAX_SIZE) {
             res.put("valid", false);
-            res.put("message", "图片大小不能超过 5MB");
+            res.put("message", "Image size cannot exceed 5MB");
             return ResponseEntity.ok(res);
         }
 
         String originalFilename = file.getOriginalFilename();
         if (!FileUploadUtils.isValidImageType(originalFilename)) {
             res.put("valid", false);
-            res.put("message", "不支持的图片格式，仅支持 JPG/JPEG/PNG/GIF");
+            res.put("message", "Unsupported image format. Only JPG/JPEG/PNG/GIF are supported");
             return ResponseEntity.ok(res);
         }
 
@@ -49,7 +49,7 @@ public class UploadController {
             BufferedImage img = ImageIO.read(in);
             if (img == null) {
                 res.put("valid", false);
-                res.put("message", "无法识别的图片或图片已损坏");
+                res.put("message", "Unable to recognize the image or the image is corrupted");
                 return ResponseEntity.ok(res);
             }
             int w = img.getWidth();
@@ -58,16 +58,16 @@ public class UploadController {
             res.put("height", h);
             if (w < MIN_WIDTH || h < MIN_HEIGHT) {
                 res.put("valid", false);
-                res.put("message", String.format("图片尺寸过小，至少 %dx%d", MIN_WIDTH, MIN_HEIGHT));
+                res.put("message", String.format("Image dimensions too small. Minimum %dx%d required", MIN_WIDTH, MIN_HEIGHT));
                 return ResponseEntity.ok(res);
             }
 
             res.put("valid", true);
-            res.put("message", "校验通过");
+            res.put("message", "Validation passed");
             return ResponseEntity.ok(res);
         } catch (Exception e) {
             res.put("valid", false);
-            res.put("message", "校验过程出错");
+            res.put("message", "Validation error occurred");
             return ResponseEntity.ok(res);
         }
     }
@@ -76,7 +76,7 @@ public class UploadController {
     public ResponseEntity<Map<String, Object>> uploadImage(@RequestParam("file") MultipartFile file) {
         Map<String, Object> res = new HashMap<>();
         if (file == null || file.isEmpty()) {
-            res.put("error", "文件为空");
+            res.put("error", "File is empty");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         }
 
@@ -89,7 +89,7 @@ public class UploadController {
             res.put("error", iae.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         } catch (Exception e) {
-            res.put("error", "保存失败: " + e.getMessage());
+            res.put("error", "Upload failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }

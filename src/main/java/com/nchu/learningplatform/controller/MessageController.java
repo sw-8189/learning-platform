@@ -45,7 +45,7 @@ public class MessageController {
         Long senderId = getUserIdByToken(token);
         if (senderId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
@@ -54,7 +54,7 @@ public class MessageController {
             
             if (content == null || content.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
-                        .body(Map.of("message", "消息内容不能为空"));
+                        .body(Map.of("message", "Message content cannot be empty"));
             }
 
             Message message = messageService.sendMessage(senderId, receiverId, content);
@@ -62,7 +62,7 @@ public class MessageController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "发送消息失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to send message: " + e.getMessage()));
         }
     }
 
@@ -76,7 +76,7 @@ public class MessageController {
         Long userId = getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
@@ -87,7 +87,7 @@ public class MessageController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取会话失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch conversation: " + e.getMessage()));
         }
     }
 
@@ -100,7 +100,7 @@ public class MessageController {
         Long userId = getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
@@ -109,7 +109,7 @@ public class MessageController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取会话列表失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch conversation list: " + e.getMessage()));
         }
     }
 
@@ -122,7 +122,7 @@ public class MessageController {
         Long userId = getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
@@ -131,7 +131,7 @@ public class MessageController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取未读消息数量失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch unread message count: " + e.getMessage()));
         }
     }
     
@@ -145,16 +145,16 @@ public class MessageController {
         Long userId = getUserIdByToken(token);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
 
         try {
             messageService.markMessageAsRead(messageId, userId);
-            return ResponseEntity.ok(Map.of("message", "消息已标记为已读"));
+            return ResponseEntity.ok(Map.of("message", "Message marked as read"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "标记消息失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to mark message: " + e.getMessage()));
         }
     }
 }

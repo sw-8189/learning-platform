@@ -147,7 +147,7 @@ public class CommunityServiceImpl implements CommunityService {
     public Post updatePost(Long postId, Long userId, Post post) {
         Post existingPost = postMapper.findById(postId, userId);
         if (existingPost == null || !existingPost.getUserId().equals(userId)) {
-            throw new RuntimeException("无权修改此帖子");
+            throw new RuntimeException("You do not have permission to edit this post");
         }
         
         post.setId(postId);
@@ -160,7 +160,7 @@ public class CommunityServiceImpl implements CommunityService {
     public void deletePost(Long postId, Long userId) {
         Post post = postMapper.findById(postId, userId);
         if (post == null || !post.getUserId().equals(userId)) {
-            throw new RuntimeException("无权删除此帖子");
+            throw new RuntimeException("You do not have permission to delete this post");
         }
         postMapper.delete(postId);
     }
@@ -182,7 +182,7 @@ public class CommunityServiceImpl implements CommunityService {
         // 创建通知
         Post post = postMapper.findById(postId, userId);
         if (post != null && !post.getUserId().equals(userId)) {
-            createNotification(post.getUserId(), "like", postId, userId, "点赞了你的帖子");
+            createNotification(post.getUserId(), "like", postId, userId, "liked your post");
         }
     }
 
@@ -290,7 +290,7 @@ public class CommunityServiceImpl implements CommunityService {
         // 创建通知
         Post post = postMapper.findById(comment.getPostId(), userId);
         if (post != null && !post.getUserId().equals(userId)) {
-            String content = comment.getParentId() == null ? "评论了你的帖子" : "回复了你的评论";
+            String content = comment.getParentId() == null ? "commented on your post" : "replied to your comment";
             createNotification(post.getUserId(), "comment", comment.getPostId(), userId, content);
         }
         
@@ -298,7 +298,7 @@ public class CommunityServiceImpl implements CommunityService {
         if (comment.getParentId() != null) {
             Comment parentComment = commentMapper.findById(comment.getParentId());
             if (parentComment != null && !parentComment.getUserId().equals(userId)) {
-                createNotification(parentComment.getUserId(), "reply", comment.getPostId(), userId, "回复了你的评论");
+                createNotification(parentComment.getUserId(), "reply", comment.getPostId(), userId, "replied to your comment");
             }
         }
         
@@ -332,7 +332,7 @@ public class CommunityServiceImpl implements CommunityService {
     public Comment updateComment(Long commentId, Long userId, Comment comment) {
         Comment existing = commentMapper.findById(commentId);
         if (existing == null || !existing.getUserId().equals(userId)) {
-            throw new RuntimeException("无权修改此评论");
+            throw new RuntimeException("You do not have permission to edit this comment");
         }
         
         comment.setId(commentId);
@@ -345,7 +345,7 @@ public class CommunityServiceImpl implements CommunityService {
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = commentMapper.findById(commentId);
         if (comment == null || !comment.getUserId().equals(userId)) {
-            throw new RuntimeException("无权删除此评论");
+            throw new RuntimeException("You do not have permission to delete this comment");
         }
         Long postId = comment.getPostId();
         commentMapper.delete(commentId);
@@ -362,7 +362,7 @@ public class CommunityServiceImpl implements CommunityService {
     public void setBestAnswer(Long commentId, Long postId, Long userId) {
         Post post = postMapper.findById(postId, userId);
         if (post == null || !post.getUserId().equals(userId) || !"question".equals(post.getType())) {
-            throw new RuntimeException("无权设置最佳回答");
+            throw new RuntimeException("You do not have permission to set best answer");
         }
         
         commentMapper.unsetBestAnswer(postId);
@@ -373,7 +373,7 @@ public class CommunityServiceImpl implements CommunityService {
         // 通知评论作者
         Comment comment = commentMapper.findById(commentId);
         if (comment != null) {
-            createNotification(comment.getUserId(), "best_answer", postId, userId, "你的回答被采纳为最佳答案");
+            createNotification(comment.getUserId(), "best_answer", postId, userId, "Your answer was selected as the best answer");
         }
     }
 
@@ -395,7 +395,7 @@ public class CommunityServiceImpl implements CommunityService {
         followMapper.insert(follow);
         
         // 创建通知
-        createNotification(followingId, "follow", null, followerId, "关注了你");
+        createNotification(followingId, "follow", null, followerId, "started following you");
     }
 
     @Override

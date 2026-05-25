@@ -57,11 +57,11 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
@@ -70,7 +70,7 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取用户列表失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch user list: " + e.getMessage()));
         }
     }
 
@@ -84,18 +84,18 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
             User user = adminService.getUserById(id);
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "用户不存在"));
+                        .body(Map.of("message", "User not found"));
             }
             // 不返回密码
             user.setPassword(null);
@@ -103,7 +103,7 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取用户详情失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch user details: " + e.getMessage()));
         }
     }
 
@@ -117,20 +117,20 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
             adminService.deleteUser(id);
-            return ResponseEntity.ok(Map.of("message", "用户删除成功"));
+            return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "删除用户失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to delete user: " + e.getMessage()));
         }
     }
 
@@ -144,20 +144,20 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
             adminService.freezeUser(id);
-            return ResponseEntity.ok(Map.of("message", "用户已冻结"));
+            return ResponseEntity.ok(Map.of("message", "User has been frozen"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "冻结用户失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to freeze user: " + e.getMessage()));
         }
     }
 
@@ -171,20 +171,20 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
             adminService.unfreezeUser(id);
-            return ResponseEntity.ok(Map.of("message", "用户已恢复"));
+            return ResponseEntity.ok(Map.of("message", "User has been restored"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "恢复用户失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to restore user: " + e.getMessage()));
         }
     }
 
@@ -202,11 +202,11 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
@@ -215,7 +215,7 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取课程列表失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch course list: " + e.getMessage()));
         }
     }
 
@@ -241,22 +241,22 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
             Course course = adminService.addCourse(cover, title, description, detailDescription,
                     level, category, teacher, teacherIntro, price, tags, courseOutline,
                     courseImages, duration);
-            return ResponseEntity.ok(Map.of("message", "课程添加成功", "course", course));
+            return ResponseEntity.ok(Map.of("message", "Course added successfully", "course", course));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "添加课程失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to add course: " + e.getMessage()));
         }
     }
 
@@ -283,22 +283,22 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
             Course course = adminService.updateCourse(id, cover, title, description, detailDescription,
                     level, category, teacher, teacherIntro, price, tags, courseOutline,
                     courseImages, duration);
-            return ResponseEntity.ok(Map.of("message", "课程更新成功", "course", course));
+            return ResponseEntity.ok(Map.of("message", "Course updated successfully", "course", course));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "更新课程失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to update course: " + e.getMessage()));
         }
     }
 
@@ -312,25 +312,25 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
             Long adminId = authController.getUserIdByToken(token);
             if (adminId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "无法获取管理员信息"));
+                        .body(Map.of("message", "Unable to retrieve admin information"));
             }
             adminService.deleteCourse(id, adminId);
-            return ResponseEntity.ok(Map.of("message", "课程删除成功，已通知相关用户"));
+            return ResponseEntity.ok(Map.of("message", "Course deleted successfully. Affected users have been notified"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "删除课程失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to delete course: " + e.getMessage()));
         }
     }
 
@@ -345,11 +345,11 @@ public class AdminController {
     ) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
@@ -358,7 +358,7 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "获取统计数据失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to fetch statistics: " + e.getMessage()));
         }
     }
 
@@ -373,11 +373,11 @@ public class AdminController {
             @RequestBody Map<String, String> payload) {
         if (token == null || token.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "未登录或登录已失效"));
+                    .body(Map.of("message", "Not logged in or session expired"));
         }
         if (!checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "无权限访问，仅管理员可访问"));
+                    .body(Map.of("message", "Access denied. Admin privileges required"));
         }
 
         try {
@@ -386,22 +386,22 @@ public class AdminController {
 
             if (title == null || title.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
-                        .body(Map.of("message", "公告标题不能为空"));
+                        .body(Map.of("message", "Announcement title cannot be empty"));
             }
 
             if (content == null || content.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
-                        .body(Map.of("message", "公告内容不能为空"));
+                        .body(Map.of("message", "Announcement content cannot be empty"));
             }
 
             Long adminId = authController.getUserIdByToken(token);
             adminService.sendAnnouncementToAllUsers(title.trim(), content.trim(), adminId);
 
-            return ResponseEntity.ok(Map.of("message", "公告发送成功"));
+            return ResponseEntity.ok(Map.of("message", "Announcement sent successfully"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "发送公告失败: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to send announcement: " + e.getMessage()));
         }
     }
 }

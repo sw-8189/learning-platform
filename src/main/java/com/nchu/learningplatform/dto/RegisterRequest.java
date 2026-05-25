@@ -14,30 +14,30 @@ public class RegisterRequest {
     /** 头像 URL（可空） */
     private String avatarUrl;
 
-    @NotBlank(message = "用户名不能为空")
+    @NotBlank(message = "Username is required")
     private String username;
 
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Invalid phone number format")
     private String phone;
 
-    @Email(message = "邮箱格式不正确")
+    @Email(message = "Invalid email format")
     private String email;
 
-    @NotBlank(message = "密码不能为空")
+    @NotBlank(message = "Password is required")
     private String password;
 
-    /** 性别 */
-    @NotBlank(message = "性别不能为空")
+    /** Gender */
+    @NotBlank(message = "Gender is required")
     private String gender;
 
-    /** 学习偏好（可多选） */
+    /** Learning Preferences (multiple selection) */
     private List<String> learningPreference;
 
-    /** 课程兴趣（可多选） */
+    /** Course Interests (multiple selection) */
     private List<String> courseInterest;
 
-    /** 学习目标（单选） */
-    @NotBlank(message = "学习目标不能为空")
+    /** Learning Goal (single selection) */
+    @NotBlank(message = "Learning goal is required")
     private String learningGoal;
 
     /** 用户角色：USER（普通用户）或 ADMIN（管理员），默认为USER */

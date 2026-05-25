@@ -19,10 +19,10 @@ public class LearningPlatformApplication {
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().browse(new URI(url));
             } else {
-                System.out.println("请在浏览器中访问: " + url);
+                System.out.println("Please open your browser and visit: " + url);
             }
         } catch (Exception e) {
-            System.out.println("无法自动打开浏览器，请手动访问 http://localhost:8080/index.html");
+            System.out.println("Unable to open browser automatically. Please visit http://localhost:8080/index.html manually");
         }
     }
 }

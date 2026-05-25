@@ -95,7 +95,7 @@ public class AdminServiceImpl implements AdminService {
             userMapper.resetAutoIncrement(maxId + 1);
         } catch (Exception e) {
             // 如果重置失败，记录日志但不影响删除操作
-            System.err.println("重置AUTO_INCREMENT失败: " + e.getMessage());
+            System.err.println("Failed to reset AUTO_INCREMENT: " + e.getMessage());
         }
     }
 
@@ -104,10 +104,10 @@ public class AdminServiceImpl implements AdminService {
     public void freezeUser(Long id) {
         User user = userMapper.findById(id);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new RuntimeException("User not found");
         }
         if ("ADMIN".equals(user.getRole())) {
-            throw new RuntimeException("不能冻结管理员账号");
+            throw new RuntimeException("Cannot freeze admin accounts");
         }
         userMapper.updateStatus(id, "FROZEN");
     }
@@ -117,7 +117,7 @@ public class AdminServiceImpl implements AdminService {
     public void unfreezeUser(Long id) {
         User user = userMapper.findById(id);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new RuntimeException("User not found");
         }
         userMapper.updateStatus(id, "ACTIVE");
     }
@@ -140,7 +140,7 @@ public class AdminServiceImpl implements AdminService {
                             String duration) {
         // 参数验证
         if (title == null || title.trim().isEmpty()) {
-            throw new RuntimeException("课程标题不能为空");
+            throw new RuntimeException("Course title is required");
         }
 
         Course course = new Course();
@@ -165,7 +165,7 @@ public class AdminServiceImpl implements AdminService {
                 // 验证文件大小（限制 5MB）
                 long maxSize = 5 * 1024 * 1024;
                 if (cover.getSize() > maxSize) {
-                    throw new RuntimeException("封面图片大小不能超过5MB");
+                    throw new RuntimeException("Cover image size cannot exceed 5MB");
                 }
 
                 // 验证文件类型
@@ -177,7 +177,7 @@ public class AdminServiceImpl implements AdminService {
                             lowerFilename.endsWith(".png") ||
                             lowerFilename.endsWith(".gif");
                     if (!isValidType) {
-                        throw new RuntimeException("封面图片格式不支持，仅支持 JPG、JPEG、PNG、GIF 格式");
+                        throw new RuntimeException("Unsupported cover image format. Only JPG, JPEG, PNG, GIF are supported");
                     }
                 }
 
@@ -199,12 +199,12 @@ public class AdminServiceImpl implements AdminService {
                 // 保存文件
                 java.io.File targetFile = target.toFile();
                 if (targetFile == null) {
-                    throw new RuntimeException("无法创建目标文件");
+                    throw new RuntimeException("Unable to create target file");
                 }
                 cover.transferTo(targetFile);
                 course.setCoverUrl("/uploads/course/" + filename);
             } catch (Exception e) {
-                throw new RuntimeException("上传封面图片失败: " + e.getMessage(), e);
+                throw new RuntimeException("Failed to upload cover image: " + e.getMessage(), e);
             }
         }
 
@@ -220,7 +220,7 @@ public class AdminServiceImpl implements AdminService {
                                String duration) {
         Course existingCourse = courseMapper.findById(id);
         if (existingCourse == null) {
-            throw new RuntimeException("课程不存在");
+            throw new RuntimeException("Course not found");
         }
 
         // 更新课程信息
@@ -267,7 +267,7 @@ public class AdminServiceImpl implements AdminService {
                 // 验证文件大小和类型（与添加课程相同）
                 long maxSize = 5 * 1024 * 1024;
                 if (cover.getSize() > maxSize) {
-                    throw new RuntimeException("封面图片大小不能超过5MB");
+                    throw new RuntimeException("Cover image size cannot exceed 5MB");
                 }
 
                 String originalFilename = cover.getOriginalFilename();
@@ -278,7 +278,7 @@ public class AdminServiceImpl implements AdminService {
                             lowerFilename.endsWith(".png") ||
                             lowerFilename.endsWith(".gif");
                     if (!isValidType) {
-                        throw new RuntimeException("封面图片格式不支持，仅支持 JPG、JPEG、PNG、GIF 格式");
+                        throw new RuntimeException("Unsupported cover image format. Only JPG, JPEG, PNG, GIF are supported");
                     }
                 }
 
@@ -302,11 +302,11 @@ public class AdminServiceImpl implements AdminService {
                 if (targetFile != null) {
                     cover.transferTo(targetFile);
                 } else {
-                    throw new RuntimeException("无法创建目标文件");
+                    throw new RuntimeException("Unable to create target file");
                 }
                 existingCourse.setCoverUrl("/uploads/course/" + filename);
             } catch (Exception e) {
-                throw new RuntimeException("更新封面图片失败: " + e.getMessage(), e);
+                throw new RuntimeException("Failed to update cover image: " + e.getMessage(), e);
             }
         }
 
@@ -319,7 +319,7 @@ public class AdminServiceImpl implements AdminService {
     public void deleteCourse(Long id, Long adminId) {
         Course course = courseMapper.findById(id);
         if (course == null) {
-            throw new RuntimeException("课程不存在");
+            throw new RuntimeException("Course not found");
         }
         
         // 1. 查询所有选择了这门课程的用户
@@ -331,9 +331,9 @@ public class AdminServiceImpl implements AdminService {
         
         // 2. 如果有用户选择了这门课程，发送系统公告通知他们
         if (!userIds.isEmpty()) {
-            String title = "课程下架通知";
-            String content = String.format("很抱歉，您选择的课程《%s》已被管理员下架。\n\n" +
-                    "如有疑问，请联系平台客服。感谢您的理解与支持！", course.getTitle());
+            String title = "Course Removal Notice";
+            String content = String.format("We're sorry, but the course \"%s\" you enrolled in has been removed by the administrator.\n\n" +
+                    "If you have any questions, please contact platform support. Thank you for your understanding!", course.getTitle());
             
             // 为每个选择了该课程的用户发送通知
             for (Long userId : userIds) {
@@ -354,7 +354,7 @@ public class AdminServiceImpl implements AdminService {
         // 4. 删除课程
         int deleted = courseMapper.deleteById(id);
         if (deleted == 0) {
-            throw new RuntimeException("删除课程失败");
+            throw new RuntimeException("Failed to delete course");
         }
     }
 
@@ -403,7 +403,7 @@ public class AdminServiceImpl implements AdminService {
             List<Course> allCourses = courseMapper.pageQueryAll(0, Integer.MAX_VALUE, null);
             Map<String, Long> categoryDistribution = new HashMap<>();
             for (Course course : allCourses) {
-                String cat = course.getCategory() != null ? course.getCategory() : "未分类";
+                String cat = course.getCategory() != null ? course.getCategory() : "Uncategorized";
                 categoryDistribution.put(cat, categoryDistribution.getOrDefault(cat, 0L) + 1);
             }
             statistics.put("categoryDistribution", categoryDistribution);
@@ -411,7 +411,7 @@ public class AdminServiceImpl implements AdminService {
             // 统计课程难度分布
             Map<String, Long> levelDistribution = new HashMap<>();
             for (Course course : allCourses) {
-                String level = course.getLevel() != null ? course.getLevel() : "未分类";
+                String level = course.getLevel() != null ? course.getLevel() : "Uncategorized";
                 levelDistribution.put(level, levelDistribution.getOrDefault(level, 0L) + 1);
             }
             statistics.put("levelDistribution", levelDistribution);
@@ -474,10 +474,13 @@ public class AdminServiceImpl implements AdminService {
                         }
                     });
             statistics.put("popularCourses", popularCourses);
-            
+
+            // User registration trend (by month)
+            statistics.put("registrationTrend", userMapper.countUsersByMonth());
+
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("获取统计数据失败: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to fetch statistics: " + e.getMessage(), e);
         }
         
         return statistics;

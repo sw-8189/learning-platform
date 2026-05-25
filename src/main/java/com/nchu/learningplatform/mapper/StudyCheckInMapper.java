@@ -12,6 +12,8 @@ public interface StudyCheckInMapper {
 
     int insert(StudyCheckIn checkIn);
 
+    int update(StudyCheckIn checkIn);
+
     StudyCheckIn findByUserIdAndDate(@Param("userId") Long userId, @Param("checkInDate") LocalDate checkInDate);
 
     List<StudyCheckIn> findByUserIdBetweenDates(
